@@ -1,7 +1,5 @@
-// src/Pages/Dashboard/TravelStats.jsx
-
 import React from 'react';
-import Card from '../../components/Card'; // ✅ your custom wrapper component
+import Card from '../../components/Card';
 import { motion } from 'framer-motion';
 
 const fadeUp = {
@@ -19,9 +17,13 @@ const TravelStats = () => {
           initial="hidden"
           animate="visible"
           transition={{
-            duration: 1.6,
-            delay: index * 0.2,
+            duration: 1.4,
+            delay: 0.5,
             ease: 'easeInOut',
+          }}
+          whileHover={{
+            scale: 1.03, // just a tiny "towards you" effect
+            transition: { type: 'spring', stiffness: 100 },
           }}
         >
           <Card className="bg-transparent border border-white/10 rounded-xl p-4">

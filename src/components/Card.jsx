@@ -1,13 +1,13 @@
 import React from 'react'
 
 function Card({
-    classname='',
+    className='',
     children,
     ...props
 
 }) {
   return (
-   <div className={`rounded-xl shadow-md p-4 ${classname}`}{...props}>
+   <div className={`rounded-xl shadow-md p-4 ${className}`}{...props}>
     {children}
    </div>
   )

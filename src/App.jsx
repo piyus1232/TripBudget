@@ -3,44 +3,20 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import React from 'react';
-// import HeroSection from './page/Dashboard/Herosection';
-import TravelStats from './pages/Dashboard/TravelStats';
-import HeroSection from './Pages/Dashboard/Herosection';
+import Dashboard from './Pages/Dashboard/Dashboard';
+// import SideBar from './components/SideBar/SideBar';
+import { Outlet } from 'react-router-dom';
 
 
-
-function App() {
- 
-
+ function App() {
   return (
-    <>
-      {/* <Outlet />
-        <Sidebar /> */}
-       
-      <>
-  {/* <Outlet />
-      <Sidebar /> */}
-  
-  <div className="min-h-screen bg-[#171221] text-white px-4 md:px-10 py-10 space-y-10">
-    
-    {/* Hero Section */}
-    <div className="max-w-6xl mx-auto">
-      <HeroSection />
-    </div>
-
-    {/* Travel Stats */}
-    <div className="max-w-6xl mx-auto">
-      <TravelStats />
-    </div>
-
-  </div>
-</>
-
+     <div className="flex w-full bg-[#0f0b1d]">
      
-
-  
-    </>
-  )
+      <div className=" w-full min-h-screen bg-[#0f0b1d] p-4">
+        <Outlet />
+      </div>
+    </div>
+  );
 }
 
-export default App
+export  {App}
