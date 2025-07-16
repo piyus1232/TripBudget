@@ -4,6 +4,11 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import {App} from './App';
 import Dashboard from './Pages/Dashboard/Dashboard';
+import { Provider } from 'react-redux';
+import store from './store/store.js'
+import Login from './components/Login.jsx';
+import Register from './components/Register.jsx';
+import Account from './pages/Account.jsx';
 
 
 const router = createBrowserRouter([
@@ -12,9 +17,9 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: '/DashBoard', element: <Dashboard /> },
-    //   { path: '/MyTrips', element: <MyTrips /> },
-    //   { path: '/ExploreCities', element: <ExploreCities /> },
-    //   { path: '/PlanTrip', element: <PlanTrip /> },
+      { path: '/login', element: <Login/>},
+      { path: '/register', element: <Register/> },
+      { path: '/Account', element: <Account/> },
     //   { path: '/BudgetEstimator', element: <BudgetEstimator /> },
     //   { path: '/Account', element: <Account /> },
     ],
@@ -23,6 +28,13 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+    <RouterProvider router={router} 
+    
+    
+    
+    />
+  </Provider>
+    
   </React.StrictMode>
 );

@@ -29,12 +29,12 @@ const UpcomingTrip = () => {
         <WordByWordReveal
           text="Summer in Mumbai"
           className="text-lg text-white/80 mt-6"
-          delay={0.6}
+          delay={0.4}
         />
         <WordByWordReveal
           text="4th–10th August"
           className="text-base text-white/50 mb-6"
-          delay={0.8}
+          delay={0.6}
         />
         <div className="mb-6 flex justify-center md:justify-start">
           <Button>View Trip</Button>
@@ -42,19 +42,18 @@ const UpcomingTrip = () => {
       </div>
 
       {/* Right Image Section */}
-      <motion.div
-        whileHover={{ scale: 1.03 }}
-        transition={{ type: 'spring', stiffness: 100 }}
-        className="w-full max-w-sm h-48 md:w-80 md:h-44 rounded-xl overflow-hidden"
-      >
-      <div className="w-full max-w-sm md:max-w-xs h-48 md:h-44 flex-shrink-0 rounded-xl overflow-hidden">
-        <img
-          src={upcomingImg}
-          alt="Upcoming trip"
-          className="w-full h-full object-cover rounded-xl"
-        />
-      </div>
-      </motion.div>
+<motion.div
+
+  
+  whileHover={{ scale: 1.03 }}
+  className="w-full max-w-sm h-48 md:w-80 md:h-44 rounded-xl overflow-hidden"
+>
+  <img
+    src={upcomingImg}
+    alt="Upcoming trip"
+    className="w-full h-full object-cover rounded-xl"
+  />
+</motion.div>
     </motion.div>
   );
 };

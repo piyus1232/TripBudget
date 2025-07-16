@@ -1,9 +1,13 @@
+'use client';
+
 import React, { useState } from 'react';
 import { FaBars, FaTimes, FaHome, FaMapMarkedAlt, FaSearchLocation, FaUsers, FaPlusCircle, FaCalculator, FaUserCircle } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-function SideBar() {
+function SideBar({
+  intial,animate,transition
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const navoptions = [
@@ -27,9 +31,9 @@ function SideBar() {
 
       {/* Sidebar */}
       <motion.aside
-        initial={{ x: -250 }}
-        animate={{ x: isOpen || window.innerWidth >= 640 ? 0 : -250 }}
-        transition={{ duration: 0.6 }}
+      initial={intial}
+animate={animate}
+transition={transition}
         className={`fixed top-0 left-0 h-screen w-[260px] sm:w-[280px] md:w-[320px] lg:w-[380px] bg-[#14101d] text-white shadow-lg z-40 flex flex-col transition-all duration-300 ${
           isOpen ? 'block' : 'hidden sm:flex'
         }`}
