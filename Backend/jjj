@@ -1,0 +1,16 @@
+const avatarLocalPath = req.files?.avatar[0]?.path;
+//   console.log(req.files);
+  
+//   console.log(avatarLocalPath);
+  
+  if (!avatarLocalPath) {
+   throw new ApiError(400,"avatar is required")
+  }
+    const avatar=  await uploadfilecloudnary(avatarLocalPath)
+   //  console.log(avatar);
+
+   
+    
+    if (!avatar) {
+        throw new ApiError(400, "Avatar file is required")
+    }
