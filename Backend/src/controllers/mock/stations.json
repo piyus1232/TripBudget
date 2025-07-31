@@ -1,0 +1,3372 @@
+[
+  {
+    "station_name": "ABU ROAD",
+    "code": "ABR",
+    "city": "Abu Road"
+  },
+  {
+    "station_name": "ADILABAD",
+    "code": "ADB",
+    "city": "Adilabad"
+  },
+  {
+    "station_name": "ADONI",
+    "code": "AD",
+    "city": "Adoni"
+  },
+  {
+    "station_name": "ADRA",
+    "code": "ADRA",
+    "city": "Adra"
+  },
+  {
+    "station_name": "AGARTALA",
+    "code": "AGTL",
+    "city": "Agartala"
+  },
+  {
+    "station_name": "AGRA FORT",
+    "code": "AF",
+    "city": "Agra"
+  },
+  {
+    "station_name": "AGRA CANTT.",
+    "code": "AGC",
+    "city": "Agra"
+  },
+  {
+    "station_name": "AHMADNAGAR",
+    "code": "ANG",
+    "city": "Ahmednagar"
+  },
+  {
+    "station_name": "AHMEDABAD",
+    "code": "ADI",
+    "city": "Ahmedabad"
+  },
+  {
+    "station_name": "AJMER",
+    "code": "AII",
+    "city": "Ajmer"
+  },
+  {
+    "station_name": "AJNI",
+    "code": "AJNI",
+    "city": "Nagpur"
+  },
+  {
+    "station_name": "AKOLA",
+    "code": "AK",
+    "city": "Akola"
+  },
+  {
+    "station_name": "ALIGARH",
+    "code": "ALJN",
+    "city": "Aligarh"
+  },
+  {
+    "station_name": "ALIPURDUAR JN.",
+    "code": "APDJ",
+    "city": "Alipurduar"
+  },
+  {
+    "station_name": "ALLAHABAD",
+    "code": "ALD",
+    "city": "Allahabad"
+  },
+  {
+    "station_name": "ALAPPUZHA",
+    "code": "ALLP",
+    "city": "Alappuzha"
+  },
+  {
+    "station_name": "ALNAWAR JN.",
+    "code": "LWR",
+    "city": "Alnavar"
+  },
+  {
+    "station_name": "ALUVA",
+    "code": "AWY",
+    "city": "Aluva"
+  },
+  {
+    "station_name": "ALWAR",
+    "code": "AWR",
+    "city": "Alwar"
+  },
+  {
+    "station_name": "AMALNER",
+    "code": "AN",
+    "city": "Amalner"
+  },
+  {
+    "station_name": "AMB ANDAVRA",
+    "code": "AADR",
+    "city": "Amb Andaura"
+  },
+  {
+    "station_name": "AMBALA CANTT.",
+    "code": "UMB",
+    "city": "Ambala"
+  },
+  {
+    "station_name": "AMBIKAPUR",
+    "code": "ABKP",
+    "city": "Ambikapur"
+  },
+  {
+    "station_name": "AMLA",
+    "code": "AMLA",
+    "city": "Amla"
+  },
+  {
+    "station_name": "AMRITSAR",
+    "code": "ASR",
+    "city": "Amritsar"
+  },
+  {
+    "station_name": "ANAKAPALLE",
+    "code": "AKP",
+    "city": "Anakapalle"
+  },
+  {
+    "station_name": "ANAND",
+    "code": "ANND",
+    "city": "Anand"
+  },
+  {
+    "station_name": "ANAND NAGAR",
+    "code": "ANDN",
+    "city": "Anand Nagar"
+  },
+  {
+    "station_name": "ANAND VIHAR TERMINUS",
+    "code": "ANVT",
+    "city": "Delhi"
+  },
+  {
+    "station_name": "ANANTAPUR",
+    "code": "ATP",
+    "city": "Anantapur"
+  },
+  {
+    "station_name": "ANGUL",
+    "code": "ANGL",
+    "city": "Angul"
+  },
+  {
+    "station_name": "ANNAVARAM",
+    "code": "ANV",
+    "city": "Annavaram"
+  },
+  {
+    "station_name": "ANUPPUR",
+    "code": "APR",
+    "city": "Anuppur"
+  },
+  {
+    "station_name": "ARA",
+    "code": "ARA",
+    "city": "Ara"
+  },
+  {
+    "station_name": "ARAKKONAM",
+    "code": "AJJ",
+    "city": "Arakkonam"
+  },
+  {
+    "station_name": "ARSIKERE",
+    "code": "ASK",
+    "city": "Arsikere"
+  },
+  {
+    "station_name": "ASANSOL",
+    "code": "ASN",
+    "city": "Asansol"
+  },
+  {
+    "station_name": "AUNRIHAR",
+    "code": "ARJ",
+    "city": "Aunrihar"
+  },
+  {
+    "station_name": "AURANGABAD",
+    "code": "AWB",
+    "city": "Aurangabad"
+  },
+  {
+    "station_name": "AYODHYA",
+    "code": "AY",
+    "city": "Ayodhya"
+  },
+  {
+    "station_name": "AZAMGARH",
+    "code": "AMH",
+    "city": "Azamgarh"
+  },
+  {
+    "station_name": "AZIMGANJ JN.",
+    "code": "AZ",
+    "city": "Azimganj"
+  },
+  {
+    "station_name": "BADARPUR",
+    "code": "BPB",
+    "city": "Badarpur"
+  },
+  {
+    "station_name": "BADNERA JN.",
+    "code": "BD",
+    "city": "Amravati"
+  },
+  {
+    "station_name": "BAGALKOT",
+    "code": "BGK",
+    "city": "Bagalkot"
+  },
+  {
+    "station_name": "BAGHPAT ROAD",
+    "code": "BPM",
+    "city": "Baghpat"
+  },
+  {
+    "station_name": "BAIDYANATHDHAM",
+    "code": "BDME",
+    "city": "Deoghar"
+  },
+  {
+    "station_name": "BAKTHIYARPUR",
+    "code": "BKP",
+    "city": "Bakhtiyarpur"
+  },
+  {
+    "station_name": "BALASORE",
+    "code": "BLS",
+    "city": "Balasore"
+  },
+  {
+    "station_name": "BALAGHAT",
+    "code": "BTC",
+    "city": "Balaghat"
+  },
+  {
+    "station_name": "BALANGIR",
+    "code": "BLGR",
+    "city": "Balangir"
+  },
+  {
+    "station_name": "BALUGAON",
+    "code": "BALU",
+    "city": "Balugaon"
+  },
+  {
+    "station_name": "BALURGHAT",
+    "code": "BLGT",
+    "city": "Balurghat"
+  },
+  {
+    "station_name": "BALHARSHAH",
+    "code": "BPQ",
+    "city": "Balharshah"
+  },
+  {
+    "station_name": "BALLIA",
+    "code": "BUI",
+    "city": "Ballia"
+  },
+  {
+    "station_name": "BANARHAT",
+    "code": "BNQ",
+    "city": "Banarhat"
+  },
+  {
+    "station_name": "BANDA JN.",
+    "code": "BNDA",
+    "city": "Banda"
+  },
+  {
+    "station_name": "BANDEL JN.",
+    "code": "BDC",
+    "city": "Bandel"
+  },
+  {
+    "station_name": "BANDIKUI JN.",
+    "code": "BKI",
+    "city": "Bandikui"
+  },
+  {
+    "station_name": "BANDRA (T)",
+    "code": "BDTS",
+    "city": "Mumbai"
+  },
+  {
+    "station_name": "BANGALORE CITY",
+    "code": "SBC",
+    "city": "Bangalore"
+  },
+  {
+    "station_name": "BANGALORE CANTT.",
+    "code": "BNC",
+    "city": "Bangalore"
+  },
+  {
+    "station_name": "BANGARAPET",
+    "code": "BWT",
+    "city": "Bangarapet"
+  },
+  {
+    "station_name": "BANGRIPOSI",
+    "code": "BGY",
+    "city": "Bangriposi"
+  },
+  {
+    "station_name": "BANKURA",
+    "code": "BQA",
+    "city": "Bankura"
+  },
+  {
+    "station_name": "BANMANKHI",
+    "code": "BNKI",
+    "city": "Banmankhi"
+  },
+  {
+    "station_name": "BAPATLA",
+    "code": "BPP",
+    "city": "Bapatla"
+  },
+  {
+    "station_name": "BARABANKI JN.",
+    "code": "BBK",
+    "city": "Barabanki"
+  },
+  {
+    "station_name": "BARABIL",
+    "code": "BBN",
+    "city": "Barabil"
+  },
+  {
+    "station_name": "BARAN",
+    "code": "BAZ",
+    "city": "Baran"
+  },
+  {
+    "station_name": "BARAUNI JN.",
+    "code": "BJU",
+    "city": "Barauni"
+  },
+  {
+    "station_name": "BARAUT",
+    "code": "BTU",
+    "city": "Baraut"
+  },
+  {
+    "station_name": "BARAPALLI",
+    "code": "BRPL",
+    "city": "Barapalli"
+  },
+  {
+    "station_name": "BARDDHAMAN JN.",
+    "code": "BWN",
+    "city": "Barddhaman"
+  },
+  {
+    "station_name": "BAREILLY",
+    "code": "BE",
+    "city": "Bareilly"
+  },
+  {
+    "station_name": "BARGARH ROAD",
+    "code": "BRGA",
+    "city": "Bargarh"
+  },
+  {
+    "station_name": "BARHNI",
+    "code": "BNY",
+    "city": "Barhni"
+  },
+  {
+    "station_name": "BARKAKANA",
+    "code": "BRKA",
+    "city": "Barkakana"
+  },
+  {
+    "station_name": "BARMER",
+    "code": "BME",
+    "city": "Barmer"
+  },
+  {
+    "station_name": "BAROG",
+    "code": "BOF",
+    "city": "Barog"
+  },
+  {
+    "station_name": "BARSOI",
+    "code": "BOE",
+    "city": "Barsoi"
+  },
+  {
+    "station_name": "BARWADIH",
+    "code": "BRWD",
+    "city": "Barwadih"
+  },
+  {
+    "station_name": "BASAR",
+    "code": "BSX",
+    "city": "Basar"
+  },
+  {
+    "station_name": "BASTI",
+    "code": "BST",
+    "city": "Basti"
+  },
+  {
+    "station_name": "BATHINDA JN.",
+    "code": "BTI",
+    "city": "Bathinda"
+  },
+  {
+    "station_name": "BAYANA",
+    "code": "BXN",
+    "city": "Bayana"
+  },
+  {
+    "station_name": "BEAS",
+    "code": "BEAS",
+    "city": "Beas"
+  },
+  {
+    "station_name": "BEAWAR",
+    "code": "BER",
+    "city": "Beawar"
+  },
+  {
+    "station_name": "BELAPUR",
+    "code": "BAP",
+    "city": "Belapur"
+  },
+  {
+    "station_name": "BELGAUM",
+    "code": "BGM",
+    "city": "Belgaum"
+  },
+  {
+    "station_name": "BELLARY JN.",
+    "code": "BAY",
+    "city": "Bellary"
+  },
+  {
+    "station_name": "BELLARY",
+    "code": "BYY",
+    "city": "Bellary"
+  },
+  {
+    "station_name": "BETTIAH",
+    "code": "BTH",
+    "city": "Bettiah"
+  },
+  {
+    "station_name": "BETUL",
+    "code": "BZU",
+    "city": "Betul"
+  },
+  {
+    "station_name": "BHADOHI",
+    "code": "BOY",
+    "city": "Bhadohi"
+  },
+  {
+    "station_name": "BHADRAK",
+    "code": "BHC",
+    "city": "Bhadrak"
+  },
+  {
+    "station_name": "BHAGALPUR",
+    "code": "BGP",
+    "city": "Bhagalpur"
+  },
+  {
+    "station_name": "BHAGAT KI KOTHI",
+    "code": "BGKT",
+    "city": "Jodhpur"
+  },
+  {
+    "station_name": "BHARATPUR",
+    "code": "BTE",
+    "city": "Bharatpur"
+  },
+  {
+    "station_name": "BHARUCH",
+    "code": "BH",
+    "city": "Bharuch"
+  },
+  {
+    "station_name": "BHATAPARA",
+    "code": "BYT",
+    "city": "Bhatapara"
+  },
+  {
+    "station_name": "BHATKAL",
+    "code": "BTJL",
+    "city": "Bhatkal"
+  },
+  {
+    "station_name": "BHATNI",
+    "code": "BTT",
+    "city": "Bhatni"
+  },
+  {
+    "station_name": "BHAVNAGAR (T)",
+    "code": "BVC",
+    "city": "Bhavnagar"
+  },
+  {
+    "station_name": "BHAWANIPATNA",
+    "code": "BWPI",
+    "city": "Bhawanipatna"
+  },
+  {
+    "station_name": "BHILWARA",
+    "code": "BHL",
+    "city": "Bhilwara"
+  },
+  {
+    "station_name": "BHIMAVARAM JN.",
+    "code": "BVRM",
+    "city": "Bhimavaram"
+  },
+  {
+    "station_name": "BHIMAVARAM TOWN",
+    "code": "BVRT",
+    "city": "Bhimavaram"
+  },
+  {
+    "station_name": "BHIND",
+    "code": "BIX",
+    "city": "Bhind"
+  },
+  {
+    "station_name": "BHIWANI",
+    "code": "BNW",
+    "city": "Bhiwani"
+  },
+  {
+    "station_name": "BHOPAL",
+    "code": "BPL",
+    "city": "Bhopal"
+  },
+  {
+    "station_name": "BHUBANESWAR",
+    "code": "BBS",
+    "city": "Bhubaneswar"
+  },
+  {
+    "station_name": "BHUJ",
+    "code": "BHUJ",
+    "city": "Bhuj"
+  },
+  {
+    "station_name": "BHUSAVAL",
+    "code": "BSL",
+    "city": "Bhusaval"
+  },
+  {
+    "station_name": "BIJAPUR",
+    "code": "BJP",
+    "city": "Bijapur"
+  },
+  {
+    "station_name": "BIJNOR",
+    "code": "BJO",
+    "city": "Bijnor"
+  },
+  {
+    "station_name": "BIKANER",
+    "code": "BKN",
+    "city": "Bikaner"
+  },
+  {
+    "station_name": "BILASPUR JN.",
+    "code": "BSP",
+    "city": "Bilaspur"
+  },
+  {
+    "station_name": "BINA",
+    "code": "BINA",
+    "city": "Bina"
+  },
+  {
+    "station_name": "BINNAGURI",
+    "code": "BNV",
+    "city": "Binnaguri"
+  },
+  {
+    "station_name": "BIRUR",
+    "code": "RRB",
+    "city": "Birur"
+  },
+  {
+    "station_name": "BITRAGUNTA",
+    "code": "BTTR",
+    "city": "Bitragunta"
+  },
+  {
+    "station_name": "BIYAVARA RAJGARH",
+    "code": "BRRG",
+    "city": "Biyavara Rajgarh"
+  },
+  {
+    "station_name": "BOBBILI",
+    "code": "VBL",
+    "city": "Bobbili"
+  },
+  {
+    "station_name": "BOINDA",
+    "code": "BONA",
+    "city": "Boinda"
+  },
+  {
+    "station_name": "BOKARO STEEL CITY",
+    "code": "BKSC",
+    "city": "Bokaro"
+  },
+  {
+    "station_name": "BOLPUR SHANTINIKETAN",
+    "code": "BHP",
+    "city": "Bolpur"
+  },
+  {
+    "station_name": "BORIVALI",
+    "code": "BVI",
+    "city": "Mumbai"
+  },
+  {
+    "station_name": "BOTAD",
+    "code": "BTD",
+    "city": "Botad"
+  },
+  {
+    "station_name": "BUDAUN",
+    "code": "BEM",
+    "city": "Budaun"
+  },
+  {
+    "station_name": "BUNDI",
+    "code": "BUDI",
+    "city": "Bundi"
+  },
+  {
+    "station_name": "BURHANPUR",
+    "code": "BAU",
+    "city": "Burhanpur"
+  },
+  {
+    "station_name": "BURHWAL",
+    "code": "BUW",
+    "city": "Burhwal"
+  },
+  {
+    "station_name": "BUXAR",
+    "code": "BXR",
+    "city": "Buxar"
+  },
+  {
+    "station_name": "CANACONA",
+    "code": "CNO",
+    "city": "Canacona"
+  },
+  {
+    "station_name": "CHAKIA",
+    "code": "CAA",
+    "city": "Chakia"
+  },
+  {
+    "station_name": "CHAKKI BANK",
+    "code": "CHKB",
+    "city": "Pathankot"
+  },
+  {
+    "station_name": "CHAKRADHARPUR",
+    "code": "CKP",
+    "city": "Chakradharpur"
+  },
+  {
+    "station_name": "CHALISGAON",
+    "code": "CSN",
+    "city": "Chalisgaon"
+  },
+  {
+    "station_name": "CHAMPA",
+    "code": "CPH",
+    "city": "Champa"
+  },
+  {
+    "station_name": "CHANDAUSI",
+    "code": "CH",
+    "city": "Chandausi"
+  },
+  {
+    "station_name": "CHANDERIYA",
+    "code": "CNA",
+    "city": "Chanderiya"
+  },
+  {
+    "station_name": "CHANDIGARH",
+    "code": "CDG",
+    "city": "Chandigarh"
+  },
+  {
+    "station_name": "CHANDIL",
+    "code": "CNI",
+    "city": "Chandil"
+  },
+  {
+    "station_name": "CHANDRAPUR",
+    "code": "CD",
+    "city": "Chandrapur"
+  },
+  {
+    "station_name": "CHANDRAPURA",
+    "code": "CRP",
+    "city": "Chandrapura"
+  },
+  {
+    "station_name": "CHAPARMUKH",
+    "code": "CPK",
+    "city": "Chaparmukh"
+  },
+  {
+    "station_name": "CHATRAPUR",
+    "code": "CAP",
+    "city": "Chatrapur"
+  },
+  {
+    "station_name": "CHENGALPATTU JN.",
+    "code": "CGL",
+    "city": "Chengalpattu"
+  },
+  {
+    "station_name": "CHENGANNUR",
+    "code": "CNGR",
+    "city": "Chengannur"
+  },
+  {
+    "station_name": "CHENNAI CENTRAL",
+    "code": "MAS",
+    "city": "Chennai"
+  },
+  {
+    "station_name": "CHENNAI EGMORE",
+    "code": "MS",
+    "city": "Chennai"
+  },
+  {
+    "station_name": "CHHAPRA",
+    "code": "CPR",
+    "city": "Chhapra"
+  },
+  {
+    "station_name": "CHHINDWARA",
+    "code": "CWA",
+    "city": "Chhindwara"
+  },
+  {
+    "station_name": "CHIDAMBARAM",
+    "code": "CDM",
+    "city": "Chidambaram"
+  },
+  {
+    "station_name": "CHIKJAJUR",
+    "code": "JRU",
+    "city": "Chikjajur"
+  },
+  {
+    "station_name": "CHIPLUN",
+    "code": "CHI",
+    "city": "Chiplun"
+  },
+  {
+    "station_name": "CHIRALA",
+    "code": "CLX",
+    "city": "Chirala"
+  },
+  {
+    "station_name": "CHITRAKOOTDHAM KARVI",
+    "code": "CKTD",
+    "city": "Chitrakoot"
+  },
+  {
+    "station_name": "CHITTARANJAN",
+    "code": "CRJ",
+    "city": "Chittaranjan"
+  },
+  {
+    "station_name": "CHITTAURGARH",
+    "code": "COR",
+    "city": "Chittorgarh"
+  },
+  {
+    "station_name": "CHITTOOR",
+    "code": "CTO",
+    "city": "Chittoor"
+  },
+  {
+    "station_name": "CHOPAN",
+    "code": "CPU",
+    "city": "Chopan"
+  },
+  {
+    "station_name": "CHUNAR",
+    "code": "CAR",
+    "city": "Chunar"
+  },
+  {
+    "station_name": "CHURU",
+    "code": "CUR",
+    "city": "Churu"
+  },
+  {
+    "station_name": "COIMBATORE JN.",
+    "code": "CBE",
+    "city": "Coimbatore"
+  },
+  {
+    "station_name": "COONOOR",
+    "code": "ONR",
+    "city": "Coonoor"
+  },
+  {
+    "station_name": "CUDDALORE PORT",
+    "code": "CUPJ",
+    "city": "Cuddalore"
+  },
+  {
+    "station_name": "CUDDAPAH",
+    "code": "HX",
+    "city": "Cuddapah"
+  },
+  {
+    "station_name": "CUTTACK",
+    "code": "CTC",
+    "city": "Cuttack"
+  },
+  {
+    "station_name": "DADAR",
+    "code": "DR",
+    "city": "Mumbai"
+  },
+  {
+    "station_name": "DAHANU ROAD",
+    "code": "DRD",
+    "city": "Dahanu"
+  },
+  {
+    "station_name": "DAHOD",
+    "code": "DHD",
+    "city": "Dahod"
+  },
+  {
+    "station_name": "DALGAON",
+    "code": "DLO",
+    "city": "Dalgaon"
+  },
+  {
+    "station_name": "DALTONGANJ",
+    "code": "DTO",
+    "city": "Daltonganj"
+  },
+  {
+    "station_name": "DALLIRAJHARA",
+    "code": "DRZ",
+    "city": "Dalli Rajhara"
+  },
+  {
+    "station_name": "DAMOH",
+    "code": "DMO",
+    "city": "Damoh"
+  },
+  {
+    "station_name": "DANAPUR",
+    "code": "DNR",
+    "city": "Danapur"
+  },
+  {
+    "station_name": "DARBHANGA",
+    "code": "DBG",
+    "city": "Darbhanga"
+  },
+  {
+    "station_name": "DAUND",
+    "code": "DD",
+    "city": "Daund"
+  },
+  {
+    "station_name": "DAVANGERE",
+    "code": "DVG",
+    "city": "Davangere"
+  },
+  {
+    "station_name": "DEHRADUN",
+    "code": "DDN",
+    "city": "Dehradun"
+  },
+  {
+    "station_name": "DEHRI-ON-SONE",
+    "code": "DOS",
+    "city": "Dehri"
+  },
+  {
+    "station_name": "DELHI",
+    "code": "DLI",
+    "city": "Delhi"
+  },
+  {
+    "station_name": "NEW DELHI",
+    "code": "NDLS",
+    "city": "Delhi"
+  },
+  {
+    "station_name": "DELHI CANTT.",
+    "code": "DEC",
+    "city": "Delhi"
+  },
+  {
+    "station_name": "DELHI SARAI ROHILLA",
+    "code": "DEE",
+    "city": "Delhi"
+  },
+  {
+    "station_name": "DELHI SHAHDARA",
+    "code": "DSA",
+    "city": "Delhi"
+  },
+  {
+    "station_name": "DEORIASADAR",
+    "code": "DEOS",
+    "city": "Deoria"
+  },
+  {
+    "station_name": "DEVLALI",
+    "code": "DVL",
+    "city": "Devlali"
+  },
+  {
+    "station_name": "DHAMANGAON",
+    "code": "DMN",
+    "city": "Dhamangaon"
+  },
+  {
+    "station_name": "DHANBAD",
+    "code": "DHN",
+    "city": "Dhanbad"
+  },
+  {
+    "station_name": "DHARMABAD",
+    "code": "DAB",
+    "city": "Dharmabad"
+  },
+  {
+    "station_name": "DHARMANAGAR",
+    "code": "DMR",
+    "city": "Dharmanagar"
+  },
+  {
+    "station_name": "DHARMAPURI",
+    "code": "DPJ",
+    "city": "Dharmapuri"
+  },
+  {
+    "station_name": "DHARMAVARAM",
+    "code": "DMM",
+    "city": "Dharmavaram"
+  },
+  {
+    "station_name": "DHARWAD",
+    "code": "DWR",
+    "city": "Dharwad"
+  },
+  {
+    "station_name": "DHASA",
+    "code": "DAS",
+    "city": "Dhasa"
+  },
+  {
+    "station_name": "DHAULPUR",
+    "code": "DHO",
+    "city": "Dhaulpur"
+  },
+  {
+    "station_name": "DHENKANAL",
+    "code": "DNKL",
+    "city": "Dhenkanal"
+  },
+  {
+    "station_name": "DHOLA",
+    "code": "DLJ",
+    "city": "Dhola"
+  },
+  {
+    "station_name": "DHONE",
+    "code": "DHNE",
+    "city": "Dhone"
+  },
+  {
+    "station_name": "DHRANGADHRA",
+    "code": "DHG",
+    "city": "Dhrangadhra"
+  },
+  {
+    "station_name": "DHUBRI",
+    "code": "DBB",
+    "city": "Dhubri"
+  },
+  {
+    "station_name": "DHURI",
+    "code": "DUI",
+    "city": "Dhuri"
+  },
+  {
+    "station_name": "DIBRUGARH",
+    "code": "DBRG",
+    "city": "Dibrugarh"
+  },
+  {
+    "station_name": "DIBRUGARH TOWN",
+    "code": "DBRT",
+    "city": "Dibrugarh"
+  },
+  {
+    "station_name": "DIGHA",
+    "code": "DGHA",
+    "city": "Digha"
+  },
+  {
+    "station_name": "DILDARNAGAR",
+    "code": "DLN",
+    "city": "Dildarnagar"
+  },
+  {
+    "station_name": "DIMAPUR",
+    "code": "DMV",
+    "city": "Dimapur"
+  },
+  {
+    "station_name": "DINDIGUL JN.",
+    "code": "DG",
+    "city": "Dindigul"
+  },
+  {
+    "station_name": "DONGARGARH",
+    "code": "DGG",
+    "city": "Dongargarh"
+  },
+  {
+    "station_name": "DORNAKAL",
+    "code": "DKJ",
+    "city": "Dornakal"
+  },
+  {
+    "station_name": "DUNGARPUR",
+    "code": "DNRP",
+    "city": "Dungarpur"
+  },
+  {
+    "station_name": "DURG",
+    "code": "DURG",
+    "city": "Durg"
+  },
+  {
+    "station_name": "DURGAPUR",
+    "code": "DGR",
+    "city": "Durgapur"
+  },
+  {
+    "station_name": "DUVVADA",
+    "code": "DVD",
+    "city": "Visakhapatnam"
+  },
+  {
+    "station_name": "DWARKA",
+    "code": "DWK",
+    "city": "Dwarka"
+  },
+  {
+    "station_name": "ELURU",
+    "code": "EE",
+    "city": "Eluru"
+  },
+  {
+    "station_name": "ERNAKULAM JN.",
+    "code": "ERS",
+    "city": "Ernakulam"
+  },
+  {
+    "station_name": "ERNAKULAM TOWN",
+    "code": "ERN",
+    "city": "Ernakulam"
+  },
+  {
+    "station_name": "ERODE",
+    "code": "ED",
+    "city": "Erode"
+  },
+  {
+    "station_name": "ETAWAH",
+    "code": "ETW",
+    "city": "Etawah"
+  },
+  {
+    "station_name": "FAIZABAD",
+    "code": "FD",
+    "city": "Faizabad"
+  },
+  {
+    "station_name": "FARIDABAD",
+    "code": "FDB",
+    "city": "Faridabad"
+  },
+  {
+    "station_name": "FARRUKHABAD",
+    "code": "FBD",
+    "city": "Farrukhabad"
+  },
+  {
+    "station_name": "FATEHABAD CHAND",
+    "code": "FTD",
+    "city": "Fatehabad"
+  },
+  {
+    "station_name": "FATEHPUR",
+    "code": "FTP",
+    "city": "Fatehpur"
+  },
+  {
+    "station_name": "FATUHA",
+    "code": "FUT",
+    "city": "Fatuha"
+  },
+  {
+    "station_name": "FAZILKA",
+    "code": "FKA",
+    "city": "Fazilka"
+  },
+  {
+    "station_name": "FIROZABAD",
+    "code": "FZD",
+    "city": "Firozabad"
+  },
+  {
+    "station_name": "FIROZPUR CITY",
+    "code": "FZP",
+    "city": "Firozpur"
+  },
+  {
+    "station_name": "FIROZPUR CANTT.",
+    "code": "FZR",
+    "city": "Firozpur"
+  },
+  {
+    "station_name": "FORBESGANJ",
+    "code": "FBG",
+    "city": "Forbesganj"
+  },
+  {
+    "station_name": "FURKATING",
+    "code": "FKG",
+    "city": "Furkating"
+  },
+  {
+    "station_name": "GADAG",
+    "code": "GDG",
+    "city": "Gadag"
+  },
+  {
+    "station_name": "GAJRAULA",
+    "code": "GJL",
+    "city": "Gajraula"
+  },
+  {
+    "station_name": "GANDHIDHAM",
+    "code": "GIM",
+    "city": "Gandhidham"
+  },
+  {
+    "station_name": "GANDHINAGAR",
+    "code": "GADJ",
+    "city": "Gandhinagar"
+  },
+  {
+    "station_name": "GANGAPUR CITY",
+    "code": "GGC",
+    "city": "Gangapur"
+  },
+  {
+    "station_name": "GARWA ROAD",
+    "code": "GHD",
+    "city": "Garwa"
+  },
+  {
+    "station_name": "GAYA",
+    "code": "GAYA",
+    "city": "Gaya"
+  },
+  {
+    "station_name": "GEVRA ROAD",
+    "code": "GAD",
+    "city": "Gevra"
+  },
+  {
+    "station_name": "GHATSILA",
+    "code": "GTS",
+    "city": "Ghatsila"
+  },
+  {
+    "station_name": "GHAZIABAD",
+    "code": "GZB",
+    "city": "Ghaziabad"
+  },
+  {
+    "station_name": "GOALPARA TOWN",
+    "code": "GLPT",
+    "city": "Goalpara"
+  },
+  {
+    "station_name": "GODHRA",
+    "code": "GDA",
+    "city": "Godhra"
+  },
+  {
+    "station_name": "GOLA GOKARANNATH",
+    "code": "GK",
+    "city": "Gola Gokarannath"
+  },
+  {
+    "station_name": "GONDA",
+    "code": "GD",
+    "city": "Gonda"
+  },
+  {
+    "station_name": "GONDIA",
+    "code": "G",
+    "city": "Gondia"
+  },
+  {
+    "station_name": "GOOTY",
+    "code": "GY",
+    "city": "Gooty"
+  },
+  {
+    "station_name": "GORAKHPUR",
+    "code": "GKP",
+    "city": "Gorakhpur"
+  },
+  {
+    "station_name": "GOSSAINGAON HAT",
+    "code": "GOGH",
+    "city": "Gossaingaon"
+  },
+  {
+    "station_name": "GUDIVADA",
+    "code": "GDV",
+    "city": "Gudivada"
+  },
+  {
+    "station_name": "GUDUR",
+    "code": "GDR",
+    "city": "Gudur"
+  },
+  {
+    "station_name": "GULBARGA",
+    "code": "GR",
+    "city": "Gulbarga"
+  },
+  {
+    "station_name": "GUNA",
+    "code": "GUNA",
+    "city": "Guna"
+  },
+  {
+    "station_name": "GUNTAKAL",
+    "code": "GTL",
+    "city": "Guntakal"
+  },
+  {
+    "station_name": "GUNTUR",
+    "code": "GNT",
+    "city": "Guntur"
+  },
+  {
+    "station_name": "GURGAON",
+    "code": "GGN",
+    "city": "Gurgaon"
+  },
+  {
+    "station_name": "GURUVAYUR",
+    "code": "GUV",
+    "city": "Guruvayur"
+  },
+  {
+    "station_name": "GUWAHATI",
+    "code": "GHY",
+    "city": "Guwahati"
+  },
+  {
+    "station_name": "GWALIOR",
+    "code": "GWL",
+    "city": "Gwalior"
+  },
+  {
+    "station_name": "GYANPUR ROAD",
+    "code": "GYN",
+    "city": "Gyanpur"
+  },
+  {
+    "station_name": "HABIBGANJ",
+    "code": "HBJ",
+    "city": "Bhopal"
+  },
+  {
+    "station_name": "HAJIPUR",
+    "code": "HJP",
+    "city": "Hajipur"
+  },
+  {
+    "station_name": "HALDIA",
+    "code": "HLZ",
+    "city": "Haldia"
+  },
+  {
+    "station_name": "HALDIBARI",
+    "code": "HDB",
+    "city": "Haldibari"
+  },
+  {
+    "station_name": "HAMILTONGANJ",
+    "code": "HOJ",
+    "city": "Hamiltonganj"
+  },
+  {
+    "station_name": "HANUMANGARH",
+    "code": "HMH",
+    "city": "Hanumangarh"
+  },
+  {
+    "station_name": "HAPA",
+    "code": "HAPA",
+    "city": "Hapa"
+  },
+  {
+    "station_name": "HAPUR",
+    "code": "HPU",
+    "city": "Hapur"
+  },
+  {
+    "station_name": "HARDA",
+    "code": "HD",
+    "city": "Harda"
+  },
+  {
+    "station_name": "HARIDWAR",
+    "code": "HW",
+    "city": "Haridwar"
+  },
+  {
+    "station_name": "HARIHAR",
+    "code": "HRR",
+    "city": "Harihar"
+  },
+  {
+    "station_name": "HARPALPUR",
+    "code": "HPP",
+    "city": "Harpalpur"
+  },
+  {
+    "station_name": "HASIMARA",
+    "code": "HSA",
+    "city": "Hasimara"
+  },
+  {
+    "station_name": "HATIA",
+    "code": "HTE",
+    "city": "Ranchi"
+  },
+  {
+    "station_name": "HAZUR SAHIB NANDED",
+    "code": "NED",
+    "city": "Nanded"
+  },
+  {
+    "station_name": "HILSA",
+    "code": "HIL",
+    "city": "Hilsa"
+  },
+  {
+    "station_name": "HIMMAT NAGAR",
+    "code": "HMT",
+    "city": "Himmatnagar"
+  },
+  {
+    "station_name": "HINDUPUR",
+    "code": "HUP",
+    "city": "Hindupur"
+  },
+  {
+    "station_name": "HINGOLI",
+    "code": "HNL",
+    "city": "Hingoli"
+  },
+  {
+    "station_name": "HISAR",
+    "code": "HSR",
+    "city": "Hisar"
+  },
+  {
+    "station_name": "HOSHANGABAD",
+    "code": "HBD",
+    "city": "Hoshangabad"
+  },
+  {
+    "station_name": "HOSPET",
+    "code": "HPT",
+    "city": "Hospet"
+  },
+  {
+    "station_name": "HOSUR",
+    "code": "HSRA",
+    "city": "Hosur"
+  },
+  {
+    "station_name": "HOWBADH",
+    "code": "HBG",
+    "city": "Howbadh"
+  },
+  {
+    "station_name": "HOWRAH",
+    "code": "HWH",
+    "city": "Howrah"
+  },
+  {
+    "station_name": "HUBLI",
+    "code": "UBL",
+    "city": "Hubli"
+  },
+  {
+    "station_name": "HYDERABAD",
+    "code": "HYB",
+    "city": "Hyderabad"
+  },
+  {
+    "station_name": "IGATPURI",
+    "code": "IGP",
+    "city": "Igatpuri"
+  },
+  {
+    "station_name": "INDARA",
+    "code": "IAA",
+    "city": "Indara"
+  },
+  {
+    "station_name": "INDORE",
+    "code": "INDB",
+    "city": "Indore"
+  },
+  {
+    "station_name": "ISLAMPUR",
+    "code": "IPR",
+    "city": "Islampur"
+  },
+  {
+    "station_name": "ITARSI",
+    "code": "ET",
+    "city": "Itarsi"
+  },
+  {
+    "station_name": "JABALPUR",
+    "code": "JBP",
+    "city": "Jabalpur"
+  },
+  {
+    "station_name": "JAGDALPUR",
+    "code": "JDB",
+    "city": "Jagdalpur"
+  },
+  {
+    "station_name": "JAIPUR",
+    "code": "JP",
+    "city": "Jaipur"
+  },
+  {
+    "station_name": "JAISALMER",
+    "code": "JSM",
+    "city": "Jaisalmer"
+  },
+  {
+    "station_name": "JAJPUR KEONJHAR ROAD",
+    "code": "JJKR",
+    "city": "Jajpur"
+  },
+  {
+    "station_name": "JAKHAL",
+    "code": "JHL",
+    "city": "Jakhal"
+  },
+  {
+    "station_name": "JALAMB",
+    "code": "JM",
+    "city": "Jalamb"
+  },
+  {
+    "station_name": "JALANDHAR CANTT.",
+    "code": "JRC",
+    "city": "Jalandhar"
+  },
+  {
+    "station_name": "JALANDHAR CITY",
+    "code": "JUC",
+    "city": "Jalandhar"
+  },
+  {
+    "station_name": "JALGAON",
+    "code": "JL",
+    "city": "Jalgaon"
+  },
+  {
+    "station_name": "JALNA",
+    "code": "J",
+    "city": "Jalna"
+  },
+  {
+    "station_name": "JALPAIGURI",
+    "code": "JPG",
+    "city": "Jalpaiguri"
+  },
+  {
+    "station_name": "JAMALPUR",
+    "code": "JMP",
+    "city": "Jamalpur"
+  },
+  {
+    "station_name": "JAMMU",
+    "code": "JAT",
+    "city": "Jammu"
+  },
+  {
+    "station_name": "JAMNAGAR",
+    "code": "JAM",
+    "city": "Jamnagar"
+  },
+  {
+    "station_name": "JANGHAI",
+    "code": "JNH",
+    "city": "Janghai"
+  },
+  {
+    "station_name": "JASIDIH",
+    "code": "JSME",
+    "city": "Jasidih"
+  },
+  {
+    "station_name": "JAUNPUR JN.",
+    "code": "JNU",
+    "city": "Jaunpur"
+  },
+  {
+    "station_name": "JAYNAGAR",
+    "code": "JYG",
+    "city": "Jaynagar"
+  },
+  {
+    "station_name": "JETALSAR",
+    "code": "JLR",
+    "city": "Jetalsar"
+  },
+  {
+    "station_name": "JHAJHA",
+    "code": "JAJ",
+    "city": "Jhajha"
+  },
+  {
+    "station_name": "JHANSI",
+    "code": "JHS",
+    "city": "Jhansi"
+  },
+  {
+    "station_name": "JHARGRAM",
+    "code": "JGM",
+    "city": "Jhargram"
+  },
+  {
+    "station_name": "JHARSUGUDA",
+    "code": "JSG",
+    "city": "Jharsuguda"
+  },
+  {
+    "station_name": "JIND",
+    "code": "JIND",
+    "city": "Jind"
+  },
+  {
+    "station_name": "JODHPUR",
+    "code": "JU",
+    "city": "Jodhpur"
+  },
+  {
+    "station_name": "JOGBANI",
+    "code": "JBN",
+    "city": "Jogbani"
+  },
+  {
+    "station_name": "JOLARPETTAI",
+    "code": "JTJ",
+    "city": "Jolarpettai"
+  },
+  {
+    "station_name": "JORHAT",
+    "code": "JT",
+    "city": "Jorhat"
+  },
+  {
+    "station_name": "JUNAGARH JN.",
+    "code": "JND",
+    "city": "Junagarh"
+  },
+  {
+    "station_name": "KACHEGUDA",
+    "code": "KCG",
+    "city": "Hyderabad"
+  },
+  {
+    "station_name": "KAKINADA PORT",
+    "code": "COA",
+    "city": "Kakinada"
+  },
+  {
+    "station_name": "KALCHINI",
+    "code": "KCF",
+    "city": "Kalchini"
+  },
+  {
+    "station_name": "KALKA",
+    "code": "KLK",
+    "city": "Kalka"
+  },
+  {
+    "station_name": "KALOL",
+    "code": "KLL",
+    "city": "Kalol"
+  },
+  {
+    "station_name": "KALYAN",
+    "code": "KYN",
+    "city": "Kalyan"
+  },
+  {
+    "station_name": "KAMAKHYA",
+    "code": "KYQ",
+    "city": "Guwahati"
+  },
+  {
+    "station_name": "KANCHIPURAM",
+    "code": "CJ",
+    "city": "Kanchipuram"
+  },
+  {
+    "station_name": "KANDHLA",
+    "code": "KQL",
+    "city": "Kandhla"
+  },
+  {
+    "station_name": "KANNIYAKUMARI",
+    "code": "CAPE",
+    "city": "Kanniyakumari"
+  },
+  {
+    "station_name": "KANNUR",
+    "code": "CAN",
+    "city": "Kannur"
+  },
+  {
+    "station_name": "KANPUR CENTRAL",
+    "code": "CNB",
+    "city": "Kanpur"
+  },
+  {
+    "station_name": "KANPUR ANWARGANJ",
+    "code": "CPA",
+    "city": "Kanpur"
+  },
+  {
+    "station_name": "KAPTANGANJ",
+    "code": "CPJ",
+    "city": "Kaptanganj"
+  },
+  {
+    "station_name": "KARAIKAL",
+    "code": "KIK",
+    "city": "Karaikal"
+  },
+  {
+    "station_name": "KARAIKKUDI JN.",
+    "code": "KKDI",
+    "city": "Karaikkudi"
+  },
+  {
+    "station_name": "KARIMGANJ",
+    "code": "KXJ",
+    "city": "Karimganj"
+  },
+  {
+    "station_name": "KARNAL",
+    "code": "KUN",
+    "city": "Karnal"
+  },
+  {
+    "station_name": "KARUR",
+    "code": "KRR",
+    "city": "Karur"
+  },
+  {
+    "station_name": "KARWAR",
+    "code": "KAWR",
+    "city": "Karwar"
+  },
+  {
+    "station_name": "KASARAGOD",
+    "code": "KGQ",
+    "city": "Kasaragod"
+  },
+  {
+    "station_name": "KASGANJ",
+    "code": "KSJ",
+    "city": "Kasganj"
+  },
+  {
+    "station_name": "KATHGODAM",
+    "code": "KGM",
+    "city": "Kathgodam"
+  },
+  {
+    "station_name": "KATIHAR",
+    "code": "KIR",
+    "city": "Katihar"
+  },
+  {
+    "station_name": "KATNI",
+    "code": "KTE",
+    "city": "Katni"
+  },
+  {
+    "station_name": "KATNI MURWARA",
+    "code": "KMZ",
+    "city": "Katni"
+  },
+  {
+    "station_name": "KATPADI",
+    "code": "KPD",
+    "city": "Katpadi"
+  },
+  {
+    "station_name": "KATWA",
+    "code": "KWAE",
+    "city": "Katwa"
+  },
+  {
+    "station_name": "KAZIPET",
+    "code": "KZJ",
+    "city": "Kazipet"
+  },
+  {
+    "station_name": "KESINGA",
+    "code": "KSNG",
+    "city": "Kesinga"
+  },
+  {
+    "station_name": "KENDUJHARGARH",
+    "code": "KDJR",
+    "city": "Kendujhargarh"
+  },
+  {
+    "station_name": "KHAGARIA",
+    "code": "KGG",
+    "city": "Khagaria"
+  },
+  {
+    "station_name": "KHALILABAD",
+    "code": "KLD",
+    "city": "Khalilabad"
+  },
+  {
+    "station_name": "KHAMMAM",
+    "code": "KMT",
+    "city": "Khammam"
+  },
+  {
+    "station_name": "KHANDWA",
+    "code": "KNW",
+    "city": "Khandwa"
+  },
+  {
+    "station_name": "KHARAGPUR",
+    "code": "KGP",
+    "city": "Kharagpur"
+  },
+  {
+    "station_name": "KHEKRA",
+    "code": "KEX",
+    "city": "Khekra"
+  },
+  {
+    "station_name": "KHURDA ROAD",
+    "code": "KUR",
+    "city": "Khurda"
+  },
+  {
+    "station_name": "KHURJA",
+    "code": "KRJ",
+    "city": "Khurja"
+  },
+  {
+    "station_name": "KISHANGANJ",
+    "code": "KNE",
+    "city": "Kishanganj"
+  },
+  {
+    "station_name": "KISHANGARH",
+    "code": "KSG",
+    "city": "Kishangarh"
+  },
+  {
+    "station_name": "KIUL",
+    "code": "KIUL",
+    "city": "Kiul"
+  },
+  {
+    "station_name": "KOCHUVELI",
+    "code": "KCVL",
+    "city": "Thiruvananthapuram"
+  },
+  {
+    "station_name": "KODAIKANAL ROAD",
+    "code": "KQN",
+    "city": "Kodaikanal"
+  },
+  {
+    "station_name": "KOLKATA",
+    "code": "KOAA",
+    "city": "Kolkata"
+  },
+  {
+    "station_name": "KOLLAM",
+    "code": "QLN",
+    "city": "Kollam"
+  },
+  {
+    "station_name": "KOPERGAON",
+    "code": "KPG",
+    "city": "Kopargaon"
+  },
+  {
+    "station_name": "KORAPUT",
+    "code": "KRPU",
+    "city": "Koraput"
+  },
+  {
+    "station_name": "KORBA",
+    "code": "KRBA",
+    "city": "Korba"
+  },
+  {
+    "station_name": "KOTA",
+    "code": "KOTA",
+    "city": "Kota"
+  },
+  {
+    "station_name": "KOTDWARA",
+    "code": "KTW",
+    "city": "Kotdwara"
+  },
+  {
+    "station_name": "KOT KAPURA",
+    "code": "KKP",
+    "city": "Kot Kapura"
+  },
+  {
+    "station_name": "KOTTAYAM",
+    "code": "KTYM",
+    "city": "Kottayam"
+  },
+  {
+    "station_name": "KOZHIKODE",
+    "code": "CLT",
+    "city": "Kozhikode"
+  },
+  {
+    "station_name": "KRISHNANAGAR CITY",
+    "code": "KNJ",
+    "city": "Krishnanagar"
+  },
+  {
+    "station_name": "KRISHNARAJAPURAM",
+    "code": "KJM",
+    "city": "Bangalore"
+  },
+  {
+    "station_name": "KUMARGHAT",
+    "code": "KUGT",
+    "city": "Kumarghat"
+  },
+  {
+    "station_name": "KUMBAKONAM",
+    "code": "KMU",
+    "city": "Kumbakonam"
+  },
+  {
+    "station_name": "KUNDAPURA",
+    "code": "KUDA",
+    "city": "Kundapura"
+  },
+  {
+    "station_name": "KURDUWADI",
+    "code": "KWV",
+    "city": "Kurduwadi"
+  },
+  {
+    "station_name": "KURNOOL TOWN",
+    "code": "KRNT",
+    "city": "Kurnool"
+  },
+  {
+    "station_name": "KURUKSHETRA",
+    "code": "KKDE",
+    "city": "Kurukshetra"
+  },
+  {
+    "station_name": "LAKHIMPUR",
+    "code": "LMP",
+    "city": "Lakhimpur"
+  },
+  {
+    "station_name": "LAKSAR",
+    "code": "LRJ",
+    "city": "Laksar"
+  },
+  {
+    "station_name": "LALGARH",
+    "code": "LGH",
+    "city": "Lalgarh"
+  },
+  {
+    "station_name": "LALGOLA",
+    "code": "LGL",
+    "city": "Lalgola"
+  },
+  {
+    "station_name": "LALITPUR",
+    "code": "LAR",
+    "city": "Lalitpur"
+  },
+  {
+    "station_name": "LALKUAN JN.",
+    "code": "LKU",
+    "city": "Lalkuan"
+  },
+  {
+    "station_name": "LATUR",
+    "code": "LUR",
+    "city": "Latur"
+  },
+  {
+    "station_name": "LEDO",
+    "code": "LEDO",
+    "city": "Ledo"
+  },
+  {
+    "station_name": "LOHARU",
+    "code": "LHU",
+    "city": "Loharu"
+  },
+  {
+    "station_name": "LOKMANYA TILAK (T)",
+    "code": "LTT",
+    "city": "Mumbai"
+  },
+  {
+    "station_name": "LONAVLA",
+    "code": "LNL",
+    "city": "Lonavla"
+  },
+  {
+    "station_name": "LONDA",
+    "code": "LD",
+    "city": "Londa"
+  },
+  {
+    "station_name": "LOWER HALFLONG",
+    "code": "LFG",
+    "city": "Lower Haflong"
+  },
+  {
+    "station_name": "LUCKNOW",
+    "code": "LJN",
+    "city": "Lucknow"
+  },
+  {
+    "station_name": "LUDHIANA",
+    "code": "LDH",
+    "city": "Ludhiana"
+  },
+  {
+    "station_name": "LUMDING",
+    "code": "LMG",
+    "city": "Lumding"
+  },
+  {
+    "station_name": "LUNI",
+    "code": "LUNI",
+    "city": "Luni"
+  },
+  {
+    "station_name": "MACHILIPATNAM",
+    "code": "MTM",
+    "city": "Machilipatnam"
+  },
+  {
+    "station_name": "MADARIHAT",
+    "code": "MDT",
+    "city": "Madarihat"
+  },
+  {
+    "station_name": "MADDUR",
+    "code": "MAD",
+    "city": "Maddur"
+  },
+  {
+    "station_name": "MADGAON (GOA)",
+    "code": "MAO",
+    "city": "Madgaon"
+  },
+  {
+    "station_name": "MADHUBANI",
+    "code": "MBI",
+    "city": "Madhubani"
+  },
+  {
+    "station_name": "MADHUPUR",
+    "code": "MDP",
+    "city": "Madhupur"
+  },
+  {
+    "station_name": "MADURAI JN.",
+    "code": "MDU",
+    "city": "Madurai"
+  },
+  {
+    "station_name": "MAHASAMUND",
+    "code": "MSMD",
+    "city": "Mahasamund"
+  },
+  {
+    "station_name": "MAHBUBNAGAR",
+    "code": "MBNR",
+    "city": "Mahbubnagar"
+  },
+  {
+    "station_name": "MAHUVA",
+    "code": "MHV",
+    "city": "Mahuva"
+  },
+  {
+    "station_name": "MUNIGUDA",
+    "code": "MNGD",
+    "city": "Muniguda"
+  },
+  {
+    "station_name": "MAHESANA",
+    "code": "MSH",
+    "city": "Mahesana"
+  },
+  {
+    "station_name": "MAHOBA",
+    "code": "MBA",
+    "city": "Mahoba"
+  },
+  {
+    "station_name": "MAILANI",
+    "code": "MLN",
+    "city": "Mailani"
+  },
+  {
+    "station_name": "MAKSI",
+    "code": "MKC",
+    "city": "Maksi"
+  },
+  {
+    "station_name": "MALDA TOWN",
+    "code": "MLDT",
+    "city": "Malda"
+  },
+  {
+    "station_name": "MANAMADURAI",
+    "code": "MNM",
+    "city": "Manamadurai"
+  },
+  {
+    "station_name": "MANDUADIH",
+    "code": "MUV",
+    "city": "Varanasi"
+  },
+  {
+    "station_name": "MANGALORE CENTRAL",
+    "code": "MAQ",
+    "city": "Mangalore"
+  },
+  {
+    "station_name": "MANGALORE JN.",
+    "code": "MAJN",
+    "city": "Mangalore"
+  },
+  {
+    "station_name": "MANIKPUR",
+    "code": "MKP",
+    "city": "Manikpur"
+  },
+  {
+    "station_name": "MANKAPUR",
+    "code": "MUR",
+    "city": "Mankapur"
+  },
+  {
+    "station_name": "MANMAD",
+    "code": "MMR",
+    "city": "Manmad"
+  },
+  {
+    "station_name": "MANNARGUDI",
+    "code": "MQ",
+    "city": "Mannargudi"
+  },
+  {
+    "station_name": "MANSI",
+    "code": "MNE",
+    "city": "Mansi"
+  },
+  {
+    "station_name": "MANU",
+    "code": "MANU",
+    "city": "Manu"
+  },
+  {
+    "station_name": "MARIANI",
+    "code": "MXN",
+    "city": "Mariani"
+  },
+  {
+    "station_name": "MARWAR JN.",
+    "code": "MJ",
+    "city": "Marwar"
+  },
+  {
+    "station_name": "MATHURA",
+    "code": "MTJ",
+    "city": "Mathura"
+  },
+  {
+    "station_name": "MAU",
+    "code": "MAU",
+    "city": "Mau"
+  },
+  {
+    "station_name": "MAYILADUTURAI JN.",
+    "code": "MV",
+    "city": "Mayiladuturai"
+  },
+  {
+    "station_name": "MEERUT CITY",
+    "code": "MTC",
+    "city": "Meerut"
+  },
+  {
+    "station_name": "MERTA ROAD",
+    "code": "MTD",
+    "city": "Merta"
+  },
+  {
+    "station_name": "METTUPALAYAM",
+    "code": "MTP",
+    "city": "Mettupalayam"
+  },
+  {
+    "station_name": "MIDNAPORE",
+    "code": "MDN",
+    "city": "Midnapore"
+  },
+  {
+    "station_name": "MIRAJ",
+    "code": "MRJ",
+    "city": "Miraj"
+  },
+  {
+    "station_name": "MIRYALAGUDA",
+    "code": "MRGA",
+    "city": "Miryalguda"
+  },
+  {
+    "station_name": "MIRZAPUR",
+    "code": "MZP",
+    "city": "Mirzapur"
+  },
+  {
+    "station_name": "MOGA",
+    "code": "MOGA",
+    "city": "Moga"
+  },
+  {
+    "station_name": "MOKAMA",
+    "code": "MKA",
+    "city": "Mokama"
+  },
+  {
+    "station_name": "MORADABAD",
+    "code": "MB",
+    "city": "Moradabad"
+  },
+  {
+    "station_name": "MOTIHARI",
+    "code": "MKI",
+    "city": "Motihari"
+  },
+  {
+    "station_name": "MUDKHED",
+    "code": "MUE",
+    "city": "Mudkhed"
+  },
+  {
+    "station_name": "MUGHALSARAI",
+    "code": "MGS",
+    "city": "Mughalsarai"
+  },
+  {
+    "station_name": "MUMBAI CENTRAL",
+    "code": "BCT",
+    "city": "Mumbai"
+  },
+  {
+    "station_name": "MUMBAI CST",
+    "code": "CSTM",
+    "city": "Mumbai"
+  },
+  {
+    "station_name": "MURI",
+    "code": "MURI",
+    "city": "Muri"
+  },
+  {
+    "station_name": "MURKEONGSELEK",
+    "code": "MZS",
+    "city": "Murkeongselek"
+  },
+  {
+    "station_name": "MURTAJAPUR",
+    "code": "MZR",
+    "city": "Murtijapur"
+  },
+  {
+    "station_name": "MUZAFFAR NAGAR",
+    "code": "MOZ",
+    "city": "Muzaffarnagar"
+  },
+  {
+    "station_name": "MUZAFFARPUR",
+    "code": "MFP",
+    "city": "Muzaffarpur"
+  },
+  {
+    "station_name": "MYSORE",
+    "code": "MYS",
+    "city": "Mysore"
+  },
+  {
+    "station_name": "NABADWIPDHAM",
+    "code": "NDAE",
+    "city": "Nabadwip"
+  },
+  {
+    "station_name": "NADIAD",
+    "code": "ND",
+    "city": "Nadiad"
+  },
+  {
+    "station_name": "NADIKUDI",
+    "code": "NDKD",
+    "city": "Nadkudi"
+  },
+  {
+    "station_name": "NAGAPPATTINAM",
+    "code": "NGT",
+    "city": "Nagappattinam"
+  },
+  {
+    "station_name": "NAGARKATA",
+    "code": "NKB",
+    "city": "Nagarkata"
+  },
+  {
+    "station_name": "NAGARSOL",
+    "code": "NSL",
+    "city": "Nagarsol"
+  },
+  {
+    "station_name": "NAGBHIR",
+    "code": "NAB",
+    "city": "Nagbhir"
+  },
+  {
+    "station_name": "NAGDA",
+    "code": "NAD",
+    "city": "Nagda"
+  },
+  {
+    "station_name": "NAGERCOIL JN.",
+    "code": "NCJ",
+    "city": "Nagercoil"
+  },
+  {
+    "station_name": "NAGORE",
+    "code": "NCR",
+    "city": "Nagore"
+  },
+  {
+    "station_name": "NAGPUR",
+    "code": "NGP",
+    "city": "Nagpur"
+  },
+  {
+    "station_name": "NAINPUR",
+    "code": "NIR",
+    "city": "Nainpur"
+  },
+  {
+    "station_name": "NAJIBABAD",
+    "code": "NBD",
+    "city": "Najibabad"
+  },
+  {
+    "station_name": "NALANDA",
+    "code": "NLD",
+    "city": "Nalanda"
+  },
+  {
+    "station_name": "NALGONDA",
+    "code": "NLDA",
+    "city": "Nalgonda"
+  },
+  {
+    "station_name": "NAMAKKAL",
+    "code": "NMKL",
+    "city": "Namakkal"
+  },
+  {
+    "station_name": "NANDALUR",
+    "code": "NRE",
+    "city": "Nandalur"
+  },
+  {
+    "station_name": "NANDGAON",
+    "code": "NGN",
+    "city": "Nandgaon"
+  },
+  {
+    "station_name": "NANDURBAR",
+    "code": "NDB",
+    "city": "Nandurbar"
+  },
+  {
+    "station_name": "NANDYAL",
+    "code": "NDL",
+    "city": "Nandyal"
+  },
+  {
+    "station_name": "NANGAL DAM",
+    "code": "NLDM",
+    "city": "Nangal"
+  },
+  {
+    "station_name": "NARKATIAGANJ",
+    "code": "NKE",
+    "city": "Narkatiaganj"
+  },
+  {
+    "station_name": "NARASAPUR",
+    "code": "NS",
+    "city": "Narasapur"
+  },
+  {
+    "station_name": "NARSINGPUR",
+    "code": "NU",
+    "city": "Narsinghpur"
+  },
+  {
+    "station_name": "NARWANA",
+    "code": "NRW",
+    "city": "Narwana"
+  },
+  {
+    "station_name": "NASIK ROAD",
+    "code": "NK",
+    "city": "Nasik"
+  },
+  {
+    "station_name": "NAUGARH",
+    "code": "NUH",
+    "city": "Naugarh"
+  },
+  {
+    "station_name": "NELLORE",
+    "code": "NLR",
+    "city": "Nellore"
+  },
+  {
+    "station_name": "NETAJI SUBHASH CHANDRA BOSE GOMOH",
+    "code": "GMO",
+    "city": "Gomoh"
+  },
+  {
+    "station_name": "NEW ALIPURDUAR",
+    "code": "NOQ",
+    "city": "Alipurduar"
+  },
+  {
+    "station_name": "NEW BONGAIGAON",
+    "code": "NBQ",
+    "city": "Bongaigaon"
+  },
+  {
+    "station_name": "NEW COOCHBEHAR",
+    "code": "NCB",
+    "city": "Cooch Behar"
+  },
+  {
+    "station_name": "NEW FARAKKA",
+    "code": "NFK",
+    "city": "Farakka"
+  },
+  {
+    "station_name": "NEW JALPAIGURI",
+    "code": "NJP",
+    "city": "Jalpaiguri"
+  },
+  {
+    "station_name": "NEWMAL JN.",
+    "code": "NMZ",
+    "city": "New Mal"
+  },
+  {
+    "station_name": "NEW TINSUKIA",
+    "code": "NTSK",
+    "city": "Tinsukia"
+  },
+  {
+    "station_name": "NIDADAVOLU",
+    "code": "NDD",
+    "city": "Nidadavolu"
+  },
+  {
+    "station_name": "NIDAMANGALAM",
+    "code": "NMJ",
+    "city": "Nidamangalam"
+  },
+  {
+    "station_name": "NIDUBROLU",
+    "code": "NDO",
+    "city": "Nidubrolu"
+  },
+  {
+    "station_name": "NIMACH",
+    "code": "NMH",
+    "city": "Nimach"
+  },
+  {
+    "station_name": "NIZAMABAD",
+    "code": "NZB",
+    "city": "Nizamabad"
+  },
+  {
+    "station_name": "NIZAMUDDIN",
+    "code": "NZM",
+    "city": "Delhi"
+  },
+  {
+    "station_name": "NOLI",
+    "code": "NOLI",
+    "city": "Noli"
+  },
+  {
+    "station_name": "NORTH LAKHIMPUR",
+    "code": "NLP",
+    "city": "North Lakhimpur"
+  },
+  {
+    "station_name": "ODLABARI",
+    "code": "ODB",
+    "city": "Odlabari"
+  },
+  {
+    "station_name": "OKHA",
+    "code": "OKHA",
+    "city": "Okha"
+  },
+  {
+    "station_name": "ONGOLE",
+    "code": "OGL",
+    "city": "Ongole"
+  },
+  {
+    "station_name": "ORAI",
+    "code": "ORAI",
+    "city": "Orai"
+  },
+  {
+    "station_name": "PACHORA",
+    "code": "PC",
+    "city": "Pachora"
+  },
+  {
+    "station_name": "PALANI",
+    "code": "PLNI",
+    "city": "Palani"
+  },
+  {
+    "station_name": "PALANPUR",
+    "code": "PNU",
+    "city": "Palanpur"
+  },
+  {
+    "station_name": "PALASA",
+    "code": "PSA",
+    "city": "Palasa"
+  },
+  {
+    "station_name": "PALAKKAD",
+    "code": "PGT",
+    "city": "Palakkad"
+  },
+  {
+    "station_name": "PALAKKAD TOWN",
+    "code": "PGTN",
+    "city": "Palakkad"
+  },
+  {
+    "station_name": "PALIAKALAN",
+    "code": "PLK",
+    "city": "Paliakalan"
+  },
+  {
+    "station_name": "PANDHARAPUR",
+    "code": "PVR",
+    "city": "Pandharpur"
+  },
+  {
+    "station_name": "PANIPAT",
+    "code": "PNP",
+    "city": "Panipat"
+  },{
+    "station_name": "PANVEL",
+    "code": "PNVL",
+    "city": "Panvel"
+  },
+  {
+    "station_name": "PARADEEP",
+    "code": "PRDP",
+    "city": "Paradeep"
+  },
+  {
+    "station_name": "PARASNATH",
+    "code": "PNME",
+    "city": "Parasanth"
+  },
+  {
+    "station_name": "PARBHANI",
+    "code": "PBN",
+    "city": "Parbhani"
+  },
+  {
+    "station_name": "PARLI VAIJNATH",
+    "code": "PRLI",
+    "city": "Parli"
+  },
+  {
+    "station_name": "PARVATIPURAM",
+    "code": "PVP",
+    "city": "Parvatipuram"
+  },
+  {
+    "station_name": "PATHANKOT",
+    "code": "PTK",
+    "city": "Pathankot"
+  },
+  {
+    "station_name": "PATIALA",
+    "code": "PTA",
+    "city": "Patiala"
+  },
+  {
+    "station_name": "PATNA",
+    "code": "PNBE",
+    "city": "Patna"
+  },
+  {
+    "station_name": "PENDRA ROAD",
+    "code": "PND",
+    "city": "Pendra"
+  },
+  {
+    "station_name": "PHAGWARA",
+    "code": "PGW",
+    "city": "Phagwara"
+  },
+  {
+    "station_name": "PHAPHUND",
+    "code": "PHD",
+    "city": "Phaphund"
+  },
+  {
+    "station_name": "PIPARIYA",
+    "code": "PPI",
+    "city": "Pipariya"
+  },
+  {
+    "station_name": "PODANUR",
+    "code": "PTJ",
+    "city": "Coimbatore"
+  },
+  {
+    "station_name": "PORBANDAR",
+    "code": "PBR",
+    "city": "Porbandar"
+  },
+  {
+    "station_name": "PUDUKKOTTAI",
+    "code": "PDKT",
+    "city": "Pudukkottai"
+  },
+  {
+    "station_name": "PULGAON",
+    "code": "PLO",
+    "city": "Pulgaon"
+  },
+  {
+    "station_name": "PUNE",
+    "code": "PUNE",
+    "city": "Pune"
+  },
+  {
+    "station_name": "PURANPUR",
+    "code": "PP",
+    "city": "Puranpur"
+  },
+  {
+    "station_name": "PURI",
+    "code": "PURI",
+    "city": "Puri"
+  },
+  {
+    "station_name": "PURNA",
+    "code": "PAU",
+    "city": "Purna"
+  },
+  {
+    "station_name": "PURNIA",
+    "code": "PRNA",
+    "city": "Purnia"
+  },
+  {
+    "station_name": "PURULIA",
+    "code": "PRR",
+    "city": "Purulia"
+  },
+  {
+    "station_name": "QUILON",
+    "code": "QLN",
+    "city": "Kollam"
+  },
+  {
+    "station_name": "RAE BARELI",
+    "code": "RBL",
+    "city": "Rae Bareli"
+  },
+  {
+    "station_name": "RAICHUR",
+    "code": "RC",
+    "city": "Raichur"
+  },
+  {
+    "station_name": "RAIGANJ",
+    "code": "RGJ",
+    "city": "Raiganj"
+  },
+  {
+    "station_name": "RAIPUR",
+    "code": "R",
+    "city": "Raipur"
+  },
+  {
+    "station_name": "RAJAHMUNDRY",
+    "code": "RJY",
+    "city": "Rajahmundry"
+  },
+  {
+    "station_name": "RAJA KI MANDI",
+    "code": "RKM",
+    "city": "Agra"
+  },
+  {
+    "station_name": "RAJA TALAB",
+    "code": "RTB",
+    "city": "Raja Talab"
+  },
+  {
+    "station_name": "RAJENDRANAGAR",
+    "code": "RJQ",
+    "city": "Rajendranagar"
+  },
+  {
+    "station_name": "RAJGIR",
+    "code": "RGD",
+    "city": "Rajgir"
+  },
+  {
+    "station_name": "RAJKOT",
+    "code": "RJT",
+    "city": "Rajkot"
+  },
+  {
+    "station_name": "RAJNANDGAON",
+    "code": "RJN",
+    "city": "Rajnandgaon"
+  },
+  {
+    "station_name": "RAMANATHAPURAM",
+    "code": "RMD",
+    "city": "Ramanathapuram"
+  },
+  {
+    "station_name": "RAMGARH CANTT.",
+    "code": "RMT",
+    "city": "Ramgarh"
+  },
+  {
+    "station_name": "RAMPUR",
+    "code": "RMU",
+    "city": "Rampur"
+  },
+  {
+    "station_name": "RAMPURHAT",
+    "code": "RPH",
+    "city": "Rampurhat"
+  },
+  {
+    "station_name": "RANCHI",
+    "code": "RNC",
+    "city": "Ranchi"
+  },
+  {
+    "station_name": "RANGIYA",
+    "code": "RNY",
+    "city": "Rangiya"
+  },
+  {
+    "station_name": "RATLAM",
+    "code": "RTM",
+    "city": "Ratlam"
+  },
+  {
+    "station_name": "RATNAGIRI",
+    "code": "RN",
+    "city": "Ratnagiri"
+  },
+  {
+    "station_name": "RAWANIA DUNGAR",
+    "code": "RWJ",
+    "city": "Rawania Dungar"
+  },
+  {
+    "station_name": "RAYAGADA",
+    "code": "RGDA",
+    "city": "Rayagada"
+  },
+  {
+    "station_name": "RENOUKUTI",
+    "code": "RNQ",
+    "city": "Renukut"
+  },
+  {
+    "station_name": "REWA",
+    "code": "REWA",
+    "city": "Rewa"
+  },
+  {
+    "station_name": "REWARI",
+    "code": "RE",
+    "city": "Rewari"
+  },
+  {
+    "station_name": "RISHIKESH",
+    "code": "RKSH",
+    "city": "Rishikesh"
+  },
+  {
+    "station_name": "ROHTAK",
+    "code": "ROK",
+    "city": "Rohtak"
+  },
+  {
+    "station_name": "ROORKEE",
+    "code": "RK",
+    "city": "Roorkee"
+  },
+  {
+    "station_name": "ROURKELA",
+    "code": "ROU",
+    "city": "Rourkela"
+  },
+  {
+    "station_name": "SADulpur",
+    "code": "SDLP",
+    "city": "Sadulpur"
+  },
+  {
+    "station_name": "SAGAR JAMBAGARU",
+    "code": "SRF",
+    "city": "Sagar"
+  },
+  {
+    "station_name": "SAHARANPUR",
+    "code": "SRE",
+    "city": "Saharanpur"
+  },
+  {
+    "station_name": "SAHARSA",
+    "code": "SHC",
+    "city": "Saharsa"
+  },
+  {
+    "station_name": "SAI NAGAR SHIRDI",
+    "code": "SNSI",
+    "city": "Shirdi"
+  },
+  {
+    "station_name": "SALEM",
+    "code": "SA",
+    "city": "Salem"
+  },
+  {
+    "station_name": "SAMALKOT",
+    "code": "SLO",
+    "city": "Samalkot"
+  },
+  {
+    "station_name": "SAMASTIPUR",
+    "code": "SPJ",
+    "city": "Samastipur"
+  },
+  {
+    "station_name": "SAMBALPUR",
+    "code": "SBP",
+    "city": "Sambalpur"
+  },
+  {
+    "station_name": "SANGLI",
+    "code": "SLI",
+    "city": "Sangli"
+  },
+  {
+    "station_name": "SANGRUR",
+    "code": "SAG",
+    "city": "Sangrur"
+  },
+  {
+    "station_name": "SANT RAVIDAS NAGAR",
+    "code": "SRNT",
+    "city": "Sant Ravidas Nagar"
+  },
+  {
+    "station_name": "SARUPATHAR",
+    "code": "SZR",
+    "city": "Sarupathar"
+  },
+  {
+    "station_name": "SASARAM",
+    "code": "SSM",
+    "city": "Sasaram"
+  },
+  {
+    "station_name": "SATARA",
+    "code": "STR",
+    "city": "Satara"
+  },
+  {
+    "station_name": "SATNA",
+    "code": "STA",
+    "city": "Satna"
+  },
+  {
+    "station_name": "SATTENAPALLE",
+    "code": "SAP",
+    "city": "Sattenapalle"
+  },
+  {
+    "station_name": "SAWAI MADHOPUR",
+    "code": "SWM",
+    "city": "Sawai Madhopur"
+  },
+  {
+    "station_name": "SEALDAH",
+    "code": "SDAH",
+    "city": "Kolkata"
+  },
+  {
+    "station_name": "SECUNDERABAD",
+    "code": "SC",
+    "city": "Secunderabad"
+  },
+  {
+    "station_name": "SENCHOA",
+    "code": "SCE",
+    "city": "Senchoa"
+  },
+  {
+    "station_name": "SEWAGRAM",
+    "code": "SEGM",
+    "city": "Wardha"
+  },
+  {
+    "station_name": "SHAHABAD",
+    "code": "SDB",
+    "city": "Shahabad"
+  },
+  {
+    "station_name": "SHAHGANJ",
+    "code": "SHG",
+    "city": "Shahganj"
+  },
+  {
+    "station_name": "SHAHJAHANPUR",
+    "code": "SPN",
+    "city": "Shahjahanpur"
+  },
+  {
+    "station_name": "SHAHPUR PATOREE",
+    "code": "SPP",
+    "city": "Shahpur Patoree"
+  },
+  {
+    "station_name": "SHAKTINAGAR",
+    "code": "SKTN",
+    "city": "Shaktinagar"
+  },
+  {
+    "station_name": "SHALIMAR",
+    "code": "SHM",
+    "city": "Kolkata"
+  },
+  {
+    "station_name": "SHAMGARH",
+    "code": "SGZ",
+    "city": "Shamgarh"
+  },
+  {
+    "station_name": "SHAMLI",
+    "code": "SMQL",
+    "city": "Shamli"
+  },
+  {
+    "station_name": "SHEGAON",
+    "code": "SEG",
+    "city": "Shegaon"
+  },
+  {
+    "station_name": "SHIMOGA TOWN",
+    "code": "SMET",
+    "city": "Shimoga"
+  },
+  {
+    "station_name": "SHIVPURI",
+    "code": "SVPI",
+    "city": "Shivpuri"
+  },
+  {
+    "station_name": "SHORANUR",
+    "code": "SRR",
+    "city": "Shoranur"
+  },
+  {
+    "station_name": "SHRI GANGANAGAR",
+    "code": "SGNR",
+    "city": "Sri Ganganagar"
+  },
+  {
+    "station_name": "SHRIKAKULAM ROAD",
+    "code": "CHE",
+    "city": "Srikakulam"
+  },
+  {
+    "station_name": "SHRIRAMPUR",
+    "code": "SRP",
+    "city": "Shrirampur"
+  },
+  {
+    "station_name": "SIHOR GUJARAT",
+    "code": "SOJN",
+    "city": "Sihor"
+  },
+  {
+    "station_name": "SIKANDARPUR",
+    "code": "SKQ",
+    "city": "Sikandarpur"
+  },
+  {
+    "station_name": "SIKAR",
+    "code": "SIKR",
+    "city": "Sikar"
+  },
+  {
+    "station_name": "SILCHAR",
+    "code": "SCL",
+    "city": "Silchar"
+  },
+  {
+    "station_name": "SILIGURI",
+    "code": "SGUJ",
+    "city": "Siliguri"
+  },
+  {
+    "station_name": "SINGRAULI",
+    "code": "SGRL",
+    "city": "Singrauli"
+  },
+  {
+    "station_name": "SIROHI ROAD",
+    "code": "SOH",
+    "city": "Sirohi"
+  },
+  {
+    "station_name": "SIRSA",
+    "code": "SSA",
+    "city": "Sirsa"
+  },
+  {
+    "station_name": "SITAMARHI",
+    "code": "SMI",
+    "city": "Sitamarhi"
+  },
+  {
+    "station_name": "SITAPUR CANTT.",
+    "code": "SCC",
+    "city": "Sitapur"
+  },
+  {
+    "station_name": "SIVAKASI",
+    "code": "SVKS",
+    "city": "Sivakasi"
+  },
+  {
+    "station_name": "SIWAN",
+    "code": "SV",
+    "city": "Siwan"
+  },
+  {
+    "station_name": "SOLAPUR",
+    "code": "SUR",
+    "city": "Solapur"
+  },
+  {
+    "station_name": "SONPUR",
+    "code": "SEE",
+    "city": "Sonpur"
+  },
+  {
+    "station_name": "SRI DUNGARGARH",
+    "code": "SDGH",
+    "city": "Sri Dungargarh"
+  },
+  {
+    "station_name": "SRIKALAHASTI",
+    "code": "KHT",
+    "city": "Srikalahasti"
+  },
+  {
+    "station_name": "SULTANPUR",
+    "code": "SLN",
+    "city": "Sultanpur"
+  },
+  {
+    "station_name": "SURAT",
+    "code": "ST",
+    "city": "Surat"
+  },
+  {
+    "station_name": "SURATGARH",
+    "code": "SOG",
+    "city": "Suratgarh"
+  },
+  {
+    "station_name": "SURENDRANAGAR",
+    "code": "SUNR",
+    "city": "Surendranagar"
+  },
+  {
+    "station_name": "TADEPALLIGUDEM",
+    "code": "TDD",
+    "city": "Tadepalligudem"
+  },
+  {
+    "station_name": "TAMBARAM",
+    "code": "TBM",
+    "city": "Chennai"
+  },
+  {
+    "station_name": "TATANAGAR",
+    "code": "TATA",
+    "city": "Jamshedpur"
+  },
+  {
+    "station_name": "TENALI",
+    "code": "TEL",
+    "city": "Tenali"
+  },
+  {
+    "station_name": "TENKASI",
+    "code": "TSI",
+    "city": "Tenkasi"
+  },
+  {
+    "station_name": "THALASSERY",
+    "code": "TLY",
+    "city": "Thalassery"
+  },
+  {
+    "station_name": "THANE",
+    "code": "TNA",
+    "city": "Thane"
+  },
+  {
+    "station_name": "THANJAVUR",
+    "code": "TJ",
+    "city": "Thanjavur"
+  },
+  {
+    "station_name": "THIRUVALLA",
+    "code": "TRVL",
+    "city": "Thiruvalla"
+  },
+  {
+    "station_name": "THIRUVANANTHAPURAM",
+    "code": "TVC",
+    "city": "Thiruvananthapuram"
+  },
+  {
+    "station_name": "THRISUR",
+    "code": "TCR",
+    "city": "Thrissur"
+  },
+  {
+    "station_name": "TIRUCHCHIRAPPALLI",
+    "code": "TPJ",
+    "city": "Tiruchirappalli"
+  },
+  {
+    "station_name": "TIRUNELVELI",
+    "code": "TEN",
+    "city": "Tirunelveli"
+  },
+  {
+    "station_name": "TIRUPATI",
+    "code": "TPTY",
+    "city": "Tirupati"
+  },
+  {
+    "station_name": "TIRUPPUR",
+    "code": "TUP",
+    "city": "Tiruppur"
+  },
+  {
+    "station_name": "TIRUR",
+    "code": "TIR",
+    "city": "Tirur"
+  },
+  {
+    "station_name": "TITLAGARH",
+    "code": "TIG",
+    "city": "Titlagarh"
+  },
+  {
+    "station_name": "TUMSAR ROAD",
+    "code": "TMR",
+    "city": "Tumsar"
+  },
+  {
+    "station_name": "TUNDLA",
+    "code": "TDL",
+    "city": "Tundla"
+  },
+  {
+    "station_name": "TUNI",
+    "code": "TUNI",
+    "city": "Tuni"
+  },
+  {
+    "station_name": "TUTICORIN",
+    "code": "TN",
+    "city": "Tuticorin"
+  },
+  {
+    "station_name": "UDAIPUR CITY",
+    "code": "UDZ",
+    "city": "Udaipur"
+  },
+  {
+    "station_name": "UDHAMPUR",
+    "code": "UHP",
+    "city": "Udhampur"
+  },
+  {
+    "station_name": "UDUPI",
+    "code": "UD",
+    "city": "Udupi"
+  },
+  {
+    "station_name": "UJJAIN",
+    "code": "UJN",
+    "city": "Ujjain"
+  },
+  {
+    "station_name": "UNNAO",
+    "code": "ON",
+    "city": "Unnao"
+  },
+  {
+    "station_name": "VADAKARA",
+    "code": "BDJ",
+    "city": "Vadakara"
+  },
+  {
+    "station_name": "VADODARA",
+    "code": "BRC",
+    "city": "Vadodara"
+  },
+  {
+    "station_name": "VALSAD",
+    "code": "BL",
+    "city": "Valsad"
+  },
+  {
+    "station_name": "VARANASI",
+    "code": "BSB",
+    "city": "Varanasi"
+  },
+  {
+    "station_name": "VARKALA",
+    "code": "VAK",
+    "city": "Varkala"
+  },
+  {
+    "station_name": "VASAI ROAD",
+    "code": "BSR",
+    "city": "Vasai"
+  },
+  {
+    "station_name": "Vasco da Gama",
+    "code": "VSG",
+    "city": "Vasco da Gama"
+  },
+  {
+    "station_name": "VERAVAL",
+    "code": "VRL",
+    "city": "Veraval"
+  },
+  {
+    "station_name": "VIDISHA",
+    "code": "BHS",
+    "city": "Vidisha"
+  },
+  {
+    "station_name": "VIJAYAWADA",
+    "code": "BZA",
+    "city": "Vijayawada"
+  },
+  {
+    "station_name": "VIKRAMGARH ALOT",
+    "code": "VMA",
+    "city": "Vikramgarh Alot"
+  },
+  {
+    "station_name": "VILLUPURAM",
+    "code": "VM",
+    "city": "Villupuram"
+  },
+  {
+    "station_name": "VIRAMGAM",
+    "code": "VG",
+    "city": "Viramgam"
+  },
+  {
+    "station_name": "VIRUDUNAGAR",
+    "code": "VPT",
+    "city": "Virudunagar"
+  },
+  {
+    "station_name": "VISAKHAPATNAM",
+    "code": "VSKP",
+    "city": "Visakhapatnam"
+  },
+  {
+    "station_name": "VIZIANAGARAM",
+    "code": "VZM",
+    "city": "Vizianagaram"
+  },
+  {
+    "station_name": "VRIDDHACHALAM",
+    "code": "VRI",
+    "city": "Vriddhachalam"
+  },
+  {
+    "station_name": "WADI",
+    "code": "WADI",
+    "city": "Wadi"
+  },
+  {
+    "station_name": "WANKANER",
+    "code": "WKR",
+    "city": "Wankaner"
+  },
+  {
+    "station_name": "WARANGAL",
+    "code": "WL",
+    "city": "Warangal"
+  },
+  {
+    "station_name": "WARDHA",
+    "code": "WR",
+    "city": "Wardha"
+  },
+  {
+    "station_name": "WHITEFIELD",
+    "code": "WFD",
+    "city": "Bangalore"
+  },
+  {
+    "station_name": "YAMUNANAGAR JAGADHRI",
+    "code": "YJUD",
+    "city": "Yamunanagar"
+  },
+  {
+    "station_name": "YELAHANKA",
+    "code": "YNK",
+    "city": "Bangalore"
+  },
+  {
+    "station_name": "YESVANTPUR",
+    "code": "YPR",
+    "city": "Bangalore"
+  }
+
+]
