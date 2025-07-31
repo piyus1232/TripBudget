@@ -24,14 +24,14 @@ const Login = () => {
     try {
       // Step 1: Login and receive tokens via cookies
       const session = await axios.post(
-        "http://localhost:3000/api/v1/users/login",
+        "http://localhost:5000/api/v1/users/login",
         formData,
         { withCredentials: true }
       );
       if(session){
          // Step 2: Fetch user data securely
       const { data: userRes } = await axios.get(
-        "http://localhost:3000/api/v1/users/getCurrentUser",
+        "http://localhost:5000/api/v1/users/getCurrentUser",
         { withCredentials: true }
       );
 

@@ -21,7 +21,7 @@ const buildRouter = (isLoggedIn) =>
       element: <App />,
       children: isLoggedIn
         ? [
-            { path: '/home', element: <Landing/> },
+            { path: '/', element: <Landing/> },
             { path: '/dashboard', element: <Dashboard /> },
             { path: '/account', element: <Account /> },
                 // { path: '/Contact', element: <ContactPage/> },
@@ -32,7 +32,7 @@ const buildRouter = (isLoggedIn) =>
             
           ]
         : [
-            { path: '/home', element: <Landing /> },
+            { path: '/', element: <Landing /> },
            { path: '/Contact', element: <ContactPage/> },
               // { path: '/', element: <Dashboard /> },
             { path: '/dashboard', element: <Dashboard /> },

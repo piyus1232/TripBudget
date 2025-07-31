@@ -93,7 +93,7 @@ const ContactPage = () => {
     if (validateForm()) {
       try {
         setIsLoading(true);
-        await axios.post("http://localhost:3000/api/v1/users/form", formData, {
+        await axios.post("http://localhost:5000/api/v1/users/form", formData, {
           withCredentials: true,
         });
         toast.success("Message sent successfully! We'll get back to you soon.");
@@ -160,7 +160,7 @@ const ContactPage = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6 lg:space-x-10">
               <NavLink
-                to="/home"
+                to="/"
                 className={({ isActive }) =>
                   `text-base lg:text-lg font-medium transition-colors ${isActive ? "text-blue-400" : "text-slate-300 hover:text-white"}`
                 }

@@ -18,7 +18,7 @@ const Register = () => {
   const onSubmit = async (formdata) => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/users/register",
+        "http://localhost:5000/api/v1/users/register",
         formdata,
         { withCredentials: true }
       );

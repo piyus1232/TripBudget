@@ -17,7 +17,7 @@ import { login, logout } from './conf/authSlice.js';
   const dispatch = useDispatch()
 
   useEffect(() => {
-     axios.post('http://localhost:3000/api/v1/users/getCurrentUser',{},{withCredentials: true})
+     axios.post('http://localhost:5000/api/v1/users/getCurrentUser',{},{withCredentials: true})
     .then((userData) => {
       if (userData) {
         dispatch(login({userdata: userData.data.data}))

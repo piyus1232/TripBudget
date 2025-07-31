@@ -27,13 +27,13 @@ function Account() {
     const fetchUser = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:3000/api/v1/users/getCurrentUser",
+          "http://localhost:5000/api/v1/users/getCurrentUser",
           { withCredentials: true }
         );
         setUser(res.data.data);
       } catch {
         toast.error("Session expired");
-        navigate("/home");
+        navigate("/");
       } finally {
         setLoading(false);
       }
@@ -44,12 +44,12 @@ function Account() {
   const logout = async () => {
     try {
       await axios.post(
-        "http://localhost:3000/api/v1/users/logout",
+        "http://localhost:5000/api/v1/users/logout",
         {},
         { withCredentials: true }
       );
       toast.success("User logged out successfully");
-      navigate("/home");
+      navigate("/");
     } catch {
       toast.error("Error in logout");
     }
@@ -58,7 +58,7 @@ function Account() {
   const deleteAccount = async () => {
     try {
       await axios.post(
-        "http://localhost:3000/api/v1/users/deleteaccount",
+        "http://localhost:5000/api/v1/users/deleteaccount",
         {},
         { withCredentials: true }
       );
@@ -72,7 +72,7 @@ function Account() {
   const onSubmit = async (data) => {
     try {
       const response = await axios.put(
-        "http://localhost:3000/api/v1/users/editprofile",
+        "http://localhost:5000/api/v1/users/editprofile",
         data,
         { withCredentials: true }
       );
@@ -94,7 +94,7 @@ function Account() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/users/updateProfile",
+        "http://localhost:5000/api/v1/users/updateProfile",
         formData,
         { withCredentials: true }
       );

@@ -176,7 +176,7 @@ const Landing = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6 lg:space-x-10">
               <NavLink
-                to="/home"
+                to="/"
                 className={({ isActive }) =>
                   `text-base lg:text-lg font-medium transition-colors ${isActive ? 'text-blue-400' : 'text-slate-300 hover:text-white'}`
                 }
