@@ -1,184 +1,218 @@
-import React, { useState } from 'react';
-import Card from '../../components/utils/Card';
-import Button from '../../components/utils/Button';
-import Input from '../../components/utils/Input';
+import React, {  useState } from 'react';
 import { useForm } from 'react-hook-form';
 import SideBar from '../../components/SideBar/SideBar';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
+import axios from 'axios';
+import Button from '../../components/utils/Button';
 
 function PlanTrip() {
-  const {
-    register,
-    handleSubmit,
-  } = useForm();
-
-  // Manage local UI selections with useState
-  const [budget, setBudget] = useState('medium');
-  const [travelers, setTravelers] = useState('');
+  const { register, handleSubmit } = useForm();
+  const [budget, setBudget] = useState(1000);
+  const [travelers, setTravelers] = useState(2);
   const [transport, setTransport] = useState('');
   const [accommodation, setAccommodation] = useState('');
-  const [food, setFood] = useState('');
+  const [loading, setLoading] = useState(false);
+  const[load,setload]= useState(true)
+  const [user,setUser] =useState(null)
+  const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    const finalData = {
-      ...data,
-      budget,
-      travelers,
-      transport,
-      accommodation,
-      food
-    };
-    console.log('Final Submitted Data:', data);
+  const onSubmit = async (data) => {
+    setLoading(true);
+    const finalData = { ...data, budget, travelers, transport, accommodation };
+    console.log('Final Submitted Data:', finalData);
+    setTimeout(() => setLoading(false), 2000);
+  };
+  const indianCities = [
+  "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune",
+  "Ahmedabad", "Jaipur", "Lucknow", "Chandigarh", "Bhopal", "Indore", "Nagpur",
+  "Goa", "Varanasi", "Amritsar", "Surat", "Kanpur", "Patna", "Ranchi", "Raipur",
+  "Jodhpur", "Guwahati", "Dehradun", "Shimla", "Manali", "Udaipur", "Agra",
+  "Noida", "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
+  "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
+  "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur",
+  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik"
+];
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/v1/users/getCurrentUser", {
+        withCredentials: true,
+      });
+     
+      setUser(res.data.data);
+    } catch {
+     
+      toast.error("Session expired");
+    
+    } finally {
+      setload(false);
+    }
   };
 
+  fetchUser(); 
+}, []);
+
+useEffect(() => {
+  if (!load && !user) {
+
+    navigate("/");
+    toast.error("Session expired");
+
+  }
+}, [load,user, navigate]);
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 ml-80 w-285">
-      <SideBar />
+    <div className="relative min-h-screen">
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#2e2a47,#1c1b2e)] bg-cover" />
+      <div className="container mx-auto px-4 pt-6 ml-80 w-285">
+        <SideBar />
+        <motion.form
+          onSubmit={handleSubmit(onSubmit)}
+          className="relative bg-[#191726]/90 text-white rounded-3xl p-8 shadow-lg max-w-4xl mx-auto border border-purple-800/30 
+                     before:absolute before:inset-0 before:rounded-3xl before:border before:border-purple-500/20 
+                     before:pointer-events-none before:shadow-[0_0_20px_rgba(168,85,247,0.15)] backdrop-blur-md"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: 'easeInOut' }}
+        >
+          <h2 className="text-2xl font-bold mb-4">🗺️ Plan Your Trip</h2>
 
-      {/* Hero Section */}
-      <motion.div
-        className="  border bg-gradient-to-br from-[#1f1b2d] to-[#261e38] border-[#604490] rounded-xl p-6 mb-8 text-white shadow-xl"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: 'easeInOut', delay: 0.4 }}
-      >
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-purple-500">Advanced Budget Trip Planner</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <Card className="bg-[#2f2748] hover:bg-[#3b2f59] text-white py-4 transition">
-            <h2 className="text-2xl font-bold">2K+</h2>
-            <p className="text-sm text-gray-300">Trips Planned</p>
-          </Card>
-          <Card className="bg-[#2f2748] hover:bg-[#3b2f59] text-white py-4 transition">
-            <h2 className="text-2xl font-bold">₹500+</h2>
-            <p className="text-sm text-gray-300">Avg Savings</p>
-          </Card>
-          <Card className="bg-[#2f2748] hover:bg-[#3b2f59] text-white py-4 transition">
-            <h2 className="text-2xl font-bold">4.9★</h2>
-            <p className="text-sm text-gray-300">User Rating</p>
-          </Card>
-        </div>
-      </motion.div>
+          <div className="grid grid-cols-1 gap-4">
+            {/* Departure City and Destination */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm mb-1">From</label>
+                <select
+                  {...register('from')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                >
+                   {indianCities.map((city) => (
+    <option key={city} value={city}>{city}</option>
+  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm mb-1">To</label>
+                <select
+                  {...register('to')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                >
+                    {indianCities.map((city) => (
+    <option key={city} value={city}>{city}</option>
+  ))}
+                </select>
+              </div>
+            </div>
 
-      {/* Main Form */}
-      <motion.form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-[#1e1b2e] text-white rounded-xl p-6 shadow-xl space-y-6"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: 'easeInOut', delay: 0.4 }}
-      >
-        <h2 className="text-2xl font-semibold text-center text-purple-400">Plan Your Budget Trip</h2>
+            {/* Travel Dates */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm mb-1">Start Date</label>
+                <input
+                  type="date"
+                  {...register('startDate')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">End Date</label>
+                <input
+                  type="date"
+                  {...register('endDate')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                />
+              </div>
+            </div>
 
-        {/* Locations & Dates */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Input label="From" {...register("from")} placeholder="Jaipur" />
-          <Input label="To" {...register("to")} placeholder="Mumbai" />
-          <Input label="Start Date" type="date" {...register("startDate")} />
-          <Input label="End Date" type="date" {...register("endDate")} />
-        </div>
+            {/* Budget */}
+            <div>
+              <label className="block text-sm mb-1">Preferred Budget</label>
+              <input
+                type="range"
+                min={500}
+                max={10000}
+                step={500}
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                className="w-full accent-green-500 h-3"
+              />
+              <p className="text-right text-sm font-medium text-green-400 mt-1">₹{budget}</p>
+            </div>
 
-        {/* Travelers */}
-        <div>
-          <label className="block mb-2 font-medium text-sm text-gray-300">Travelers</label>
-          <div className="flex gap-3">
-            {['1', '2', '3', '4+'].map((val) => (
-              <Button
-                key={val}
-                type="button"
-                className={`px-4 py-2 rounded ${travelers === val ? 'bg-purple-600' : 'bg-[#322E3B]'} text-white`}
-                onClick={() => setTravelers(val)}
+            {/* Mode of Travel */}
+            <div>
+              <label className="block text-sm mb-1">Mode of Travel</label>
+              <div className="flex gap-2">
+                {['Flight', 'Train', 'Bus'].map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setTransport(mode)}
+                    className={`flex-1 py-2 px-3 rounded-md border text-sm transition duration-200 ${
+                      transport === mode
+                        ? 'bg-green-500 text-black font-semibold'
+                        : 'bg-[#242236] border-[#444] text-white'
+                    }`}
+                  >
+                    {mode}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Accommodation Preference */}
+            <div>
+              <label className="block text-sm mb-1">Accommodation</label>
+              <select
+                onChange={(e) => setAccommodation(e.target.value)}
+                value={accommodation}
+                className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
               >
-                {val}
-              </Button>
-            ))}
-          </div>
-        </div>
+                <option value="">Select accommodation</option>
+                <option value="Hotel">Hotel</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Homestay">Homestay</option>
+              </select>
+            </div>
 
-        {/* Budget Type */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {['low', 'medium'].map((b) => (
-            <Card
-              key={b}
-              onClick={() => setBudget(b)}
-              className={`p-4 cursor-pointer rounded-xl text-center transition duration-200 ${
-                budget === b ? 'bg-purple-600' : 'bg-[#2b2540]'
-              }`}
+            {/* Number of Travelers */}
+            <div>
+              <label className="block text-sm mb-1">Travelers</label>
+              <div className="flex items-center justify-start gap-3 bg-[#242236] border border-[#444] px-3 py-2 rounded-md w-fit">
+                <button
+                  type="button"
+                  onClick={() => setTravelers(Math.max(1, travelers - 1))}
+                  className="text-white text-lg"
+                >
+                  −
+                </button>
+                <span className="text-sm">{travelers}</span>
+                <button
+                  type="button"
+                  onClick={() => setTravelers(travelers + 1)}
+                  className="text-white text-lg"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full text-black font-bold py-2.5 rounded-md shadow-md shadow-green-500/30 transition text-sm"
             >
-              <h3 className="font-semibold text-white capitalize">{b} Budget</h3>
-              <p className="text-sm text-gray-300">
-                {b === 'low'
-                  ? 'Affordable stays, local transport, street food'
-                  : 'Comfortable hotels, mixed transport, dining'}
-              </p>
-            </Card>
-          ))}
-        </div>
-
-        {/* Preferences */}
-        <div className="space-y-6">
-          {/* Transport */}
-          <div>
-            <label className="block font-medium mb-2 text-sm text-gray-300">Preferred Transport</label>
-            <div className="flex gap-3 flex-wrap">
-              {['Bus', 'Train', 'Flight'].map((mode) => (
-                <Button
-                  key={mode}
-                  type="button"
-                  className={`px-4 py-2 rounded ${transport === mode ? 'bg-purple-600' : 'bg-[#322E3B]'} text-white`}
-                  onClick={() => setTransport(mode)}
-                >
-                  {mode}
-                </Button>
-              ))}
-            </div>
+              {loading ? 'Planning...' : '📍 Plan My Trip'}
+            </Button>
           </div>
-
-          {/* Accommodation */}
-          <div>
-            <label className="block font-medium mb-2 text-sm text-gray-300">Accommodation Type</label>
-            <div className="flex gap-3 flex-wrap">
-              {['Hostel', 'Lodge', 'Hotel'].map((acc) => (
-                <Button
-                  key={acc}
-                  type="button"
-                  className={`px-4 py-2 rounded ${accommodation === acc ? 'bg-purple-600' : 'bg-[#322E3B]'} text-white`}
-                  onClick={() => setAccommodation(acc)}
-                >
-                  {acc}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Food Preferences */}
-          <div>
-            <label className="block font-medium mb-2 text-sm text-gray-300">Food Preferences</label>
-            <div className="flex gap-3 flex-wrap">
-              {['Veg', 'Non-Veg', 'Local'].map((f) => (
-                <Button
-                  key={f}
-                  type="button"
-                  className={`px-4 py-2 rounded ${food === f ? 'bg-purple-600' : 'bg-[#322E3B]'} text-white`}
-                  onClick={() => setFood(f)}
-                >
-                  {f}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <div className="text-center pt-4">
-          <Button
-            type="submit"
-           
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-8 py-3 rounded-full shadow-lg transition duration-300"
-          >
-            Generate Budget Plan
-          </Button>
-        </div>
-      </motion.form>
+        </motion.form>
+      </div>
     </div>
   );
 }

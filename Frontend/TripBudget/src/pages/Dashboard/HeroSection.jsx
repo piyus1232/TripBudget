@@ -4,8 +4,10 @@ import TypingText from '../../framermotion/TypingText';
 import WordByWordReveal from '../../framermotion/WordReveal';
 import Button from '../../components/utils/Button';
 import heroImg from '../../assets/hero.jpg';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <motion.section
       initial={{ opacity: 0, y: -20 }}
@@ -35,7 +37,7 @@ const HeroSection = () => {
 
         {/* Button */}
         <div className="mt-6 sm:mt-8 flex justify-center md:justify-start">
-          <Button>Start Planning</Button>
+          <Button onClick={()=>(navigate('/plantrip'))} >Start Planning</Button>
         </div>
       </div>
     </motion.section>

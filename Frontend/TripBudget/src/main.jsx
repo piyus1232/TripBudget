@@ -12,6 +12,8 @@ import Landing from './pages/Landingpage/Landing';
 import ContactPage from './pages/Landingpage/Contactus';
 import AboutPage from './pages/Landingpage/AboutPage';
 import PlanTrip from './pages/PlanTrip/PlanTrip';
+import FormResponse from './pages/formresponse/formresponse';
+import ExploreCities from './pages/ExploreCities/explorecities';
 
 // Function to build router based on login state
 const buildRouter = (isLoggedIn) =>
@@ -23,6 +25,8 @@ const buildRouter = (isLoggedIn) =>
         ? [
             { path: '/', element: <Landing/> },
             { path: '/dashboard', element: <Dashboard /> },
+             { path: '/ExploreCities', element: <ExploreCities/> },
+                    { path: '/response', element: <FormResponse/> },
             { path: '/account', element: <Account /> },
                 // { path: '/Contact', element: <ContactPage/> },
               
@@ -34,11 +38,13 @@ const buildRouter = (isLoggedIn) =>
         : [
             { path: '/', element: <Landing /> },
            { path: '/Contact', element: <ContactPage/> },
+              { path: '/response', element: <FormResponse/> },
+               { path: '/ExploreCities', element: <ExploreCities/> },
               // { path: '/', element: <Dashboard /> },
             { path: '/dashboard', element: <Dashboard /> },
             { path: '/account', element: <Account /> },
             { path: '/about', element: <AboutPage /> },
-             { path: '/plantrip', element: <PlanTrip /> },
+             { path: '/plantrip', element: <PlanTrip/> },
           ],
     },
   ]);

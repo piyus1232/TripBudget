@@ -29,7 +29,7 @@ const TravelStats = () => {
           }}
           className="w-full"
         >
-          <Card className="bg-transparent border border-white/40 rounded-xl p-4 sm:p-6 flex flex-col items-center">
+          <Card className="bg-transparent border border-white/5 rounded-xl p-4 sm:p-6 flex flex-col items-center">
             <h3 className="text-xs sm:text-sm md:text-base uppercase text-white/80 tracking-wide text-center">
               {title}
             </h3>

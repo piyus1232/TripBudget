@@ -29,9 +29,9 @@ import { login, logout } from './conf/authSlice.js';
   }, [])
   return  !loading ? (
     <>
-     <div className="flex w-full bg-[#0f0b1d]">
+     <div className="flex w-full bg-[#171221]">
      
-      <div className=" w-full min-h-screen bg-[#0f0b1d] p-4">
+      <div className=" w-full min-h-screen bg-[#171221] p-4">
         <Outlet />
       </div>
     </div>

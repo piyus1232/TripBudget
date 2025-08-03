@@ -42,14 +42,14 @@ function SideBar({ initial, animate, transition }) {
         initial={initial}
         animate={animate}
         transition={transition}
-        className={`fixed top-0 left-0 h-screen bg-[#14101d] text-white shadow-lg z-40 flex flex-col w-[240px] sm:w-[260px] md:w-[280px] lg:w-[300px] transition-all duration-300
+        className={`fixed top-0 left-0 h-screen bg-[#171221] text-white shadow-lg z-40 flex flex-col w-[240px] sm:w-[260px] md:w-[280px] lg:w-[300px] transition-all duration-300
           ${isOpen ? 'block' : 'hidden sm:flex'}`}
           
       >
-          <div className="absolute right-0 top-0 h-full w-[1px] bg-white/40"></div>
+          <div className="absolute right-0 top-0 h-full w-[1px] bg-white/5"></div>
         {/* Logo */}
         <div className="p-5 border-b border-white/10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-purple-400">TripBudget</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-purple-500">TripBudget</h1>
         </div>
 {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
