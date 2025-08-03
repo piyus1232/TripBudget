@@ -7,6 +7,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import axios from 'axios';
 import Button from '../../components/utils/Button';
+import TypingText from '../../framermotion/TypingText';
 
 function PlanTrip() {
   const { register, handleSubmit } = useForm();
@@ -78,7 +79,12 @@ useEffect(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: 'easeInOut' }}
         >
-          <h2 className="text-2xl font-bold mb-4">🗺️ Plan Your Trip</h2>
+         <h2  className="text-2xl font-bold mb-4">
+           <TypingText
+          delay={0.1}
+           text=" 🗺️ Plan Your Trip"
+         /> 
+         </h2>
 
           <div className="grid grid-cols-1 gap-4">
             {/* Departure City and Destination */}
