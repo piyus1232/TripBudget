@@ -19,13 +19,53 @@ function PlanTrip() {
   const[load,setload]= useState(true)
   const [user,setUser] =useState(null)
   const navigate = useNavigate();
+const onSubmit = async (data) => {
+  setLoading(true);
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    const finalData = { ...data, budget, travelers, transport, accommodation };
-    console.log('Final Submitted Data:', finalData);
-    setTimeout(() => setLoading(false), 2000);
-  };
+  try {
+    // ✅ Format dates to 'YYYY-MM-DD'
+    const formatDate = (date) => new Date(date).toISOString().split('T')[0];
+
+    const finalData = {
+      ...data,
+      startDate: formatDate(data.startDate),
+      returnDate: formatDate(data.returnDate),
+      budget,
+      travelers,
+      transport,
+      accommodation,
+
+    };
+
+    const res = await axios.post("http://localhost:5000/api/v1/users/train", finalData, {
+      withCredentials: true,
+    });
+
+    navigate('/response', {
+        state: {
+          data: res.data.data, // Pass ApiResponse.data
+          cacheStatus: res.headers['x-cache-status'],
+          originalInputs: {
+            source: data.source,
+            destination: data.destination,
+            startDate: finalData.startDate,
+            returnDate: finalData.returnDate,
+            // hotels:data.hotels.hotels
+            
+          },
+        },
+      });
+      console.log(data);
+      
+  } catch (error) {
+    console.error("Error in trip submission:", error);
+    toast.error("Something went wrong while planning the trip.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   const indianCities = [
   "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune",
   "Ahmedabad", "Jaipur", "Lucknow", "Chandigarh", "Bhopal", "Indore", "Nagpur",
@@ -34,7 +74,7 @@ function PlanTrip() {
   "Noida", "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
   "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
   "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur",
-  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik"
+  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu"
 ];
 useEffect(() => {
   const fetchUser = async () => {
@@ -92,7 +132,7 @@ useEffect(() => {
               <div>
                 <label className="block text-sm mb-1">From</label>
                 <select
-                  {...register('from')}
+                  {...register('source')}
                   className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
                 >
                    {indianCities.map((city) => (
@@ -103,7 +143,7 @@ useEffect(() => {
               <div>
                 <label className="block text-sm mb-1">To</label>
                 <select
-                  {...register('to')}
+                  {...register('destination')}
                   className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
                 >
                     {indianCities.map((city) => (
@@ -127,7 +167,7 @@ useEffect(() => {
                 <label className="block text-sm mb-1">End Date</label>
                 <input
                   type="date"
-                  {...register('endDate')}
+                  {...register('returnDate')}
                   className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
                 />
               </div>

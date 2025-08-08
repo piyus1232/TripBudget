@@ -8,8 +8,9 @@ import { getNearbyHotels } from "../controllers/hotel.controller.js";
 
 
 import { loginUser,logoutUser ,getCurrentUser,updateProfile,deleteaccount,editProfile} from "../controllers/user.controller.js";
-import { getplaces } from "../controllers/places.controller.js";
+// import { getplaces } from "../controllers/places.controller.js";
 import { getCheapestRoundTripTrains } from "../controllers/getcheapesttrain.js";
+import { finalcontroller } from "../controllers/finalcontroller.js";
 
 const router = Router();
  router.route("/register").post(registerUser)
@@ -22,9 +23,9 @@ router.route("/updateProfile").post(
   ]),        
   updateProfile 
 );
-router.route("/train").post(getCheapestRoundTripTrains);
+router.route("/train").post(finalcontroller);
 router.route("/hotel").post(getNearbyHotels);
-router.route("/places").post(getplaces);
+// router.route("/places").post(getplaces);
 
 // router.get("/test-token", (req, res) => {
 //   res.json({ cookies: req.cookies });
