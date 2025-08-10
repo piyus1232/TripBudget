@@ -1,625 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TripBudget - Explore Cities</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <title>Saved Trip Responses - TripBudget</title>
+  <style>
+    body {
+      margin: 0;
+      background: #171221;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 230px;
+      background: #221e41;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0 0 18px 0;
+      min-height: 100vh;
+      box-shadow: 2px 0 18px rgba(0,0,0,0.09);
+      position: relative;
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 24px 0 10px 22px;
+    }
+    .sidebar-logo {
+      width: 34px;
+      height: 34px;
+      background: #f51a51;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.07em;
+      color: #fff;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .sidebar-title {
+      font-size: 1.48em;
+      font-weight: bold;
+      color: #a788ff;
+      letter-spacing: 1px;
+    }
+    .sidebar-menu {
+      margin-top: 18px;
+      flex: 1;
+    }
+    .sidebar-menu-item {
+      padding: 12px 28px;
+      color: #ddd9ff;
+      font-size: 1.07em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-left: 3px solid transparent;
+      transition: background .16s, border-color .16s;
+      cursor: pointer;
+    }
+    .sidebar-menu-item:hover, .sidebar-menu-item.active {
+      background: #29255c;
+      border-left: 3px solid #6457ea;
+      color: #91ec97;
+    }
+    .sidebar-bottom {
+      padding: 0 20px;
+    }
+    .sidebar-account-btn {
+      width: 100%;
+      background: #8a4de3;
+      color: #fff;
+      text-align: center;
+      font-weight: 600;
+      border: none;
+      border-radius: 9px;
+      padding: 13px;
+      font-size: 1.08em;
+      margin-top: 14px;
+      cursor: pointer;
+      transition: background .17s;
+    }
+    .sidebar-account-btn:hover {
+      background: #a74aca;
+    }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0f1419 100%);
-            color: white;
-            line-height: 1.6;
-            min-height: 100vh;
-        }
+    /* Main content layout */
+    .main-content {
+      flex: 1;
+      padding: 40px 32px 32px 32px;
+      margin-left: 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #171221;
+    }
 
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background: rgba(15, 20, 25, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #4ade80;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: #4ade80;
-            background: rgba(74, 222, 128, 0.1);
-        }
-
-        .profile {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #4ade80, #22d3ee);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .profile:hover {
-            transform: scale(1.1);
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .page-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff, #4ade80, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .page-subtitle {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.7);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .search-section {
-            margin-bottom: 3rem;
-        }
-
-        .search-container {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1.25rem 1.5rem 1.25rem 3.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            color: white;
-            font-size: 1.1rem;
-            backdrop-filter: blur(20px);
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #4ade80;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 1.2rem;
-        }
-
-        .filter-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 3rem;
-        }
-
-        .filter-tab {
-            padding: 0.75rem 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            color: rgba(255, 255, 255, 0.8);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .filter-tab:hover,
-        .filter-tab.active {
-            background: linear-gradient(135deg, #4ade80, #22d3ee);
-            color: white;
-            border-color: transparent;
-            transform: translateY(-2px);
-        }
-
-        .cities-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .city-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .city-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        .city-image {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            position: relative;
-        }
-
-        .city-info {
-            padding: 2rem;
-        }
-
-        .city-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
-        .city-tagline {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-        }
-
-        .city-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-        }
-
-        .city-visitors {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #22d3ee;
-            font-size: 0.9rem;
-        }
-
-        .city-rating {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: #FFD700;
-            font-size: 0.9rem;
-        }
-
-        .featured-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: linear-gradient(135deg, #4ade80, #22d3ee);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .people-visited-section {
-            margin-bottom: 4rem;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 2.5rem;
-            background: linear-gradient(135deg, #4ade80, #22d3ee);
-            border-radius: 2px;
-        }
-
-        .visitors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .visitor-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 1.5rem;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .visitor-card:hover {
-            transform: translateY(-4px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .visitor-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .visitor-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #4ade80, #22d3ee, #f59e0b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-        }
-
-        .visitor-info h4 {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .visitor-location {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-        }
-
-        .visited-cities {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .city-tag {
-            background: rgba(74, 222, 128, 0.2);
-            color: #4ade80;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .visitor-review {
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 3rem;
-        }
-
-        .btn {
-            padding: 1rem 2.5rem;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #a855f7);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
-        }
-
-        .floating-elements {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .floating-circle {
-            position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 211, 238, 0.1));
-            animation: float 8s ease-in-out infinite;
-        }
-
-        .floating-circle:nth-child(1) {
-            width: 120px;
-            height: 120px;
-            top: 10%;
-            left: 5%;
-            animation-delay: 0s;
-        }
-
-        .floating-circle:nth-child(2) {
-            width: 80px;
-            height: 80px;
-            top: 50%;
-            right: 10%;
-            animation-delay: 3s;
-        }
-
-        .floating-circle:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            bottom: 20%;
-            left: 15%;
-            animation-delay: 6s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(180deg); }
-        }
-
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 2.5rem;
-            }
-            
-            .filter-tabs {
-                flex-wrap: wrap;
-            }
-            
-            .cities-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
+    h2 {
+      margin: 0 0 13px 8px;
+      font-weight: 500;
+      color: #91ec97;
+    }
+    #trip-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      margin-top: 16px;
+    }
+    .trip-card {
+      display: flex;
+      align-items: center;
+      background: #221e41;
+      border-radius: 14px;
+      padding: 18px 22px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.2s;
+      border: 1px solid #23204a;
+    }
+    .trip-card:hover {
+      background: #262258;
+      border-color: #6457ea;
+    }
+    .trip-img {
+      width: 110px;
+      height: 78px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 24px;
+    }
+    .trip-summary {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+    .trip-title {
+      font-size: 1.15em;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+      margin-bottom: 5px;
+      color: #ddd9ff;
+    }
+    .trip-hotel, .trip-visitors {
+      font-size: 0.98em;
+      color: #c4bbed;
+    }
+    .trip-places {
+      font-size: 0.98em;
+      margin-top: 4px;
+      color: #a6adf5;
+    }
+    .save-date {
+      font-size: 0.93em;
+      color: #7ed083;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 200;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(30, 22, 60, 0.83);
+      justify-content: center;
+      align-items: center;
+      transition: 0.2s;
+    }
+    .modal-content {
+      background: #221e41;
+      padding: 36px;
+      border-radius: 16px;
+      min-width: 420px;
+      max-width: 660px;
+      color: #fff;
+      position: relative;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.14);
+      font-size: 1.04em;
+    }
+    .close {
+      position: absolute;
+      right: 22px;
+      top: 16px;
+      font-size: 26px;
+      font-weight: bold;
+      color: #a6adf5;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+    .close:hover {
+      color: #f51a51;
+    }
+    .fullresponse-hr {
+      border: 0;
+      height: 1px;
+      background: #332f4a;
+      margin: 16px 0;
+    }
+    @media (max-width:900px) {
+      .sidebar {
+        width: 68px;
+        min-width: 60px;
+        padding: 0;
+      }
+      .sidebar-header {
+        justify-content: center;
+        padding: 22px 0 8px 0;
+      }
+      .sidebar-title {
+        display: none;
+      }
+      .sidebar-menu-item {
+        padding: 12px 12px;
+        font-size: 1.04em;
+        justify-content: center;
+      }
+      .sidebar-account-btn {
+        padding: 8px; font-size: 0.98em;
+      }
+      .sidebar-bottom {
+        padding: 0 7px;
+      }
+      .main-content {
+        padding: 20px 5vw 24px 14px;
+      }
+      .modal-content { min-width: unset; max-width: 98vw; padding: 14px; }
+      .trip-card { flex-direction: column; align-items: flex-start;}
+      .trip-img { margin-bottom: 8px; margin-right: 0;}
+    }
+    @media (max-width:600px) {
+      .sidebar {width: 0; min-width: 0; display:none;}
+      .main-content {padding:14px;}
+    }
+  </style>
 </head>
 <body>
-    <div class="floating-elements">
-        <div class="floating-circle"></div>
-        <div class="floating-circle"></div>
-        <div class="floating-circle"></div>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div>
+      <div class="sidebar-header">
+        <div class="sidebar-logo">TB</div>
+        <span class="sidebar-title">TripBudget</span>
+      </div>
+      <div class="sidebar-menu">
+        <div class="sidebar-menu-item active">&#128200; Dashboard</div>
+        <div class="sidebar-menu-item">&#128188; My Trips</div>
+        <div class="sidebar-menu-item">&#127758; Explore Cities</div>
+        <div class="sidebar-menu-item">&#128101; Group Discussions</div>
+        <div class="sidebar-menu-item">&#128197; Plan a Trip</div>
+        <div class="sidebar-menu-item">&#128179; Budget Estimator</div>
+      </div>
     </div>
+    <div class="sidebar-bottom">
+      <button class="sidebar-account-btn">&#128100; Account</button>
+    </div>
+  </nav>
 
-    <nav class="navbar">
-        <div class="logo">
-            <span>📱</span>
-            TripBudget
-        </div>
-        <ul class="nav-links">
-            <li><a href="#explore" class="active">Explore</a></li>
-            <li><a href="#trips">Trips</a></li>
-            <li><a href="#saved">Saved</a></li>
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>Saved Trips</h2>
+    <div id="trip-cards"></div>
+  </div>
+
+  <!-- Modal for full trip response -->
+  <div id="trip-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-modal">&times;</span>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+<script>
+const savedTrips = [
+  {
+    city: "Jaipur",
+    img: "https://images.unsplash.com/photo-1548786817-9ff59b93f3b1?auto=format&fit=crop&w=400&q=80",
+    visitors: "2.5M",
+    date: "10 Aug - 13 Aug 2025",
+    rating: 4.6,
+    hotel: "BHAI BHAI GUEST HOUSE",
+    hotelPrice: "₹406/night",
+    cost: "₹12,000",
+    places: [
+      "Albert Hall Museum (3.2 km)",
+      "Nahargarh Fort (3.9 km)",
+      "Jantar Mantar (3.9 km)",
+      "Galtaji Temple (7.7 km)"
+    ],
+    fullResponse: `
+      <h3 style="color:#91ec97;">Trip to Jaipur</h3>
+      <div><b>Dates:</b> 10 Aug - 13 Aug 2025</div>
+      <div><b>Total trip budget:</b> ₹12,000</div>
+      <div><b>Hotel:</b> BHAI BHAI GUEST HOUSE <span style="color:#7ed083;">(₹406/night)</span></div>
+      <hr class="fullresponse-hr"/>
+      <b style="color:#a6adf5;">Nearby Places to Visit</b>
+      <ul style="padding-left:20px;margin-top:6px;">
+        <li>Albert Hall Museum – 3.2 km</li>
+        <li>Nahargarh Fort – 3.9 km</li>
+        <li>Jantar Mantar – 3.9 km</li>
+        <li>Galtaji Temple – 7.7 km</li>
+      </ul>
+      <hr class="fullresponse-hr"/>
+      <b style="color:#a6adf5;">Top Train Recommendations</b>
+      <ul style="padding-left:20px;margin-top:6px;">
+        <li>
+          <b>Ashram Express:</b> 2:55 pm – 8:10 pm <span style="color:#7ed083">(₹240, 5h 15m)</span>
+        </li>
+        <li>
+          <b>BE Bhuj Express:</b> 11:50 am – 5:50 pm <span style="color:#7ed083">(₹330, 6h 0m)</span>
+        </li>
+      </ul>
+      <hr class="fullresponse-hr"/>
+      <b style="color:#a6adf5;">Return Trains</b>
+      <ul style="padding-left:20px;margin-top:6px;">
+        <li>
+          <b>RJSTHN S Kranti:</b> 12:45 am – 5:50 am <span style="color:#7ed083">(₹240, 5h 5m)</span>
+        </li>
+      </ul>
+      <hr class="fullresponse-hr"/>
+      <b style="color:#a6adf5;">Suggested Accommodations</b>
+      <div>
+        <ul style="padding-left:20px;margin-top:6px;">
+          <li>BHAI BHAI GUEST HOUSE <span style="color:#7ed083;">(₹406/night)</span></li>
+          <li>Stephels Hostel (₹550/night)</li>
+          <li>Hotel Kanchandeep (₹789/night)</li>
+          <li>PLAY IKshana Palette (₹1082/night)</li>
         </ul>
-        <div class="profile">👤</div>
-    </nav>
+      </div>
+    `
+  },
+  {
+    city: "Mumbai",
+    img: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+    visitors: "4.8M",
+    date: "20 Dec - 24 Dec 2025",
+    rating: 4.7,
+    hotel: "Hotel Sea View",
+    hotelPrice: "₹1050/night",
+    cost: "₹16,000",
+    places: [
+      "Gateway of India",
+      "Marine Drive",
+      "Siddhivinayak Temple"
+    ],
+    fullResponse: `
+      <h3 style="color:#91ec97;">Trip to Mumbai</h3>
+      <div><b>Dates:</b> 20 Dec - 24 Dec 2025</div>
+      <div><b>Total trip budget:</b> ₹16,000</div>
+      <div><b>Hotel:</b> Hotel Sea View <span style="color:#7ed083;">(₹1050/night)</span></div>
+      <hr class="fullresponse-hr"/>
+      <b style="color:#a6adf5;">Nearby Places to Visit</b>
+      <ul style="padding-left:20px;margin-top:6px;">
+        <li>Gateway of India</li>
+        <li>Marine Drive</li>
+        <li>Siddhivinayak Temple</li>
+      </ul>
+      <hr class="fullresponse-hr"/>
+      <b style="color:#a6adf5;">Train Suggestions</b>
+      <ul style="padding-left:20px;margin-top:6px;">
+        <li>Golden Express: 07:30 am – 13:00 pm (<span style="color:#7ed083">₹680, 5h 30m</span>)</li>
+      </ul>
+      `
+  }
+];
 
-    <div class="container">
-        <div class="page-header">
-            <h1 class="page-title">Explore Cities</h1>
-            <p class="page-subtitle">Discover amazing destinations around the world and plan your next adventure with personalized recommendations</p>
-        </div>
+// Render cards
+const tripCards = document.getElementById('trip-cards');
+savedTrips.forEach((trip) => {
+  const card = document.createElement('div');
+  card.className = 'trip-card';
+  card.innerHTML = `
+    <img src="${trip.img}" alt="${trip.city}" class="trip-img"/>
+    <div class="trip-summary">
+      <div class="trip-title">${trip.city}</div>
+      <div class="trip-hotel">Hotel: ${trip.hotel} <span style="color:#7ed083;">(${trip.hotelPrice})</span></div>
+      <div class="trip-visitors">Visitors: ${trip.visitors} | Rating: ${trip.rating}</div>
+      <div class="trip-places">Places: ${trip.places.slice(0,3).join(', ')}${trip.places.length > 3 ? ', ...' : ''}</div>
+      <div class="save-date">Dates: ${trip.date} &nbsp; | &nbsp; Budget: <span style="color:#7ed083;">${trip.cost}</span></div>
+    </div>
+  `;
+  card.addEventListener('click', () => {
+    document.getElementById('modal-body').innerHTML = trip.fullResponse;
+    document.getElementById('trip-modal').style.display = 'flex';
+  });
+  tripCards.appendChild(card);
+});
 
-        <div class="search-section">
-            <div class="search-container">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" placeholder="Search city or destination">
-            </div>
-
-            <div class="filter-tabs">
-                <div class="filter-tab active">All Cities</div>
-                <div class="filter-tab">Continent</div>
-                <div class="filter-tab">Budget Range</div>
-                <div class="filter-tab">Popularity</div>
-                <div class="filter-tab">Climate</div>
-            </div>
-        </div>
-
-        <div class="cities-grid">
-            <div class="city-card">
-                <div class="featured-badge">Featured</div>
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cdefs%3E%3ClinearGradient id='jaipurBg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23f4a261'/%3E%3Cstop offset='100%25' stop-color='%23e76f51'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='320' height='220' fill='url(%23jaipurBg)'/%3E%3Crect x='50' y='80' width='220' height='100' fill='%23264653' opacity='0.3'/%3E%3Cpath d='M80 120 Q160 60 240 120 Q160 140 80 120 Z' fill='%23f4a261'/%3E%3Crect x='140' y='100' width='40' height='60' fill='%23e76f51'/%3E%3Cpolygon points='160,80 140,100 180,100' fill='%234ade80'/%3E%3Ccircle cx='100' cy='180' r='8' fill='%232a9d8f'/%3E%3Ccircle cx='220' cy='180' r='8' fill='%232a9d8f'/%3E%3C/svg%3E" alt="Jaipur" class="city-image">
-                <div class="city-info">
-                    <h3 class="city-name">Jaipur</h3>
-                    <p class="city-tagline">The Pink City of India</p>
-                    <div class="city-stats">
-                        <div class="city-visitors">👥 2.5M visitors</div>
-                        <div class="city-rating">⭐ 4.6</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="city-card">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cdefs%3E%3ClinearGradient id='amsterdamBg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232a9d8f'/%3E%3Cstop offset='100%25' stop-color='%23264653'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='320' height='220' fill='url(%23amsterdamBg)'/%3E%3Cpath d='M0 180 Q160 120 320 180 L320 220 L0 220 Z' fill='%234ade80' opacity='0.3'/%3E%3Crect x='60' y='60' width='80' height='100' fill='%23f4a261'/%3E%3Crect x='180' y='80' width='80' height='80' fill='%23e76f51'/%3E%3Crect x='80' y='100' width='15' height='30' fill='%23264653'/%3E%3Crect x='200' y='120' width='15' height='20' fill='%23264653'/%3E%3Cpath d='M50 180 Q160 160 270 180' stroke='%2322d3ee' stroke-width='3' fill='none'/%3E%3C/svg%3E" alt="Amsterdam" class="city-image">
-                <div class="city-info">
-                    <h3 class="city-name">Amsterdam</h3>
-                    <p class="city-tagline">Canals and Culture</p>
-                    <div class="city-stats">
-                        <div class="city-visitors">👥 1.8M visitors</div>
-                        <div class="city-rating">⭐ 4.7</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="city-card">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cdefs%3E%3ClinearGradient id='kyotoBg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23264653'/%3E%3Cstop offset='100%25' stop-color='%232a9d8f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='320' height='220' fill='url(%23kyotoBg)'/%3E%3Cpath d='M0 150 Q80 100 160 130 Q240 160 320 140 L320 220 L0 220 Z' fill='%234ade80' opacity='0.4'/%3E%3Cpath d='M100 80 Q160 40 220 80 Q160 120 100 80 Z' fill='%23e76f51'/%3E%3Crect x='150' y='100' width='20' height='40' fill='%23f4a261'/%3E%3Ccircle cx='80' cy='180' r='6' fill='%23FFD700'/%3E%3Ccircle cx='240' cy='170' r='6' fill='%23FFD700'/%3E%3C/svg%3E" alt="Kyoto" class="city-image">
-                <div class="city-info">
-                    <h3 class="city-name">Kyoto</h3>
-                    <p class="city-tagline">Temples and Traditions</p>
-                    <div class="city-stats">
-                        <div class="city-visitors">👥 3.2M visitors</div>
-                        <div class="city-rating">⭐ 4.8</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="city-card">
-                <div class="featured-badge">Popular</div>
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cdefs%3E%3ClinearGradient id='rioBg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%234ade80'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='320' height='220' fill='url(%23rioBg)'/%3E%3Cpath d='M0 160 Q160 120 320 160 L320 220 L0 220 Z' fill='%23f4a261' opacity='0.6'/%3E%3Cpath d='M200 60 Q240 20 280 60 Q240 100 200 60 Z' fill='%23264653'/%3E%3Cpath d='M40 180 Q160 140 280 180' stroke='%23ffffff' stroke-width='2' fill='none'/%3E%3Ccircle cx='100' cy='50' r='15' fill='%23FFD700'/%3E%3C/svg%3E" alt="Rio de Janeiro" class="city-image">
-                <div class="city-info">
-                    <h3 class="city-name">Rio de Janeiro</h3>
-                    <p class="city-tagline">Beaches and Samba</p>
-                    <div class="city-stats">
-                        <div class="city-visitors">👥 4.1M visitors</div>
-                        <div class="city-rating">⭐ 4.5</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="city-card">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cdefs%3E%3ClinearGradient id='marrakechBg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23e76f51'/%3E%3Cstop offset='100%25' stop-color='%23f4a261'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='320' height='220' fill='url(%23marrakechBg)'/%3E%3Crect x='80' y='80' width='160' height='100' fill='%23264653' opacity='0.4'/%3E%3Cpath d='M120 120 Q160 80 200 120 Q160 160 120 120 Z' fill='%232a9d8f'/%3E%3Crect x='150' y='140' width='20' height='40' fill='%23e76f51'/%3E%3Cpolygon points='160,100 140,120 180,120' fill='%234ade80'/%3E%3Ccircle cx='60' cy='60' r='8' fill='%23FFD700'/%3E%3Ccircle cx='260' cy='70' r='8' fill='%23FFD700'/%3E%3C/svg%3E" alt="Marrakech" class="city-image">
-                <div class="city-info">
-                    <h3 class="city-name">Marrakech</h3>
-                    <p class="city-tagline">Markets and Medina</p>
-                    <div class="city-stats">
-                        <div class="city-visitors">👥 1.2M visitors</div>
-                        <div class="city-rating">⭐ 4.4</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="city-card">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cdefs%3E%3ClinearGradient id='havanaBg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%234ade80'/%3E%3Cstop offset='100%25' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='320' height='220' fill='url(%23havanaBg)'/%3E%3Crect x='60' y='100' width='200' height='80' fill='%23f4a261' opacity='0.7'/%3E%3Crect x='100' y='80' width='40' height='80' fill='%23e76f51'/%3E%3Crect x='180' y='90' width='40' height='70' fill='%23264653'/%3E%3Cpolygon points='160,60 140,80 180,80' fill='%232a9d8f'/%3E%3Ccircle cx='50' cy='50' r='12' fill='%23FFD700'/%3E%3Cpath d='M20 180 Q160 160 300 180' stroke='%23ffffff' stroke-width='2' fill='none'/%3E%3C/svg%3E" alt="Havana" class="city-image">
-                <div class="city-info">
-                    <h3 class="city-name">Havana</h3>
-                    <p class="city-tagline">Music and Mojitos</p>
-                    <div class="city-stats">
-                        <div class="city-visitors">👥 900K visitors</div>
-                        <div class="city-rating">⭐ 4.3</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="people-visited-section">
-            <h2 class="section-title">People Who Visited</h2>
-            <div class="visitors-grid">
-                <div class="visitor-card">
-                    <div class="visitor-header">
-                        <div class="visitor-avatar">AS</div>
-                        <div class="visitor-info">
-                            <h4>Aisha Sharma</h4>
-                            <p class="visitor-location">Mumbai, India</p>
-                        </div>
-                    </div>
-                    <div class="visited-cities">
-                        <span class="city-tag">Jaipur</span>
-                        <span class="city-tag">Udaipur</span>
-                        <span class="city-tag">Jodhpur</span>
-                    </div>
-                    <p class="visitor-review">"Rajasthan's royal heritage is absolutely mesmerizing. The palaces and forts tell incredible stories of India's rich history."</p>
-                </div>
-
-                <div class="visitor-card">
-                    <div class="visitor-header">
-                        <div class="visitor-avatar">MJ</div>
-                        <div class="visitor-info">
-                            <h4>Marcus Johnson</h4>
-                            <p class="visitor-location">New York, USA</p>
-                        </div>
-                    </div>
-                    <div class="visited-cities">
-                        <span class="city-tag">Amsterdam</span>
-                        <span class="city-tag">Brussels</span>
-                        <span class="city-tag">Paris</span>
-                    </div>
-                    <p class="visitor-review">"Amsterdam's canal tours and bike rides through the city were unforgettable. Perfect blend of history and modern culture."</p>
-                </div>
-
-                <div class="visitor-card">
-                    <div class="visitor-header">
-                        <div class="visitor-avatar">YT</div>
-                        <div class="visitor-info">
-                            <h4>Yuki Tanaka</h4>
-                            <p class="visitor-location">Tokyo, Japan</p>
-                        </div>
-                    </div>
-                    <div class="visited-cities">
-                        <span class="city-tag">Kyoto</span>
-                        <span class="city-tag">Nara</span>
-                        <span class="city-tag">Osaka</span>
-                    </div>
-                    <p class="visitor-review">"Kyoto's temples and traditional gardens are peaceful sanctuaries. The cherry blossom season made it even more magical."</p>
-                </div>
+// Modal functionality
+document.getElementById('close-modal').onclick = function() {
+  document.getElementById('trip-modal').style.display = 'none';
+};
+document.getElementById('trip-modal').onclick = function(e) {
+  if(e.target === this) this.style.display = 'none';
+};
+</script>
+</body>
+</html>

@@ -39,6 +39,35 @@ function Account() {
     fetchUser();
   }, [navigate]);
 
+
+     const [trips, setTrips] = useState([]);
+  useEffect(() => {
+
+   const fetchAllTrips = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/v1/users/getsavetrip",
+          { withCredentials: true }
+        );
+        let fetchedTrips = res.data.data || [];
+
+        // Sort newest first
+        fetchedTrips.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setTrips(fetchedTrips);
+      } catch (err) {
+        console.error("Error fetching trips:", err);
+      }
+    };
+
+   
+
+   fetchAllTrips();
+}, []);
+
+
   const logout = async () => {
     try {
       await axios.post(
@@ -52,6 +81,7 @@ function Account() {
       toast.error("Error in logout");
     }
   };
+
 
   const deleteAccount = async () => {
     try {
@@ -206,7 +236,7 @@ function Account() {
               </div>
               <div className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-200 px-4 py-2 rounded-xl text-center w-36">
                 <p className="text-sm">Trips Planned</p>
-                <p className="text-lg font-bold">1</p>
+                <p className="text-lg font-bold">{trips.length}</p>
               </div>
             </div>
 

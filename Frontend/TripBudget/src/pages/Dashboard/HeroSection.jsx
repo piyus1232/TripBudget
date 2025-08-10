@@ -5,9 +5,32 @@ import WordByWordReveal from '../../framermotion/WordReveal';
 import Button from '../../components/utils/Button';
 import heroImg from '../../assets/hero.jpg';
 import { useNavigate } from 'react-router-dom';
+import { useEffect,useState } from 'react';
+import axios from 'axios';
+import { toast } from "react-toastify";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+   
+    const [loading,setLoading]= useState(true)
+    const [user,setUser] = useState(null)
+    useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const res = await axios.get(
+            "http://localhost:5000/api/v1/users/getCurrentUser",
+            { withCredentials: true }
+          );
+          setUser(res.data.data);
+        } catch {
+          toast.error("Session expired");
+          navigate("/");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchUser();
+    }, [navigate]);
   return (
     <motion.section
       initial={{ opacity: 0, y: -20 }}
@@ -22,11 +45,13 @@ const HeroSection = () => {
     >
       <div className="w-full p-2 sm:p-4 md:p-8 rounded-xl space-y-4 sm:space-y-6 text-center md:text-left">
         {/* Typing animated headline */}
-        <TypingText
-          text="Welcome back, Piyush"
-          className="text-xl sm:text-2xl md:text-4xl font-semibold"
-          delay={0.12}
-        />
+     {!loading && user && (
+  <TypingText
+    text={`Welcome back, ${user.fullname}`}
+    className="text-xl sm:text-2xl md:text-4xl font-semibold"
+    delay={0.18}
+  />
+)}
 
         {/* Subtext */}
         <WordByWordReveal

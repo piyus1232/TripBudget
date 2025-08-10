@@ -74,6 +74,13 @@ const visitors = [
     tags: ['Rishikesh', 'Haridwar', 'Mussoorie'],
     quote:
       'Rishikesh’s spiritual vibe and river rafting made it unforgettable. Highly recommend the Ganga Aarti at Triveni Ghat.',
+  }, {
+    name: 'Piyush Gupta',
+    location: 'Jaipur, India',
+    avatar: 'PV',
+    tags: ['Rishikesh', 'udaipur', 'manali'],
+    quote:
+      'Rishikesh’s spiritual vibe and river rafting made it unforgettable. Highly recommend the Ganga Aarti at Triveni Ghat.',
   },
 ];
 
@@ -145,8 +152,8 @@ const ExploreCities = () => {
           ))}
         </div>
 
-        <h2 className="text-3xl font-semibold mt-16 mb-8 ml-12 text-center">People Who Planned</h2>
-        <motion.div  className="flex flex-wrap gap-6 ml-5">
+        <h2 className="text-3xl font-semibold  mb-14 ml-8 text-center">People Who Planned</h2>
+        <motion.div  className="flex  gap-6 ml-5">
           {visitors.map((person, i) => (
             
             <motion.Card
@@ -155,17 +162,17 @@ const ExploreCities = () => {
             transition: { type: 'spring', stiffness: 100 },
           }}
               key={i}
-              className="flex w-full sm:w-[300px] p-4 items-start ml-6 border-purple-800/20 
+              className="flex w-full sm:w-[300px] p-4 items-start  border-purple-800/20 
               before:absolute before:inset-0 before:rounded-3xl before:border before:border-purple-500/20 
               before:pointer-events-none before:shadow-[0_0_20px_rgba(168,85,247,0.15)] backdrop-blur-sm"
             >
-              <div className="bg-gradient-to-r from-teal-400 to-indigo-600 text-white font-bold rounded-full w-30 h-5 flex items-center justify-center mr-4">
+              <div className="bg-gradient-to-r from-teal-400 to-indigo-600 text-white font-bold rounded-full w-30 h-6 flex items-center justify-center mr-4">
                 {person.avatar}
               </div>
               <div>
                 <h4 className="text-lg font-semibold">{person.name}</h4>
                 <p className="text-gray-400 text-sm">{person.location}</p>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-1 mt-2">
                   {person.tags.map((tag, j) => (
                     <span key={j} className="bg-[#2e2b3a] text-teal-300 px-2 py-1 text-xs rounded-md">
                       {tag}

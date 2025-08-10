@@ -11,9 +11,6 @@ import { loginUser,logoutUser ,getCurrentUser,updateProfile,deleteaccount,editPr
 // import { getplaces } from "../controllers/places.controller.js";
 import { getCheapestRoundTripTrains } from "../controllers/getcheapesttrain.js";
 import { finalcontroller } from "../controllers/finalcontroller.js";
-// import { savedtrip } from "../controllers/savedtrip.controller.js";
-import { deletedtrips, getSavedTrips } from "../controllers/savetripfind.controller.js";
-
 
 const router = Router();
  router.route("/register").post(registerUser)
@@ -26,7 +23,7 @@ router.route("/updateProfile").post(
   ]),        
   updateProfile 
 );
-router.route("/train").post(verifyJWT,finalcontroller);
+router.route("/train").post(finalcontroller);
 router.route("/hotel").post(getNearbyHotels);
 // router.route("/places").post(getplaces);
 
@@ -41,11 +38,6 @@ router.route("/hotel").post(getNearbyHotels);
 router.route("/logout").post(verifyJWT,  logoutUser)
 
 router.route("/form").post(userform) 
-
-// router.route("/savetrip").post(savedtrip)
-router.route("/getsavetrip").get(verifyJWT,getSavedTrips)  
-router.delete("/getsavetrip/:id", verifyJWT, deletedtrips);
-
 router.route("/deleteaccount").post(verifyJWT,  deleteaccount)
 router.route("/editprofile").put(verifyJWT,editProfile)
 

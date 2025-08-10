@@ -4,6 +4,7 @@ import { getPlaces } from "./places.controller.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { getCityID, getCoordinates, getHotelData, processHotels } from "./hotel.controller.js";
+import { SavedTrip } from "../models/savedtrip.model.js";
 import { log } from "console";
 
 // Helper function to normalize input strings (matches train.controller.js)
@@ -196,6 +197,21 @@ console.log("totalfare",totalfare);
     }
   console.log(places);
   
+  const newTrip = await SavedTrip.create({
+    userId: req.user._id,
+    destination,
+    startDate,
+    returnDate,
+    cheapestOutTrain,
+    secondCheapestOutTrain,
+    cheapestReturnTrain,
+    secondCheapestReturnTrain,
+    hotels,
+    totalfare,
+    travelers,
+    places
+  });
+ 
 
     // Add cache status header (for debugging)
     res.setHeader('X-Cache-Status', trains.__fromCache ? 'hit' : 'miss');

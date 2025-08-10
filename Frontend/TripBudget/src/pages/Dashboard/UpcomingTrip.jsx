@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Button from '../../components/utils/Button';
 import WordByWordReveal from '../../framermotion/WordReveal';
 import upcomingImg from '../../assets/upcoming.webp';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 0 },
@@ -10,6 +12,55 @@ const fadeUp = {
 };
 
 const UpcomingTrip = () => {
+  const [latestTrip, setLatestTrip] = useState(null);
+     const [loading,setLoading]= useState(true);
+      const navigate = useNavigate();
+       
+
+  useEffect(() => {
+    const fetchLatestTrip = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/v1/users/getsavetrip",
+          { withCredentials: true }
+        );
+        let fetchedTrips = res.data.data || [];
+
+        // Sort by createdAt (latest first)
+        fetchedTrips.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // Keep only the latest trip
+        if (fetchedTrips.length > 0) {
+          setLatestTrip(fetchedTrips[0]);
+        }
+      } catch (err) {
+        console.error("Error fetching latest trip:", err);
+      }
+    };
+    fetchLatestTrip();
+  }, []);
+
+  const [user,setUser] = useState(null)
+      useEffect(() => {
+        const fetchUser = async () => {
+          try {
+            const res = await axios.get(
+              "http://localhost:5000/api/v1/users/getCurrentUser",
+              { withCredentials: true }
+            );
+            setUser(res.data.data);
+          } catch {
+            toast.error("Session expired");
+            navigate("/");
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchUser();
+      }, [navigate]);
+
   return (
     <motion.div
       key="upcoming"
@@ -22,23 +73,37 @@ const UpcomingTrip = () => {
       {/* Left Info Section */}
       <div className="flex-1 w-full text-center md:text-left space-y-2">
         <WordByWordReveal
-          text="UpComing Trip"
-          className="text-xl sm:text-2xl md:text-3xl text-white font-bold "
+          text="Upcoming Trip"
+          className="text-xl sm:text-2xl md:text-3xl text-white font-bold"
           delay={0.6}
         />
-        <WordByWordReveal
-          text="Summer in Mumbai"
+       
+         {!loading && user && (
+ <WordByWordReveal
+          text={
+            latestTrip
+              ? `Summer in ${latestTrip.destination}`
+              : "No trips planned yet"
+          }
           className="text-lg sm:text-xl text-white/80 mt-4"
           delay={0.4}
         />
+)}
         <WordByWordReveal
-          text="4th–10th August"
+          text={
+            latestTrip
+              ? `${new Date(latestTrip.startDate).toLocaleDateString()} – ${new Date(
+                  latestTrip.returnDate
+                ).toLocaleDateString()}`
+              : ""
+          }
           className="text-base sm:text-lg text-white/50 mb-6"
           delay={0.6}
         />
-        <div className="mb-6 flex justify-center md:justify-start">
-          <Button>View Trip</Button>
-        </div>
+        {latestTrip  &&  (<div className="mb-6 flex justify-center md:justify-start">
+          <Button disabled={!latestTrip}>View Trip</Button>
+        </div>)}
+        
       </div>
 
       {/* Right Image Section */}

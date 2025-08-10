@@ -111,13 +111,14 @@ useEffect(() => {
       <div className="container mx-auto px-4 pt-6 ml-80 w-285">
         <SideBar />
         <motion.form
+       
           onSubmit={handleSubmit(onSubmit)}
           className="relative bg-[#191726]/90 text-white rounded-3xl p-8 shadow-lg max-w-4xl mx-auto border border-purple-800/30 
                      before:absolute before:inset-0 before:rounded-3xl before:border before:border-purple-500/20 
                      before:pointer-events-none before:shadow-[0_0_20px_rgba(168,85,247,0.15)] backdrop-blur-md"
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: 'easeInOut' }}
+          transition={{ duration: 1.5, delay: 0.3, ease: 'easeInOut' }}
         >
          <h2  className="text-2xl font-bold mb-4">
            <TypingText
