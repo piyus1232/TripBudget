@@ -4,11 +4,7 @@ import jwt from "jsonwebtoken"
 const userSchema= new mongoose.Schema({
       username: {
             type: String,
-<<<<<<< HEAD
             // required: true,
-=======
-            required: true,
->>>>>>> e4db1e0 (Initial commit)
             unique: true,
             lowercase: true,
             trim: true, 
@@ -20,11 +16,8 @@ const userSchema= new mongoose.Schema({
             unique: true,
             lowercase: true,
             trim: true, 
-<<<<<<< HEAD
             isVerified: false
             
-=======
->>>>>>> e4db1e0 (Initial commit)
         },
         fullname: {
             type: String,
@@ -40,16 +33,11 @@ const userSchema= new mongoose.Schema({
       
         password: {
             type: String,
-<<<<<<< HEAD
             // required: [true, 'Password is required']
-=======
-            required: [true, 'Password is required']
->>>>>>> e4db1e0 (Initial commit)
         },
         refreshToken: {
             type: String
 
-<<<<<<< HEAD
 
         },
         form:{
@@ -60,9 +48,6 @@ const userSchema= new mongoose.Schema({
         }
         
         
-=======
-        }
->>>>>>> e4db1e0 (Initial commit)
 },{timestamps:true})
 userSchema.pre("save",async function (next) {
       if(!this.isModified("password")) return next();

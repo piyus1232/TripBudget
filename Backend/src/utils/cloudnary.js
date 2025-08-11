@@ -14,24 +14,15 @@ const uploadfilecloudnary =  async(filepath)=>{
         if(!filepath) return null;
 
     const response = await cloudinary.uploader.upload(filepath,{resource_type:"auto"})
-<<<<<<< HEAD
          fs.unlinkSync(filepath)
       
         return response;
 
-=======
-      
-        return response;
->>>>>>> e4db1e0 (Initial commit)
     }
     catch(error){
             
             console.log(error);
-<<<<<<< HEAD
             fs.unlinkSync(filepath)
-=======
-            fs.unlinkSync(localFilePath)
->>>>>>> e4db1e0 (Initial commit)
             return null;
             
 
