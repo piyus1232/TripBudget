@@ -2,6 +2,7 @@ import { registerUser } from "../controllers/user.controller.js";
 import { Router } from "express";
 import {upload} from "../middleware/multer.middleware.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
+<<<<<<< HEAD
 import userform from "../controllers/form.controller.js";
 // import { scrapeRedbusBuses } from "../controllers/buses.controller.js";
 import { getNearbyHotels } from "../controllers/hotel.controller.js";
@@ -16,6 +17,9 @@ import { deletedtrips, getSavedTrips } from "../controllers/savetripfind.control
 
 
 
+=======
+import { loginUser,logoutUser ,getCurrentUser,updateProfile} from "../controllers/user.controller.js";
+>>>>>>> e4db1e0 (Initial commit)
 const router = Router();
  router.route("/register").post(registerUser)
 router.route("/login").post(loginUser)
@@ -27,6 +31,7 @@ router.route("/updateProfile").post(
   ]),        
   updateProfile 
 );
+<<<<<<< HEAD
 router.route("/train").post(verifyJWT,finalcontroller);
 router.route("/hotel").post(getNearbyHotels);
 // router.route("/places").post(getPlacesController);
@@ -34,12 +39,20 @@ router.route("/hotel").post(getNearbyHotels);
 // router.get("/test-token", (req, res) => {
 //   res.json({ cookies: req.cookies });
 // });
+=======
+
+
+router.get("/test-token", (req, res) => {
+  res.json({ cookies: req.cookies });
+});
+>>>>>>> e4db1e0 (Initial commit)
 
 
 
 
 
 router.route("/logout").post(verifyJWT,  logoutUser)
+<<<<<<< HEAD
 
 router.route("/form").post(userform) 
 
@@ -51,4 +64,6 @@ router.route("/deleteaccount").post(verifyJWT,  deleteaccount)
 router.route("/editprofile").put(verifyJWT,editProfile)
 
 
+=======
+>>>>>>> e4db1e0 (Initial commit)
 export default router

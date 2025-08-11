@@ -6,7 +6,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import jwt from "jsonwebtoken"
 
-
 import { User } from "../models/user.model.js";
 import { request } from "express";
 const generateRefreshTokenandaccestoken = async(userId)=>{
@@ -153,7 +152,7 @@ const logoutUser = asyncHandler(async(req, res) => {
 })
  
 const refreshtoken = asyncHandler(async(req,res)=>{
- const incomingrefreshtoken =  req.cookies.refreshtoken || req.body.refreshtoken
+ const incomingrefreshtoken =  req.cookies.refreshToken || req.body.refreshToken
  if(!incomingrefreshtoken){
   throw new ApiError(401,"unauthroized request")
   
@@ -180,8 +179,8 @@ if(incomingrefreshtoken!=user.refreshToken){
  
         return res
         .status(200)
-        .cookie("accesstoken", accessToken, options)
-        .cookie("refreshtoken", newRefreshToken, options)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", newRefreshToken, options)
         .json(
             new ApiResponse(
                 200, 
@@ -200,7 +199,6 @@ if(incomingrefreshtoken!=user.refreshToken){
 
 
 })
-
 
 
 const updateProfile= asyncHandler(async(req, res) => {
@@ -236,23 +234,7 @@ const updateProfile= asyncHandler(async(req, res) => {
 })
 
 
-const deleteaccount= asyncHandler(async(req, res) => {
-      const userId = req.user?._id;
 
-  if (!userId) {
-    throw new ApiError(401, "Unauthorized: User ID not found in token");
-  }
-
-  const deleteduser = await  User.findByIdAndDelete(userId)
-  if(!deleteduser){
-    throw new ApiError(401,"Error in deleting account")
-  }
-    
-  
-    return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "User Deleted Successfully"))
-})
 
 
 const getCurrentUser = asyncHandler(async(req, res) => {
@@ -262,33 +244,7 @@ const getCurrentUser = asyncHandler(async(req, res) => {
     .status(200)
     .json(new ApiResponse(200, req.user, "User Fetched Successfully"))
 })
-const editProfile = asyncHandler(async (req, res) => {
-  const { email, fullname } = req.body;
-
-  if (!email && !fullname) {
-    throw new ApiError(400, "At least one field (email or fullname) is required to update");
-  }
-
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user?._id,
-    {
-      $set: {
-      email:email,
-      fullname:fullname
-      },
-    },
-    { new: true } //  returns updated document
-  );
-
-  if (!updatedUser) {
-    throw new ApiError(404, "User not found");
-  }
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, updatedUser, "User updated successfully"));
-});
 
 
 
-export {registerUser,loginUser,logoutUser,refreshtoken,getCurrentUser,updateProfile,deleteaccount,editProfile}
+export {registerUser,loginUser,logoutUser,refreshtoken,getCurrentUser,updateProfile}
