@@ -87,6 +87,7 @@ const processHotels = (hotelData) => {
     .slice(0, 8)
     .map(hotel => ({
       name: hotel.name,
+       id: hotel.hotelId,
       price: parseFloat(hotel.ratesSummary.minPrice).toFixed(2),
       starRating: hotel.starRating || 0,
       address: hotel.location?.address?.addressLine1 || 'N/A',

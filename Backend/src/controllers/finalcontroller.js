@@ -169,7 +169,7 @@ const getTotalHotelFare = function() {
     const totalDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // nights
 
     // Total hotel fare
-    return avgPriceINR * roomsNeeded * totalDays;
+    return avgPriceINR * roomsNeeded * (totalDays-1);
 };
 
           const hotelprice1= hotels?.hotels[0].price
@@ -215,12 +215,14 @@ console.log("totalfare",totalfare);
 
     // Add cache status header (for debugging)
     res.setHeader('X-Cache-Status', trains.__fromCache ? 'hit' : 'miss');
+    console.log('Hotels before sending:', hotels.hotels.map(h => ({ name: h.name, _id: h._id })));
+
 
     // Return response with trains, hotels, and places
     return res.status(200).json(
       new ApiResponse(
         200,
-        {
+        { 
           destination,
           startDate,
           returnDate,

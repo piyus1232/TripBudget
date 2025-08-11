@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 // GET all saved trips
 const getSavedTrips = asyncHandler(async (req, res) => {
   const trips = await SavedTrip.find({ userId: req.user._id }).sort({ createdAt: -1 });
+// console.log(trips);
 
   res.status(200).json({
     success: true,
@@ -28,6 +29,8 @@ if (!trip) {
     data: trip
   });
 });
+
+
 
 // GET one saved trip by ID
 // const getSavedTripById = asyncHandler(async (req, res) => {

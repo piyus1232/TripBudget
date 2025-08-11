@@ -24,6 +24,7 @@ function SuggestedRecommendation() {
           try {
             const res = await axios.post('http://localhost:5000/api/hotel-image', {
               name: hotel.name,
+              hotelId:hotel.id,
               city: destination
             });
 

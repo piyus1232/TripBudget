@@ -101,7 +101,7 @@ const UpcomingTrip = () => {
           delay={0.6}
         />
         {latestTrip  &&  (<div className="mb-6 flex justify-center md:justify-start">
-          <Button disabled={!latestTrip}>View Trip</Button>
+          <Button  onClick={()=>navigate(`/full-trip/${latestTrip._id}`,{ state: { trip: latestTrip } })}>View Trip</Button>
         </div>)}
         
       </div>

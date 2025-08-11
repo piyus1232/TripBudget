@@ -47,11 +47,13 @@ const trainSchema = new mongoose.Schema({
 
 const hotelSchema = new mongoose.Schema({
   name: String,
+   id: String,
   price: String,
+  photoURL:String,
   starRating: Number,
   address: String,
   amenities: [String]
-}, { _id: false });
+},{ _id: false });
 
 const placeLocationSchema = new mongoose.Schema({
   lat: Number,
@@ -60,6 +62,8 @@ const placeLocationSchema = new mongoose.Schema({
 
 const placeSchema = new mongoose.Schema({
   name: String,
+  photoURL:String,
+  placeid:String,
   address: String,
   category: String,
   location: placeLocationSchema,

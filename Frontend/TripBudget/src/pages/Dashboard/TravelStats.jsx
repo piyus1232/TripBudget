@@ -13,6 +13,7 @@ const TravelStats = () => {
 
    const [latestTrip, setLatestTrip] = useState(null);
      const [trips, setTrips] = useState([]);
+        const [avgfare, setfare] = useState([]);
   useEffect(() => {
   const fetchSecondLastTrip = async () => {
     try {
@@ -59,10 +60,14 @@ const TravelStats = () => {
    fetchAllTrips();
 }, []);
 
+  const averageBudget = trips.length
+    ? (trips.reduce((sum, trip) => sum + (Number(trip.totalfare/trip.travelers) || 0), 0) / trips.length).toFixed(2)
+    : 0;
+// averagebudget()
   return (
 
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 w-full">
-      {['Total Trips Planned', 'Average Budget', 'Last Destination'].map((title, index) => (
+      {['Total Trips Planned', 'Avg. Budget per Person', 'Last Destination'].map((title, index) => (
         <motion.div
           key={index}
           variants={fadeUp}
@@ -88,7 +93,7 @@ const TravelStats = () => {
               {
               title === 'Total Trips Planned' && (trips?.length > 0 ? trips.length : '-')
               }
-              {title === 'Average Budget' && '1500' }
+              {title === 'Avg. Budget per Person' && Math.round(averageBudget) }
               {title === 'Last Destination' &&   (latestTrip?.destination || '-')}
             </p>
           </Card>
