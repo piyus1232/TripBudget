@@ -1,5 +1,5 @@
-// File: getPlaces.js
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique place IDs
 import { ApiError } from '../utils/ApiError.js';
 import dotenv from 'dotenv';
 
@@ -115,8 +115,6 @@ const famousLandmarks = {
     { name: "ranbireshwar temple", lat: 32.7302, lng: 74.8614 },
     { name: "surinsar lake", lat: 32.7347, lng: 75.1510 }
   ],
-
-  // ---------- NEW CITIES START HERE ----------
   "kolkata": [
     { name: "victoria memorial", lat: 22.5448, lng: 88.3426 },
     { name: "howrah bridge", lat: 22.5850, lng: 88.3468 },
@@ -142,93 +140,90 @@ const famousLandmarks = {
     { name: "arignar anna zoological park", lat: 12.8796, lng: 80.0815 }
   ],
   "hyderabad": [
-  { name: "charminar", lat: 17.3616, lng: 78.4747 },
-  { name: "golconda fort", lat: 17.3833, lng: 78.4011 },
-  { name: "hussain sagar lake", lat: 17.4239, lng: 78.4738 },
-  { name: "birla mandir", lat: 17.4062, lng: 78.4691 },
-  { name: "ramoji film city", lat: 17.2543, lng: 78.6808 },
-  { name: "chowmahalla palace", lat: 17.3578, lng: 78.4712 },
-  { name: "nehru zoological park", lat: 17.3514, lng: 78.4485 },
-  { name: "qutb shahi tombs", lat: 17.3949, lng: 78.3949 },
-  { name: "salargunj museum", lat: 17.3716, lng: 78.4800 },
-  { name: "shilparamam", lat: 17.4514, lng: 78.3804 }
-],
-"bengaluru": [
-  { name: "lalbagh botanical garden", lat: 12.9507, lng: 77.5848 },
-  { name: "cubbon park", lat: 12.9763, lng: 77.5929 },
-  { name: "bangalore palace", lat: 12.9987, lng: 77.5920 },
-  { name: "vidhana soudha", lat: 12.9784, lng: 77.5910 },
-  { name: "iskcon temple", lat: 13.0094, lng: 77.5510 },
-  { name: "bannerghatta national park", lat: 12.8000, lng: 77.5770 },
-  { name: "tipu sultan's summer palace", lat: 12.9594, lng: 77.5735 },
-  { name: "nandi hills", lat: 13.3702, lng: 77.6835 },
-  { name: "innovative film city", lat: 12.7596, lng: 77.3994 },
-  { name: "commercial street", lat: 12.9844, lng: 77.6050 }
-],
-"pune": [
-  { name: "shanivar wada", lat: 18.5196, lng: 73.8553 },
-  { name: "dagdusheth halwai ganpati temple", lat: 18.5195, lng: 73.8553 },
-  { name: "agra khan palace", lat: 18.5523, lng: 73.9010 },
-  { name: "sinhagad fort", lat: 18.3661, lng: 73.7551 },
-  { name: "pataleshwar cave temple", lat: 18.5292, lng: 73.8521 },
-  { name: "rajiv gandhi zoological park", lat: 18.4514, lng: 73.8655 },
-  { name: "mulshi dam", lat: 18.5385, lng: 73.4150 },
-  { name: "okayama friendship garden", lat: 18.5040, lng: 73.8415 },
-  { name: "pashan lake", lat: 18.5405, lng: 73.7868 },
-  { name: "khadakwasla dam", lat: 18.4445, lng: 73.7714 }
-],
-"chandigarh": [
-  { name: "rock garden", lat: 30.7522, lng: 76.8104 },
-  { name: "sukhna lake", lat: 30.7421, lng: 76.8188 },
-  { name: "rose garden", lat: 30.7520, lng: 76.7836 },
-  { name: "elante mall", lat: 30.7055, lng: 76.8015 },
-  { name: "chattbir zoo", lat: 30.5893, lng: 76.8220 },
-  { name: "leisure valley", lat: 30.7485, lng: 76.7807 },
-  { name: "pinjore gardens", lat: 30.7944, lng: 76.9102 },
-  { name: "government museum and art gallery", lat: 30.7525, lng: 76.7702 },
-  { name: "sector 17 market", lat: 30.7395, lng: 76.7820 },
-  { name: "capitol complex", lat: 30.7595, lng: 76.7910 }
-],
-"varanasi": [
-  { name: "kashi vishwanath temple", lat: 25.3109, lng: 83.0104 },
-  { name: "dashashwamedh ghat", lat: 25.3062, lng: 83.0105 },
-  { name: "sarnath", lat: 25.3810, lng: 83.0216 },
-  { name: "manikarnika ghat", lat: 25.3104, lng: 83.0108 },
-  { name: "assi ghat", lat: 25.2823, lng: 83.0102 },
-  { name: "ramnagar fort", lat: 25.2870, lng: 83.0331 },
-  { name: "tulsi manas temple", lat: 25.2828, lng: 83.0055 },
-  { name: "bharat mata temple", lat: 25.3282, lng: 82.9759 },
-  { name: "new vishwanath temple", lat: 25.3173, lng: 82.9739 },
-  { name: "dhamek stupa", lat: 25.3812, lng: 83.0222 }
-],
-"amritsar": [
-  { name: "golden temple", lat: 31.6200, lng: 74.8765 },
-  { name: "jallianwala bagh", lat: 31.6206, lng: 74.8805 },
-  { name: "wagah border", lat: 31.5820, lng: 74.5748 },
-  { name: "partition museum", lat: 31.6255, lng: 74.8755 },
-  { name: "gobindgarh fort", lat: 31.6322, lng: 74.8646 },
-  { name: "maharaja ranjit singh museum", lat: 31.6420, lng: 74.8738 },
-  { name: "hall bazaar", lat: 31.6300, lng: 74.8752 },
-  { name: "ram bagh gardens", lat: 31.6378, lng: 74.8732 },
-  { name: "durgiana temple", lat: 31.6334, lng: 74.8720 },
-  { name: "khalsa college", lat: 31.6534, lng: 74.8480 }
-],
-"udaipur": [
-  { name: "city palace", lat: 24.5760, lng: 73.6828 },
-  { name: "lake pichola", lat: 24.5781, lng: 73.6829 },
-  { name: "jagdish temple", lat: 24.5783, lng: 73.6837 },
-  { name: "fateh sagar lake", lat: 24.5944, lng: 73.6833 },
-  { name: "saheliyon ki bari", lat: 24.5988, lng: 73.6837 },
-  { name: "monsoon palace", lat: 24.6135, lng: 73.6462 },
-  { name: "bagore ki haveli", lat: 24.5784, lng: 73.6839 },
-  { name: "jaisamand lake", lat: 24.2353, lng: 74.0770 },
-  { name: "gulab bagh", lat: 24.5730, lng: 73.6950 },
-  { name: "ambrai ghat", lat: 24.5768, lng: 73.6820 }
-]
-
+    { name: "charminar", lat: 17.3616, lng: 78.4747 },
+    { name: "golconda fort", lat: 17.3833, lng: 78.4011 },
+    { name: "hussain sagar lake", lat: 17.4239, lng: 78.4738 },
+    { name: "birla mandir", lat: 17.4062, lng: 78.4691 },
+    { name: "ramoji film city", lat: 17.2543, lng: 78.6808 },
+    { name: "chowmahalla palace", lat: 17.3578, lng: 78.4712 },
+    { name: "nehru zoological park", lat: 17.3514, lng: 78.4485 },
+    { name: "qutb shahi tombs", lat: 17.3949, lng: 78.3949 },
+    { name: "salargunj museum", lat: 17.3716, lng: 78.4800 },
+    { name: "shilparamam", lat: 17.4514, lng: 78.3804 }
+  ],
+  "bengaluru": [
+    { name: "lalbagh botanical garden", lat: 12.9507, lng: 77.5848 },
+    { name: "cubbon park", lat: 12.9763, lng: 77.5929 },
+    { name: "bangalore palace", lat: 12.9987, lng: 77.5920 },
+    { name: "vidhana soudha", lat: 12.9784, lng: 77.5910 },
+    { name: "iskcon temple", lat: 13.0094, lng: 77.5510 },
+    { name: "bannerghatta national park", lat: 12.8000, lng: 77.5770 },
+    { name: "tipu sultan's summer palace", lat: 12.9594, lng: 77.5735 },
+    { name: "nandi hills", lat: 13.3702, lng: 77.6835 },
+    { name: "innovative film city", lat: 12.7596, lng: 77.3994 },
+    { name: "commercial street", lat: 12.9844, lng: 77.6050 }
+  ],
+  "pune": [
+    { name: "shanivar wada", lat: 18.5196, lng: 73.8553 },
+    { name: "dagdusheth halwai ganpati temple", lat: 18.5195, lng: 73.8553 },
+    { name: "agra khan palace", lat: 18.5523, lng: 73.9010 },
+    { name: "sinhagad fort", lat: 18.3661, lng: 73.7551 },
+    { name: "pataleshwar cave temple", lat: 18.5292, lng: 73.8521 },
+    { name: "rajiv gandhi zoological park", lat: 18.4514, lng: 73.8655 },
+    { name: "mulshi dam", lat: 18.5385, lng: 73.4150 },
+    { name: "okayama friendship garden", lat: 18.5040, lng: 73.8415 },
+    { name: "pashan lake", lat: 18.5405, lng: 73.7868 },
+    { name: "khadakwasla dam", lat: 18.4445, lng: 73.7714 }
+  ],
+  "chandigarh": [
+    { name: "rock garden", lat: 30.7522, lng: 76.8104 },
+    { name: "sukhna lake", lat: 30.7421, lng: 76.8188 },
+    { name: "rose garden", lat: 30.7520, lng: 76.7836 },
+    { name: "elante mall", lat: 30.7055, lng: 76.8015 },
+    { name: "chattbir zoo", lat: 30.5893, lng: 76.8220 },
+    { name: "leisure valley", lat: 30.7485, lng: 76.7807 },
+    { name: "pinjore gardens", lat: 30.7944, lng: 76.9102 },
+    { name: "government museum and art gallery", lat: 30.7525, lng: 76.7702 },
+    { name: "sector 17 market", lat: 30.7395, lng: 76.7820 },
+    { name: "capitol complex", lat: 30.7595, lng: 76.7910 }
+  ],
+  "varanasi": [
+    { name: "kashi vishwanath temple", lat: 25.3109, lng: 83.0104 },
+    { name: "dashashwamedh ghat", lat: 25.3062, lng: 83.0105 },
+    { name: "sarnath", lat: 25.3810, lng: 83.0216 },
+    { name: "manikarnika ghat", lat: 25.3104, lng: 83.0108 },
+    { name: "assi ghat", lat: 25.2823, lng: 83.0102 },
+    { name: "ramnagar fort", lat: 25.2870, lng: 83.0331 },
+    { name: "tulsi manas temple", lat: 25.2828, lng: 83.0055 },
+    { name: "bharat mata temple", lat: 25.3282, lng: 82.9759 },
+    { name: "new vishwanath temple", lat: 25.3173, lng: 82.9739 },
+    { name: "dhamek stupa", lat: 25.3812, lng: 83.0222 }
+  ],
+  "amritsar": [
+    { name: "golden temple", lat: 31.6200, lng: 74.8765 },
+    { name: "jallianwala bagh", lat: 31.6206, lng: 74.8805 },
+    { name: "wagah border", lat: 31.5820, lng: 74.5748 },
+    { name: "partition museum", lat: 31.6255, lng: 74.8755 },
+    { name: "gobindgarh fort", lat: 31.6322, lng: 74.8646 },
+    { name: "maharaja ranjit singh museum", lat: 31.6420, lng: 74.8738 },
+    { name: "hall bazaar", lat: 31.6300, lng: 74.8752 },
+    { name: "ram bagh gardens", lat: 31.6378, lng: 74.8732 },
+    { name: "durgiana temple", lat: 31.6334, lng: 74.8720 },
+    { name: "khalsa college", lat: 31.6534, lng: 74.8480 }
+  ],
+  "udaipur": [
+    { name: "city palace", lat: 24.5760, lng: 73.6828 },
+    { name: "lake pichola", lat: 24.5781, lng: 73.6829 },
+    { name: "jagdish temple", lat: 24.5783, lng: 73.6837 },
+    { name: "fateh sagar lake", lat: 24.5944, lng: 73.6833 },
+    { name: "saheliyon ki bari", lat: 24.5988, lng: 73.6837 },
+    { name: "monsoon palace", lat: 24.6135, lng: 73.6462 },
+    { name: "bagore ki haveli", lat: 24.5784, lng: 73.6839 },
+    { name: "jaisamand lake", lat: 24.2353, lng: 74.0770 },
+    { name: "gulab bagh", lat: 24.5730, lng: 73.6950 },
+    { name: "ambrai ghat", lat: 24.5768, lng: 73.6820 }
+  ]
 };
-
-
 
 // Main function to fetch places
 const getPlaces = async (destination) => {
@@ -387,11 +382,12 @@ const getPlaces = async (destination) => {
     .sort((a, b) => b.score - a.score)
     .slice(0, 10);
 
-  // Step 8: Format response
+  // Step 8: Format response with unique placeId
   return {
     destination: formattedAddress,
     coordinates: { lat, lng },
     places: finalPlaces.map((place) => ({
+      placeid: uuidv4(), // Generate unique placeId for each place
       name: place.properties.name,
       address: [
         place.properties.address_line1 || '',

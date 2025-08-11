@@ -4,9 +4,12 @@ import { motion } from 'framer-motion';
 import TypingText from '../../framermotion/TypingText';
 import jsPDF from 'jspdf';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 function SavedTrips() {
   const [trips, setTrips] = useState([]);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchTrips();
@@ -182,7 +185,7 @@ function SavedTrips() {
                 <div className="flex gap-3 mt-4">
                   <button
                     className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm"
-                    onClick={() => alert(`Viewing full trip for ${trip.destination}`)}
+                    onClick={() => navigate(`/full-trip/${trip._id}`, { state: { trip } })}
                   >
                     View Full Trip
                   </button>

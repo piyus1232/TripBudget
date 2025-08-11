@@ -24,8 +24,9 @@ const {destination} = data;
           const queryKey = place.name.trim().toLowerCase();
 
           try {
-            const res = await axios.post('http://localhost:5000/api/hotel-image', {
+            const res = await axios.post('http://localhost:5000/api/place-image', {
               name: place.name,
+                  placeid:place.placeid,
               city: destination
             });
 
