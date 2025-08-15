@@ -3,31 +3,34 @@ import dotenv from "dotenv";
 dotenv.config();
 
 
- const sendEmail = async ({ to, subject, html }) => {
+ const sendEmail = async ({ email, subject, text }) => {
   try {
     // Create a transporter object using your email service
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // e.g., Gmail, Outlook, Yahoo — or use 'host', 'port' instead
-      auth: {
-        user: process.env.SMTP_EMAIL, // your email
-        pass: process.env.SMTP_PASSWORD, // your email password or app password
-      },
+     host:process.env.HOST,
+     service:process.env.SERVICE,
+     port:Number(process.env.EMAIL_PORT),
+     secure:Boolean(process.env.SECURE),
+     auth:{
+      user:process.env.USER,
+      pass:process.env.PASS
+     }
+
     });
+    await transporter.sendMail({
+      from:process.env.USER,
+      to:email,
+      subject:subject,
+      text:text
+    })
+    console.log("email sent");
+    
 
-    // Send mail with the defined options
-    const mailOptions = {
-      from: `"Assignic" <${process.env.SMTP_EMAIL}>`, // sender
-      to, // recipient
-      subject,
-      html, // HTML content
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent:", info.messageId);
-    return info;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    throw error;
   }
-};
+  catch(error){
+    console.log(error);
+    
+
+  }
+}
 export {sendEmail}

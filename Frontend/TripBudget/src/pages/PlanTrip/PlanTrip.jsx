@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import axios from 'axios';
 import Button from '../../components/utils/Button';
 import TypingText from '../../framermotion/TypingText';
+import { Verified } from 'lucide-react';
 
 function PlanTrip() {
   const { register, handleSubmit } = useForm();
@@ -20,10 +21,27 @@ function PlanTrip() {
   const [user,setUser] =useState(null)
   const navigate = useNavigate();
 const onSubmit = async (data) => {
+  // ✅ Validation for empty fields
+  if (!data.source || !data.destination || !data.startDate || !data.returnDate || !transport || !accommodation) {
+    toast.error("All fields are required.");
+    return;
+  }
+
+  // ✅ Validation for same start and end date
+  if (data.startDate === data.returnDate) {
+    toast.error("Start date and end date should not be the same.");
+    return;
+  }
+
+  // ✅ Validation for same From & To
+  if (data.source === data.destination) {
+    toast.error("Source and destination should not be the same.");
+    return;
+  }
+
   setLoading(true);
 
   try {
-    // ✅ Format dates to 'YYYY-MM-DD'
     const formatDate = (date) => new Date(date).toISOString().split('T')[0];
 
     const finalData = {
@@ -34,29 +52,27 @@ const onSubmit = async (data) => {
       travelers,
       transport,
       accommodation,
-
     };
 
-    const res = await axios.post("http://localhost:5000/api/v1/users/train", finalData, {
-      withCredentials: true,
-    });
+    const res = await axios.post(
+      "http://localhost:5000/api/v1/users/train",
+      finalData,
+      { withCredentials: true }
+    );
 
     navigate('/response', {
-        state: {
-          data: res.data.data, // Pass ApiResponse.data
-          cacheStatus: res.headers['x-cache-status'],
-          originalInputs: {
-            source: data.source,
-            destination: data.destination,
-            startDate: finalData.startDate,
-            returnDate: finalData.returnDate,
-            // hotels:data.hotels.hotels
-            
-          },
+      state: {
+        data: res.data.data,
+        cacheStatus: res.headers['x-cache-status'],
+        originalInputs: {
+          source: data.source,
+          destination: data.destination,
+          startDate: finalData.startDate,
+          returnDate: finalData.returnDate,
         },
-      });
-      console.log(data);
-      
+      },
+    });
+
   } catch (error) {
     console.error("Error in trip submission:", error);
     toast.error("Something went wrong while planning the trip.");
@@ -249,7 +265,10 @@ useEffect(() => {
           </div>
 
           {/* Submit Button */}
-          <div className="pt-4">
+         
+
+         { user?.verified ?  (
+         <div className="pt-4">
             <Button
               type="submit"
               disabled={loading}
@@ -257,7 +276,14 @@ useEffect(() => {
             >
               {loading ? 'Planning...' : '📍 Plan My Trip'}
             </Button>
+
           </div>
+  )
+ :
+ <Button disabled className="text-r-500 text-sm mt-2 w-full  font-bold py-2.5 rounded-md shadow-md shadow-green-500/30 transition ">🔒 Verify to Unlock</Button>
+}
+            
+
         </motion.form>
       </div>
     </div>

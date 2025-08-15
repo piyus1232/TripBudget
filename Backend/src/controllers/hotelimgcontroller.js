@@ -66,7 +66,9 @@ const hotelimgcontroller = async (req, res) => {
     // console.log(`Image URL for ${name} in ${city}:`, photoUrl);
     // console.log("Updating photoURL for hotelId:", hotelId);
       const imgurl = await SavedTrip.findOneAndUpdate(
-      { "hotels.hotels.id": hotelId},
+
+        {userId: req.user.id,
+       "hotels.hotels.id": hotelId},
       { $set: { "hotels.hotels.$.photoURL": photoUrl } }, // $ targets the matching array element
       { new: true }
     );
@@ -151,7 +153,8 @@ const placecontroller = async (req, res) => {
       //  const imgurl = await SavedTrip.updateOne()
 
         const imgurl = await SavedTrip.findOneAndUpdate(
-      { "places.places.placeid":placeid },
+           {userId: req.user.id,
+       "places.places.placeid":placeid },
       { $set: { "places.places.$.photoURL": photoUrl } }, // $ targets the matching array element
       { new: true }
     );

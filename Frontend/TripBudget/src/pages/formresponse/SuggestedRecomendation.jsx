@@ -26,7 +26,9 @@ function SuggestedRecommendation() {
               name: hotel.name,
               hotelId:hotel.id,
               city: destination
-            });
+            },{
+    withCredentials: true
+  });
 
             // Ensure the response contains a valid image URL
             if (res.data.image && typeof res.data.image === 'string') {

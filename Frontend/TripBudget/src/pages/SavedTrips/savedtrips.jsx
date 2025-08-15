@@ -5,10 +5,12 @@ import TypingText from '../../framermotion/TypingText';
 import jsPDF from 'jspdf';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { FaTrain, FaHotel, FaMapMarkerAlt, FaUsers, FaCalendarAlt, FaRupeeSign, FaFilePdf, FaEye, FaTrash } from "react-icons/fa";
 
 function SavedTrips() {
   const [trips, setTrips] = useState([]);
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
 
   useEffect(() => {
@@ -19,8 +21,8 @@ function SavedTrips() {
     try {
       const res = await axios.get("http://localhost:5000/api/v1/users/getsavetrip", {
         withCredentials: true,
+     
       });
-      console.log("API Response:", res.data);
       setTrips(res.data.data || []);
     } catch (err) {
       console.error("Error fetching trips:", err);
@@ -30,6 +32,7 @@ function SavedTrips() {
   const deleteTrip = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/v1/users/getsavetrip/${id}`, {
+        
         withCredentials: true,
       });
       setTrips((prevTrips) => prevTrips.filter((trip) => trip._id !== id));
@@ -83,135 +86,100 @@ function SavedTrips() {
         <SideBar />
       </div>
 
-      {trips.length === 0 && (
-        <div className="flex-1 flex items-center ml-115 mb-30 text-white font-bold text-2xl">
-          No Saved Trips Found
-        </div>
-      )}
+      <div className="flex-1 flex flex-col px-10 py-3">
+        <h1 className="text-3xl font-bold mb-8 text-white text-center flex items-center justify-center gap-2">
+          <TypingText delay={0.19} text="Saved Trips" />
+        </h1>
 
-      {trips.length > 0 && (
-        <div className="flex-1 flex flex-col px-10">
-          <h1 className="text-3xl font-bold mb-8 text-white text-center">
-            <TypingText delay={0.19} text="Saved Trips" />
-          </h1>
+        {trips.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center text-gray-400 text-lg">
+            No Saved Trips Found
+          </div>
+        ) : (
+         <div className="flex flex-wrap gap-6 mb-0.5">
+  {trips.map((trip, i) => (
+    <motion.div
+      key={i}
+      initial={{ opacity: 0, y: -30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.8,
+        delay: i * 0.1,
+        ease: 'easeOut'
+      }}
+      className="bg-[#1f1a2e] border border-purple-800/40 rounded-xl shadow-lg p-5
+                 w-full md:w-[48%] lg:w-[48%] min-h-[220px] flex flex-col justify-between
+                 hover:shadow-purple-700/50 transition-all duration-300 "
+    >
+      {/* Destination */}
+      <h3 className="text-white text-xl font-semibold mb-3 flex items-center gap-2">
+        <FaMapMarkerAlt className="text-purple-400 text-2xl" /> {trip.destination}
+      </h3>
 
-          <div className="flex flex-col gap-7">
-            {trips.map((trip, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: -30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 1,
-                  delay: i * 0.9,
-                  ease: 'easeOut'
-                }}
-                className="bg-[#171221] border border-purple-800/70 rounded-xl shadow-lg p-6 w-full ml-3"
-              >
-                <h3 className="text-white text-lg font-semibold mb-2 capitalize">{trip.destination}</h3>
-
-                {/* Trains */}
-                {trip.cheapestOutTrain && trip.cheapestReturnTrain && (
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    <p className="text-xs text-green-400">
-                      <span className="font-extrabold">Trains:</span>
-                    </p>
-                    {[
-                      `${trip.cheapestOutTrain.train_base.train_no} ${trip.cheapestOutTrain.train_base.train_name}`,
-                      `${trip.cheapestReturnTrain.train_base.train_no} ${trip.cheapestReturnTrain.train_base.train_name}`
-                    ].map((train, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 border border-purple-500 rounded-full text-purple-300 text-xs"
-                      >
-                        {train}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Hotels */}
-                <p className="text-sm text-gray-100 mb-2 flex flex-wrap gap-2">
-                  <span className="font-medium text-green-400">Hotels:</span>
-                  {trip.hotels?.hotels?.slice(0, 6).map((hotel, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-transparent border border-purple-500 text-purple-300 px-3 py-1 rounded-full text-xs font-semibold"
-                    >
-                      {hotel.name}
-                    </span>
-                  )) || "N/A"}
-                </p>
-
-                {/* Places */}
-                <div className="flex flex-wrap gap-2 mb-2 text-green-400">
-                  Places:
-                  {trip.places?.places?.slice(0, 6).map((place, index) => (
-                    <span
-                      key={index}
-                      className="bg-transparent border border-purple-500 text-purple-300 px-3 py-1 rounded-full text-xs font-semibold"
-                    >
-                      {place.name}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Dates and Fare */}
-                <p className="text-xs text-green-400 mb-2">
-                  <span className="font-bold">Start Date:</span>{" "}
-                  {new Date(trip.startDate).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric"
-                  })}
-                  <span className="mx-1">|</span>
-                  <span className="font-bold">Return Date:</span>{" "}
-                  {new Date(trip.returnDate).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric"
-                  })}
-                </p>
-                <p className="text-xs text-green-400 mb-3">
-                  <span className="font-bold">Total Fare:</span> ₹{Math.round(trip.totalfare)}
-                </p>
-                <p className="text-xs text-white mb-1">
-                  <span className="font-extrabold">Travelers:</span> {trip.travelers || "N/A"}
-                </p>
-
-                {/* Action Buttons */}
-                <div className="flex gap-3 mt-4">
-                  <button
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm"
-                    onClick={() => navigate(`/full-trip/${trip._id}`, { state: { trip } })}
-                  >
-                    View Full Trip
-                  </button>
-                  <button
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm"
-                    onClick={() => exportPDF(trip)}
-                  >
-                    Export to PDF
-                  </button>
-               <button
-  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm"
-  onClick={() => {
-    if (window.confirm(`Are you sure you want to delete the trip to ${trip.destination}?`)) {
-      deleteTrip(trip._id);
-    }
-  }}
->
-  Delete
-</button>
-
-                </div>
-              </motion.div>
-            ))}
+      {/* Trains */}
+      {trip.cheapestOutTrain && trip.cheapestReturnTrain && (
+        <div className="flex items-start mb-2 gap-2 text-purple-300 text-sm">
+          <FaTrain className="mt-0.5 text-green-400 text-lg" />
+          <div className="flex flex-col gap-1">
+            <span>{trip.cheapestOutTrain.train_base.train_no} {trip.cheapestOutTrain.train_base.train_name}</span>
+            <span>{trip.cheapestReturnTrain.train_base.train_no} {trip.cheapestReturnTrain.train_base.train_name}</span>
           </div>
         </div>
       )}
+
+      {/* Hotels */}
+      <div className="flex items-start mb-2 gap-2 text-sm text-purple-300">
+        <FaHotel className="mt-0.5 text-green-400 text-lg" />
+        <div className="flex flex-wrap gap-1">
+          {trip.hotels?.hotels?.length > 0
+            ? trip.hotels.hotels.slice(0, 2).map((hotel, idx) => (
+                <span key={idx} className="flex items-center gap-1 px-2 py-0.5 bg-purple-900/30 rounded-full border border-purple-500">
+                  <FaHotel className="text-purple-400 text-xs" /> {hotel.name}
+                </span>
+              ))
+            : "N/A"}
+        </div>
+      </div>
+
+      {/* Dates & Fare */}
+      <div className="text-sm text-gray-300 mb-2 space-y-1">
+        <p className="flex items-center gap-1"><FaCalendarAlt className="text-green-400 text-lg"/> Start: {new Date(trip.startDate).toLocaleDateString()}</p>
+        <p className="flex items-center gap-1"><FaCalendarAlt className="text-red-400 text-lg"/> Return: {new Date(trip.returnDate).toLocaleDateString()}</p>
+        <p className="flex items-center gap-1"><FaRupeeSign className="text-yellow-400 text-lg"/> {Math.round(trip.totalfare)}</p>
+        <p className="flex items-center gap-1"><FaUsers className="text-blue-400 text-lg"/> {trip.travelers || "N/A"}</p>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex gap-2 mt-3">
+        <button
+          className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded-md text-sm"
+          onClick={() => navigate(`/full-trip/${trip._id}`, { state: { trip } })}
+        >
+          <FaEye className="text-base" /> View
+        </button>
+        <button
+          className="flex items-center gap-1 bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md text-sm"
+          onClick={() => exportPDF(trip)}
+        >
+          <FaFilePdf className="text-base" /> PDF
+        </button>
+        <button
+          className="flex items-center gap-1 bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md text-sm"
+          onClick={() => {
+            if (window.confirm(`Delete trip to ${trip.destination}?`)) {
+              deleteTrip(trip._id);
+            }
+          }}
+        >
+          <FaTrash className="text-base" /> Delete
+        </button>
+      </div>
+    </motion.div>
+  ))}
+</div>
+
+        )}
+      </div>
     </div>
   );
 }

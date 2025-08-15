@@ -4,7 +4,7 @@ import {upload} from "../middleware/multer.middleware.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import userform from "../controllers/form.controller.js";
 // import { scrapeRedbusBuses } from "../controllers/buses.controller.js";
-import { getNearbyHotels } from "../controllers/hotel.controller.js";
+import { getHotelData, getNearbyHotels } from "../controllers/hotel.controller.js";
 
 
 import { loginUser,logoutUser ,getCurrentUser,updateProfile,deleteaccount,editProfile} from "../controllers/user.controller.js";
@@ -13,6 +13,7 @@ import { getCheapestRoundTripTrains } from "../controllers/getcheapesttrain.js";
 import { finalcontroller } from "../controllers/finalcontroller.js";
 // import { savedtrip } from "../controllers/savedtrip.controller.js";
 import { deletedtrips, getSavedTrips } from "../controllers/savetripfind.controller.js";
+// import { getNearbyFoodOptions } from "../controllers/hotel.controller.js";
 
 
 

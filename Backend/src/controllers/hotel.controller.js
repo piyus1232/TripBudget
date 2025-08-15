@@ -70,6 +70,7 @@ const getHotelData = async (cityID, checkIn, checkOut, rooms, adults) => {
   if (!response.data?.status && response.data?.errors) {
     throw new Error(`Priceline API error: ${JSON.stringify(response.data.errors)}`);
   }
+console.log(response);
 
   const hotelData = response.data?.data;
   if (!hotelData || !hotelData.hotels) {
@@ -87,12 +88,16 @@ const processHotels = (hotelData) => {
     .slice(0, 8)
     .map(hotel => ({
       name: hotel.name,
+      latitude:hotel.location.latitude,
+       longitude:hotel.location.longitude,
        id: hotel.hotelId,
       price: parseFloat(hotel.ratesSummary.minPrice).toFixed(2),
       starRating: hotel.starRating || 0,
       address: hotel.location?.address?.addressLine1 || 'N/A',
       amenities: hotel.hotelFeatures?.hotelAmenities?.map(a => a.name) || [],
     }));
+  
+    
 
   if (hotels.length === 0) {
     throw new Error('No hotels with valid prices found');
@@ -103,6 +108,57 @@ const processHotels = (hotelData) => {
     totalRecords: hotelData.meta?.totalRecords || hotels.length,
   };
 };
+
+
+
+async function getNearbyFoodOptions(lat, lon) {
+  const apiKey = process.env.GEOCODE_API_KEY;
+
+  // Use rankby=distance to get closest restaurants, cafes, or dhabas
+  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=1800&type=restaurant&keyword=dhaba|street food|cafe&key=${apiKey}`;
+
+  try {
+    const { data } = await axios.get(url);
+
+    // Filter out hotels, map with rating and price info
+    const foodOptions = data.results
+      .filter(place => !/hotel|motel|resort/i.test(place.name))
+      .map(place => ({
+        name: place.name,
+        address: place.vicinity,
+        rating: place.rating || 0,
+        priceLevel: place.price_level || 0, // 0 = very cheap, 4 = very expensive
+        priceText: ["Very Cheap","Cheap","Moderate","Expensive","Very Expensive"][place.price_level || 0]
+      }))
+      // Sort by cheapest first, then by rating descending
+      .sort((a, b) => {
+        if(a.priceLevel !== b.priceLevel) return a.priceLevel - b.priceLevel;
+        return b.rating - a.rating;
+      })
+      .slice(0, 5); // top 10 affordable options
+      // console.log(foodOptions);
+      
+
+    return foodOptions;
+
+  } catch (err) {
+    if (err.response?.status === 429) {
+      console.error(`Rate limit hit for ${lat},${lon}. Skipping this location.`);
+      return [];
+    }
+    console.error(`Food fetch error for ${lat},${lon}:`, err.message);
+    return [];
+  }
+}
+
+
+
+// export { getNearbyFoodOptions };
+
+
+
+
+
 
 // Main controller function
 const getNearbyHotels = async (req, res) => {
@@ -147,4 +203,5 @@ export {
   getCityID,
   getHotelData,
   processHotels,
+  getNearbyFoodOptions
 };

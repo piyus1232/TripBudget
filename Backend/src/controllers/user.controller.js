@@ -88,7 +88,7 @@ const createduser = await User.findById(user._id).select(
 const loginUser = asyncHandler(async(req,res)=>{
  
  const {email,password} = req.body
- console.log(req.body);
+//  console.log(req.body);
  
  if(!email){
    throw new ApiError(401,"email is required")
@@ -110,7 +110,7 @@ if(!passwordvalidated){
 
 
   const {accessToken, refreshToken}=  await  generateRefreshTokenandaccestoken(user._id)
-  console.log(refreshToken,accessToken);
+  // console.log(refreshToken,accessToken);
   
   const loggedinuser = await User.findById(user._id).select("-password -refreshToken");
   const options ={
@@ -263,17 +263,17 @@ const getCurrentUser = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, req.user, "User Fetched Successfully"))
 })
 const editProfile = asyncHandler(async (req, res) => {
-  const { email, fullname } = req.body;
+  const { username, fullname } = req.body;
 
-  if (!email && !fullname) {
-    throw new ApiError(400, "At least one field (email or fullname) is required to update");
+  if (!username && !fullname) {
+    throw new ApiError(400, "At least one field (username or fullname) is required to update");
   }
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
-      email:email,
+      username:username,
       fullname:fullname
       },
     },

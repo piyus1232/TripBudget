@@ -4,6 +4,7 @@ import SideBar from '../../components/SideBar/SideBar';
 import TripsSummary from './TripsSummary';
 import TrainRecommendation from './TrainRecomendation';
 import SuggestedRecommendation from './suggestedRecomendation';
+import HotelWithFood from './SuggestFoodoptions';
 import PlacestoVisit from './PlacestoVisit';
 // import { useNavigate } from 'react-router-dom';
 
@@ -47,6 +48,7 @@ function FormResponse() {
         <TripsSummary />
         <TrainRecommendation />
         <SuggestedRecommendation />
+  <HotelWithFood/>
         <PlacestoVisit />
       </div>
     </div>

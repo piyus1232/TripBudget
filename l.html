@@ -1,407 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Saved Trip Responses - TripBudget</title>
+  <meta charset="UTF-8">
+  <title>Hotels & Their Food Options</title>
   <style>
     body {
+      background: #191529;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #fff;
       margin: 0;
-      background: #171221;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      min-height: 100vh;
+      padding: 30px 0 40px 0;
     }
-    .sidebar {
-      width: 230px;
-      background: #221e41;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 0 0 18px 0;
-      min-height: 100vh;
-      box-shadow: 2px 0 18px rgba(0,0,0,0.09);
-      position: relative;
-    }
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 24px 0 10px 22px;
-    }
-    .sidebar-logo {
-      width: 34px;
-      height: 34px;
-      background: #f51a51;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.07em;
-      color: #fff;
-      letter-spacing: 1px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    }
-    .sidebar-title {
-      font-size: 1.48em;
-      font-weight: bold;
-      color: #a788ff;
-      letter-spacing: 1px;
-    }
-    .sidebar-menu {
-      margin-top: 18px;
-      flex: 1;
-    }
-    .sidebar-menu-item {
-      padding: 12px 28px;
-      color: #ddd9ff;
-      font-size: 1.07em;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-left: 3px solid transparent;
-      transition: background .16s, border-color .16s;
-      cursor: pointer;
-    }
-    .sidebar-menu-item:hover, .sidebar-menu-item.active {
-      background: #29255c;
-      border-left: 3px solid #6457ea;
-      color: #91ec97;
-    }
-    .sidebar-bottom {
-      padding: 0 20px;
-    }
-    .sidebar-account-btn {
-      width: 100%;
-      background: #8a4de3;
-      color: #fff;
-      text-align: center;
+    h1 {
+      font-size: 2em;
+      margin-bottom: 25px;
       font-weight: 600;
-      border: none;
-      border-radius: 9px;
-      padding: 13px;
-      font-size: 1.08em;
-      margin-top: 14px;
-      cursor: pointer;
-      transition: background .17s;
+      padding-left: 40px;
     }
-    .sidebar-account-btn:hover {
-      background: #a74aca;
-    }
-
-    /* Main content layout */
-    .main-content {
-      flex: 1;
-      padding: 40px 32px 32px 32px;
-      margin-left: 0;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      background: #171221;
-    }
-
-    h2 {
-      margin: 0 0 13px 8px;
-      font-weight: 500;
-      color: #91ec97;
-    }
-    #trip-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-      margin-top: 16px;
-    }
-    .trip-card {
+    .hotel-header {
       display: flex;
       align-items: center;
-      background: #221e41;
+      gap: 18px;
+      margin: 35px 0 7px 40px;
+    }
+    .hotel-header img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(44,255,230,0.07);
+      background: #28223d;
+      border: 1.5px solid #28223d;
+    }
+    .hotel-title {
+      font-size: 1.45em;
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+    }
+    .hotel-address {
+      color: #b4b3bc;
+      font-size: 0.95em;
+      margin: 0;
+    }
+    .section-heading {
+      font-size: 1.18em;
+      font-weight: 600;
+      color: #00d0c6;
+      padding-left: 40px;
+      margin: 10px 0 8px 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      padding-left: 40px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #231e35;
       border-radius: 14px;
-      padding: 18px 22px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-      transition: background 0.2s;
-      border: 1px solid #23204a;
+      box-shadow: 0 2px 24px 0 rgba(44,255,230,0.06),
+                  0 2px 8px 0 rgba(44,255,230,0.12);
+      overflow: hidden;
+      padding: 0 0 13px 0;
+      transition: box-shadow 0.22s;
+      display: flex;
+      flex-direction: column;
+      min-height: 183px;
+      max-width: 225px;
+      position: relative;
+      border: 1.2px solid #28223d;
     }
-    .trip-card:hover {
-      background: #262258;
-      border-color: #6457ea;
+    .card:hover {
+      box-shadow: 0 2px 36px 0 rgba(44,255,230,0.14),
+                  0 2px 8px 0 rgba(44,255,230,0.17);
     }
-    .trip-img {
-      width: 110px;
+    .card img {
+      width: 100%;
       height: 78px;
       object-fit: cover;
-      border-radius: 10px;
-      margin-right: 24px;
+      background: #28223d;
+      border-bottom: 1.2px solid #28223d;
+      display: block;
     }
-    .trip-summary {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-    }
-    .trip-title {
-      font-size: 1.15em;
-      font-weight: bold;
-      letter-spacing: 0.03em;
-      margin-bottom: 5px;
-      color: #ddd9ff;
-    }
-    .trip-hotel, .trip-visitors {
-      font-size: 0.98em;
-      color: #c4bbed;
-    }
-    .trip-places {
-      font-size: 0.98em;
-      margin-top: 4px;
-      color: #a6adf5;
-    }
-    .save-date {
-      font-size: 0.93em;
-      color: #7ed083;
-      margin-top: 5px;
-      font-style: italic;
-    }
-    /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 200;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(30, 22, 60, 0.83);
-      justify-content: center;
-      align-items: center;
-      transition: 0.2s;
-    }
-    .modal-content {
-      background: #221e41;
-      padding: 36px;
-      border-radius: 16px;
-      min-width: 420px;
-      max-width: 660px;
+    .card h3 {
+      font-size: 1em;
+      font-weight: 600;
+      margin: 6px 0 2px 0;
       color: #fff;
-      position: relative;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.14);
-      font-size: 1.04em;
+      padding-left: 12px;
     }
-    .close {
-      position: absolute;
-      right: 22px;
-      top: 16px;
-      font-size: 26px;
+    .card p {
+      margin: 2px 0 0 0;
+      font-size: 0.91em;
+      color: #b2ade6;
+      padding-left: 12px;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      font-size: 0.91em;
+      padding: 0 12px;
+      margin-top: 6px;
+    }
+    .rating {
+      color: #ffe066;
       font-weight: bold;
-      color: #a6adf5;
-      cursor: pointer;
-      transition: 0.18s;
+      letter-spacing: 0.02em;
     }
-    .close:hover {
-      color: #f51a51;
-    }
-    .fullresponse-hr {
-      border: 0;
-      height: 1px;
-      background: #332f4a;
-      margin: 16px 0;
-    }
-    @media (max-width:900px) {
-      .sidebar {
-        width: 68px;
-        min-width: 60px;
-        padding: 0;
-      }
-      .sidebar-header {
-        justify-content: center;
-        padding: 22px 0 8px 0;
-      }
-      .sidebar-title {
-        display: none;
-      }
-      .sidebar-menu-item {
-        padding: 12px 12px;
-        font-size: 1.04em;
-        justify-content: center;
-      }
-      .sidebar-account-btn {
-        padding: 8px; font-size: 0.98em;
-      }
-      .sidebar-bottom {
-        padding: 0 7px;
-      }
-      .main-content {
-        padding: 20px 5vw 24px 14px;
-      }
-      .modal-content { min-width: unset; max-width: 98vw; padding: 14px; }
-      .trip-card { flex-direction: column; align-items: flex-start;}
-      .trip-img { margin-bottom: 8px; margin-right: 0;}
-    }
-    @media (max-width:600px) {
-      .sidebar {width: 0; min-width: 0; display:none;}
-      .main-content {padding:14px;}
+    .price {
+      background: #302949;
+      color: #fff;
+      padding: 4px 13px;
+      border-radius: 13px;
+      font-size: 0.89em;
+      font-weight: 600;
+      margin-left: 8px;
+      letter-spacing: 0.01em;
+      box-shadow: 0 2px 4px 0 rgba(44,255,230,0.07);
     }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <nav class="sidebar">
-    <div>
-      <div class="sidebar-header">
-        <div class="sidebar-logo">TB</div>
-        <span class="sidebar-title">TripBudget</span>
-      </div>
-      <div class="sidebar-menu">
-        <div class="sidebar-menu-item active">&#128200; Dashboard</div>
-        <div class="sidebar-menu-item">&#128188; My Trips</div>
-        <div class="sidebar-menu-item">&#127758; Explore Cities</div>
-        <div class="sidebar-menu-item">&#128101; Group Discussions</div>
-        <div class="sidebar-menu-item">&#128197; Plan a Trip</div>
-        <div class="sidebar-menu-item">&#128179; Budget Estimator</div>
-      </div>
-    </div>
-    <div class="sidebar-bottom">
-      <button class="sidebar-account-btn">&#128100; Account</button>
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <h2>Saved Trips</h2>
-    <div id="trip-cards"></div>
-  </div>
-
-  <!-- Modal for full trip response -->
-  <div id="trip-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" id="close-modal">&times;</span>
-      <div id="modal-body"></div>
-    </div>
-  </div>
-
+<h1>Hotels with Their Nearby Food Options</h1>
+<div id="content"></div>
 <script>
-const savedTrips = [
-  {
-    city: "Jaipur",
-    img: "https://images.unsplash.com/photo-1548786817-9ff59b93f3b1?auto=format&fit=crop&w=400&q=80",
-    visitors: "2.5M",
-    date: "10 Aug - 13 Aug 2025",
-    rating: 4.6,
-    hotel: "BHAI BHAI GUEST HOUSE",
-    hotelPrice: "₹406/night",
-    cost: "₹12,000",
-    places: [
-      "Albert Hall Museum (3.2 km)",
-      "Nahargarh Fort (3.9 km)",
-      "Jantar Mantar (3.9 km)",
-      "Galtaji Temple (7.7 km)"
-    ],
-    fullResponse: `
-      <h3 style="color:#91ec97;">Trip to Jaipur</h3>
-      <div><b>Dates:</b> 10 Aug - 13 Aug 2025</div>
-      <div><b>Total trip budget:</b> ₹12,000</div>
-      <div><b>Hotel:</b> BHAI BHAI GUEST HOUSE <span style="color:#7ed083;">(₹406/night)</span></div>
-      <hr class="fullresponse-hr"/>
-      <b style="color:#a6adf5;">Nearby Places to Visit</b>
-      <ul style="padding-left:20px;margin-top:6px;">
-        <li>Albert Hall Museum – 3.2 km</li>
-        <li>Nahargarh Fort – 3.9 km</li>
-        <li>Jantar Mantar – 3.9 km</li>
-        <li>Galtaji Temple – 7.7 km</li>
-      </ul>
-      <hr class="fullresponse-hr"/>
-      <b style="color:#a6adf5;">Top Train Recommendations</b>
-      <ul style="padding-left:20px;margin-top:6px;">
-        <li>
-          <b>Ashram Express:</b> 2:55 pm – 8:10 pm <span style="color:#7ed083">(₹240, 5h 15m)</span>
-        </li>
-        <li>
-          <b>BE Bhuj Express:</b> 11:50 am – 5:50 pm <span style="color:#7ed083">(₹330, 6h 0m)</span>
-        </li>
-      </ul>
-      <hr class="fullresponse-hr"/>
-      <b style="color:#a6adf5;">Return Trains</b>
-      <ul style="padding-left:20px;margin-top:6px;">
-        <li>
-          <b>RJSTHN S Kranti:</b> 12:45 am – 5:50 am <span style="color:#7ed083">(₹240, 5h 5m)</span>
-        </li>
-      </ul>
-      <hr class="fullresponse-hr"/>
-      <b style="color:#a6adf5;">Suggested Accommodations</b>
+  const hotels = [
+    {
+      name: "Super Hotel O Laxmi Nagar Jhotwara",
+      address: "Plot No - 74 West Part, Laxmi Nagar, Jaipur",
+      image: "https://source.unsplash.com/200x200/?hotel,luxury",
+      foodOptions: [
+        { 
+          name: "Govindam Dhaba",
+          address: "WPXC+2MX, Kalwar Rd, Jaipur",
+          rating: 4.9,
+          priceText: "Very Cheap",
+          image: "https://source.unsplash.com/400x300/?indian-food"
+        },
+        { 
+          name: "Mickey Mouse Cafe",
+          address: "105 Sanjay Nagar, Jaipur",
+          rating: 4.6,
+          priceText: "Very Cheap",
+          image: "https://source.unsplash.com/400x300/?cafe"
+        }
+      ]
+    },
+    {
+      name: "Hotel O Haldi Ghati Gate",
+      address: "Sector 17, Pratapnagar, Jaipur",
+      image: "https://source.unsplash.com/200x200/?hotel,modern",
+      foodOptions: [
+        { 
+          name: "Bajrang Dhaba",
+          address: "Sector 29, Pratap Nagar, Jaipur",
+          rating: 5,
+          priceText: "Very Cheap",
+          image: "https://source.unsplash.com/400x300/?dhaba"
+        },
+        { 
+          name: "Shree Krishna Cafe",
+          address: "Sector 26, Pratap Nagar, Jaipur",
+          rating: 4.7,
+          priceText: "Cheap",
+          image: "https://source.unsplash.com/400x300/?cafe,tea"
+        }
+      ]
+    }
+  ];
+
+  const container = document.getElementById('content');
+
+  hotels.forEach(hotel => {
+    // Hotel heading
+    const headerDiv = document.createElement('div');
+    headerDiv.className = "hotel-header";
+    headerDiv.innerHTML = `
+      <img src="${hotel.image}" alt="${hotel.name}">
       <div>
-        <ul style="padding-left:20px;margin-top:6px;">
-          <li>BHAI BHAI GUEST HOUSE <span style="color:#7ed083;">(₹406/night)</span></li>
-          <li>Stephels Hostel (₹550/night)</li>
-          <li>Hotel Kanchandeep (₹789/night)</li>
-          <li>PLAY IKshana Palette (₹1082/night)</li>
-        </ul>
+        <div class="hotel-title">${hotel.name}</div>
+        <p class="hotel-address">${hotel.address}</p>
       </div>
-    `
-  },
-  {
-    city: "Mumbai",
-    img: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
-    visitors: "4.8M",
-    date: "20 Dec - 24 Dec 2025",
-    rating: 4.7,
-    hotel: "Hotel Sea View",
-    hotelPrice: "₹1050/night",
-    cost: "₹16,000",
-    places: [
-      "Gateway of India",
-      "Marine Drive",
-      "Siddhivinayak Temple"
-    ],
-    fullResponse: `
-      <h3 style="color:#91ec97;">Trip to Mumbai</h3>
-      <div><b>Dates:</b> 20 Dec - 24 Dec 2025</div>
-      <div><b>Total trip budget:</b> ₹16,000</div>
-      <div><b>Hotel:</b> Hotel Sea View <span style="color:#7ed083;">(₹1050/night)</span></div>
-      <hr class="fullresponse-hr"/>
-      <b style="color:#a6adf5;">Nearby Places to Visit</b>
-      <ul style="padding-left:20px;margin-top:6px;">
-        <li>Gateway of India</li>
-        <li>Marine Drive</li>
-        <li>Siddhivinayak Temple</li>
-      </ul>
-      <hr class="fullresponse-hr"/>
-      <b style="color:#a6adf5;">Train Suggestions</b>
-      <ul style="padding-left:20px;margin-top:6px;">
-        <li>Golden Express: 07:30 am – 13:00 pm (<span style="color:#7ed083">₹680, 5h 30m</span>)</li>
-      </ul>
-      `
-  }
-];
+    `;
+    container.appendChild(headerDiv);
 
-// Render cards
-const tripCards = document.getElementById('trip-cards');
-savedTrips.forEach((trip) => {
-  const card = document.createElement('div');
-  card.className = 'trip-card';
-  card.innerHTML = `
-    <img src="${trip.img}" alt="${trip.city}" class="trip-img"/>
-    <div class="trip-summary">
-      <div class="trip-title">${trip.city}</div>
-      <div class="trip-hotel">Hotel: ${trip.hotel} <span style="color:#7ed083;">(${trip.hotelPrice})</span></div>
-      <div class="trip-visitors">Visitors: ${trip.visitors} | Rating: ${trip.rating}</div>
-      <div class="trip-places">Places: ${trip.places.slice(0,3).join(', ')}${trip.places.length > 3 ? ', ...' : ''}</div>
-      <div class="save-date">Dates: ${trip.date} &nbsp; | &nbsp; Budget: <span style="color:#7ed083;">${trip.cost}</span></div>
-    </div>
-  `;
-  card.addEventListener('click', () => {
-    document.getElementById('modal-body').innerHTML = trip.fullResponse;
-    document.getElementById('trip-modal').style.display = 'flex';
+    // Section label
+    const sec = document.createElement('div');
+    sec.className = "section-heading";
+    sec.textContent = "Nearby Food Options";
+    container.appendChild(sec);
+
+    // Food grid
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    hotel.foodOptions.forEach(food => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <img src="${food.image}" alt="${food.name}">
+        <h3>${food.name}</h3>
+        <p>${food.address}</p>
+        <div class="card-footer">
+          <span class="rating">⭐ ${food.rating}</span>
+          <span class="price">${food.priceText}</span>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
   });
-  tripCards.appendChild(card);
-});
-
-// Modal functionality
-document.getElementById('close-modal').onclick = function() {
-  document.getElementById('trip-modal').style.display = 'none';
-};
-document.getElementById('trip-modal').onclick = function(e) {
-  if(e.target === this) this.style.display = 'none';
-};
 </script>
 </body>
 </html>

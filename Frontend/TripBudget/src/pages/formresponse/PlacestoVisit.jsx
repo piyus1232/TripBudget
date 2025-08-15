@@ -24,11 +24,18 @@ const {destination} = data;
           const queryKey = place.name.trim().toLowerCase();
 
           try {
-            const res = await axios.post('http://localhost:5000/api/place-image', {
-              name: place.name,
-                  placeid:place.placeid,
-              city: destination
-            });
+            const res = await axios.post(
+  'http://localhost:5000/api/place-image',
+  {
+    name: place.name,
+    placeid: place.placeid,
+    city: destination
+  },
+  {
+    withCredentials: true
+  }
+);
+
 
             if (res.data.image && typeof res.data.image === 'string') {
               imageMap[queryKey] = res.data.image;

@@ -8,18 +8,87 @@ import Input from "../../components/utils/Input";
 import Button from "../../components/utils/Button";
 import SideBar from "../../components/SideBar/SideBar";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
 
 function Account() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+    const [searchParams] = useSearchParams();
+  // const [isVerified,setVerified]  = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
+  
+// const toastId = toast.loading("Sending Email...");
+
+   
+const sendVerificationEmail = async () => {
+  // Show a loading toast and get its ID
+  const toastId = toast.loading("Sending verification email...");
+
+  try {
+    await axios.post(
+      "http://localhost:5000/api/verify/send-verification",
+      {},
+      { withCredentials: true }
+    );
+
+    // Update the loading toast to success
+    toast.update(toastId, {
+      render: "Verification email sent. Check your inbox.",
+      type: "success",
+      isLoading: false,
+      autoClose: 3000,
+    });
+  } catch (err) {
+    // Update the loading toast to error
+    toast.update(toastId, {
+      render: err?.response?.data || "Error sending verification email",
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    });
+  }
+};
+ useEffect(() => {
+    const  verifyFromEmail= async () => {
+      if (searchParams.get("verified") === "true") {
+        // Show loading toast
+        const toastId = toast.loading("Verifying your email...");
+
+        try {
+          const res = await axios.get(
+            "http://localhost:5000/api/v1/users/getCurrentUser",
+            { withCredentials: true }
+          );
+          setUser(res.data.data);
+
+          // Update toast to success
+          toast.update(toastId, {
+            render: "✅ Verified successfully!",
+            type: "success",
+            isLoading: false,
+            autoClose: 3000,
+          });
+        } catch (err) {
+          // Update toast to error
+          toast.update(toastId, {
+            render: "❌ Verification failed.",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          });
+        }
+      }
+    };
+
+     verifyFromEmail();
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -161,12 +230,13 @@ function Account() {
         {/* Sidebar */}
         <SideBar />
         {/* Main Content */}
-        <main className="flex-1 w-full py-2 transition-all duration-300 ml-0 sm:ml-[280px] md:ml-[300px] overflow-hidden">
-          <div className="max-w-full w-full mx-auto px-6 flex flex-col gap-4 h-full overflow-hidden" style={{ zoom: '0.75' }}>
-            <p className="text-sm text-center text-gray-400 mb-4">
+        <main className="flex-1 w-full py-10 transition-all duration-300 ml-0 sm:ml-[280px] md:ml-[300px] overflow-hidden">
+          <div className="max-w-full w-full mx-auto px-6  flex flex-col gap-4 h-full overflow-hidden" style={{ zoom: '0.75' }}>
+            { !user?.verified  && (
+            <p className="text-sm text-center text-gray-400 ">
               You have not verified your email yet. Please verify your email to unlock all features.
-            </p>
-
+            </p>)
+}
             <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
               <div className="relative group">
                 <img
@@ -209,7 +279,7 @@ function Account() {
                   <h2 className="text-lg font-semibold text-white mb-4">Edit Profile</h2>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <Input label="Full Name" type="text" defaultValue={user?.fullname} {...register("fullname")} />
-                    <Input label="Email" type="email" defaultValue={user?.email} {...register("email")} />
+                    <Input label="username" type="username" defaultValue={user?.username} {...register("username")} />
                     <div className="flex justify-end gap-3 pt-4">
                       <Button type="button" onClick={() => setShowForm(false)} className="bg-gray-500">
                         Cancel
@@ -247,10 +317,22 @@ function Account() {
                 <Input label="Username" defaultValue={user?.username} readOnly />
                 <Input label="Email Address" defaultValue={user?.email} readOnly />
                 <div className="flex items-end">
-                  {user?.isVerified ? (
-                    <span className="px-3 py-1 rounded-md bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-600 text-sm">Verified</span>
+                  {user?.verified? (
+                  <span className="bg-gray-500
+                 text-white text-sm font-semibold 
+                 px-4 py-2 rounded-full shadow-md 
+                 inline-block mb-5">
+  Verified
+</span>
+
                   ) : (
-                    <Button className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-600 text-sm mb-6">Verify Email</Button>
+                    <Button
+  className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-600 text-sm mb-6"
+  onClick={sendVerificationEmail}
+>
+  Verify Email
+</Button>
+
                   )}
                 </div>
               </div>

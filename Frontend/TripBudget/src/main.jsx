@@ -33,7 +33,7 @@ const buildRouter = (isLoggedIn) =>
                 { path: '/plantrip', element: <PlanTrip/> },
                  { path: '/MyTrips', element:  <SavedTrips/>},
 
-                  { path: '/full-trip:id', element: <FullResponse/> },
+                  { path: '/full-trip/:id', element: <FullResponse/> },
 
              
                 // { path: '/Contact', element: <ContactPage/> },
