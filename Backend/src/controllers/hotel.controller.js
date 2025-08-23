@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { v4 as uuidv4 } from 'uuid';
 // Validate input parameters
 const validateInputs = (city, checkIn, checkOut, rooms, adults, radius) => {
   if (!city || city.trim() === '') {
@@ -31,35 +31,51 @@ const getCoordinates = async (city) => {
   if (!response.data || response.data.length === 0) {
     throw new Error('City not found');
   }
-
+ console.log(response.data[0].lat);
   return { lat: response.data[0].lat, lon: response.data[0].lon };
+ 
+  
 };
 
 // Get cityID from Priceline nearby API
-const getCityID = async (coordinates, checkIn, checkOut, rooms, adults, radius) => {
-  const nearbyUrl = `https://priceline-com2.p.rapidapi.com/hotels/nearby?latitude=${coordinates.lat}&longitude=${coordinates.lon}&radius=${radius}&checkIn=${checkIn}&checkOut=${checkOut}&rooms=${rooms}&adults=${adults}`;
-  const response = await axios.get(nearbyUrl, {
-    headers: {
-      'X-Rapidapi-Key': process.env.RAPIDAPI_KEY,
-      'X-Rapidapi-Host': 'priceline-com2.p.rapidapi.com',
-    },
-  });
 
-  if (!response.data?.status && response.data?.errors) {
-    throw new Error(`Priceline API error: ${JSON.stringify(response.data.errors)}`);
+const getCityID = async (coordinates, checkIn, checkOut, rooms = 1, adults = 1, radius = 10) => {
+  try {
+    if (!checkIn || !checkOut) {
+      throw new Error('checkIn and checkOut dates are required');
+    }
+
+    const nearbyUrl = `https://priceline-com2.p.rapidapi.com/hotels/nearby?latitude=${coordinates.lat}&longitude=${coordinates.lon}&checkIn=${checkIn}&checkOut=${checkOut}&rooms=${rooms}&adults=${adults}&radius=${radius}`;
+
+    const response = await axios.get(nearbyUrl, {
+      headers: {
+        'X-Rapidapi-Key': process.env.RAPIDAPI_KEY,
+        'X-Rapidapi-Host': 'priceline-com2.p.rapidapi.com',
+      },
+    });
+
+    if (!response.data || (response.data.status === 'error' && response.data.errors)) {
+      throw new Error(`Priceline API error: ${JSON.stringify(response.data.errors)}`);
+    }
+
+    const cityData = response.data?.matchedCity || response.data?.data?.exactMatch?.matchedCity;
+
+    if (!cityData || !cityData.cityID) {
+      throw new Error('No matching city found in Priceline API');
+    }
+
+    return cityData.cityID;
+  } catch (error) {
+    console.error('Error fetching city ID:', error.message);
+    throw error;
   }
-
-  const cityData = response.data?.data?.exactMatch?.matchedCity;
-  if (!cityData || !cityData.cityID) {
-    throw new Error('No matching city found in Priceline API');
-  }
-
-  return cityData.cityID;
 };
+const getHotelData = async (cityID, checkIn, checkOut, rooms = 1, adults = 1, maxPrice =18) => {
+  if (!cityID || !Number.isInteger(Number(cityID))) throw new Error('Invalid cityID');
+  if (!checkIn || !checkOut || new Date(checkIn) >= new Date(checkOut)) throw new Error('Invalid dates');
 
-// Get hotel data from Priceline search API
-const getHotelData = async (cityID, checkIn, checkOut, rooms, adults) => {
-  const searchUrl = `https://priceline-com2.p.rapidapi.com/hotels/search?locationId=${cityID}&checkIn=${checkIn}&checkOut=${checkOut}&rooms=${rooms}&adults=${adults}&sortorder=PRICE`;
+  const searchUrl = `https://priceline-com2.p.rapidapi.com/hotels/search?locationId=${cityID}&checkIn=${checkIn}&checkOut=${checkOut}&rooms_number=${rooms}&adults=${adults}&page_number=0&maxPrice=${maxPrice}`;
+
   const response = await axios.get(searchUrl, {
     headers: {
       'X-Rapidapi-Key': process.env.RAPIDAPI_KEY,
@@ -67,41 +83,33 @@ const getHotelData = async (cityID, checkIn, checkOut, rooms, adults) => {
     },
   });
 
-  if (!response.data?.status && response.data?.errors) {
-    throw new Error(`Priceline API error: ${JSON.stringify(response.data.errors)}`);
-  }
-console.log(response);
+  const hotelData = response.data.data;
 
-  const hotelData = response.data?.data;
-  if (!hotelData || !hotelData.hotels) {
-    throw new Error('No hotel data found in Priceline API response');
-  }
+  if (!hotelData || !hotelData.hotels) throw new Error('No hotel data found');
 
   return hotelData;
 };
 
+
 // Process hotel data to get formatted results
-const processHotels = (hotelData) => {
+const processHotels = (hotelData, maxPrice = 10000) => {
   const hotels = hotelData.hotels
     .filter(hotel => hotel.ratesSummary?.minPrice && !isNaN(parseFloat(hotel.ratesSummary.minPrice)))
+    .filter(hotel => parseFloat(hotel.ratesSummary.minPrice) <= maxPrice) // filter expensive hotels
     .sort((a, b) => parseFloat(a.ratesSummary.minPrice) - parseFloat(b.ratesSummary.minPrice))
     .slice(0, 8)
     .map(hotel => ({
       name: hotel.name,
-      latitude:hotel.location.latitude,
-       longitude:hotel.location.longitude,
-       id: hotel.hotelId,
+      latitude: hotel.location.latitude,
+      longitude: hotel.location.longitude,
+      id: hotel.hotelId,
       price: parseFloat(hotel.ratesSummary.minPrice).toFixed(2),
       starRating: hotel.starRating || 0,
       address: hotel.location?.address?.addressLine1 || 'N/A',
       amenities: hotel.hotelFeatures?.hotelAmenities?.map(a => a.name) || [],
     }));
-  
-    
 
-  if (hotels.length === 0) {
-    throw new Error('No hotels with valid prices found');
-  }
+  if (hotels.length === 0) throw new Error('No hotels found within price range');
 
   return {
     hotels,
@@ -125,6 +133,7 @@ async function getNearbyFoodOptions(lat, lon) {
       .filter(place => !/hotel|motel|resort/i.test(place.name))
       .map(place => ({
         name: place.name,
+         foodid: uuidv4(), 
         address: place.vicinity,
         rating: place.rating || 0,
         priceLevel: place.price_level || 0, // 0 = very cheap, 4 = very expensive
@@ -135,7 +144,7 @@ async function getNearbyFoodOptions(lat, lon) {
         if(a.priceLevel !== b.priceLevel) return a.priceLevel - b.priceLevel;
         return b.rating - a.rating;
       })
-      .slice(0, 5); // top 10 affordable options
+      .slice(0, 12); // top 10 affordable options
       // console.log(foodOptions);
       
 

@@ -7,12 +7,13 @@ import userform from "../controllers/form.controller.js";
 import { getHotelData, getNearbyHotels } from "../controllers/hotel.controller.js";
 
 
-import { loginUser,logoutUser ,getCurrentUser,updateProfile,deleteaccount,editProfile} from "../controllers/user.controller.js";
+import { loginUser,logoutUser ,getCurrentUser,updateProfile,deleteaccount,editProfile,verifyEmail,getverifyemail} from "../controllers/user.controller.js";
 // import {  getPlacesController } from "../controllers/places.controller.js";
 import { getCheapestRoundTripTrains } from "../controllers/getcheapesttrain.js";
 import { finalcontroller } from "../controllers/finalcontroller.js";
 // import { savedtrip } from "../controllers/savedtrip.controller.js";
 import { deletedtrips, getSavedTrips } from "../controllers/savetripfind.controller.js";
+
 // import { getNearbyFoodOptions } from "../controllers/hotel.controller.js";
 
 
@@ -50,6 +51,8 @@ router.delete("/getsavetrip/:id", verifyJWT, deletedtrips);
 
 router.route("/deleteaccount").post(verifyJWT,  deleteaccount)
 router.route("/editprofile").put(verifyJWT,editProfile)
+router.route("/send-verification").post(verifyJWT,verifyEmail)
+router.route("/:token").get(getverifyemail)
 
 
 export default router

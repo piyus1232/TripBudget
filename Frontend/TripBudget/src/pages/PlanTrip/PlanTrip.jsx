@@ -19,7 +19,8 @@ function PlanTrip() {
   const [loading, setLoading] = useState(false);
   const[load,setload]= useState(true)
   const [user,setUser] =useState(null)
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+  const today=new Date().toISOString().split("T")[0];
 const onSubmit = async (data) => {
   // ✅ Validation for empty fields
   if (!data.source || !data.destination || !data.startDate || !data.returnDate || !transport || !accommodation) {
@@ -90,7 +91,17 @@ const onSubmit = async (data) => {
   "Noida", "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
   "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
   "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur",
-  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu"
+  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu","Kathgodam"
+];
+  const indianCitiess = [
+  "Jaipur", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune",
+  "Ahmedabad", "Jaipur", "Lucknow", "Chandigarh", "Bhopal", "Indore", "Nagpur",
+  "Goa", "Varanasi", "Amritsar", "Surat", "Kanpur", "Patna", "Ranchi", "Raipur",
+  "Jodhpur", "Guwahati", "Dehradun", "Shimla", "Manali", "Udaipur", "Agra", "Delhi",
+  "Noida", "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
+  "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
+  "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur",
+  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu","Kathgodam"
 ];
 useEffect(() => {
   const fetchUser = async () => {
@@ -163,7 +174,7 @@ useEffect(() => {
                   {...register('destination')}
                   className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
                 >
-                    {indianCities.map((city) => (
+                    {indianCitiess.map((city) => (
     <option key={city} value={city}>{city}</option>
   ))}
                 </select>
@@ -178,6 +189,7 @@ useEffect(() => {
                   type="date"
                   {...register('startDate')}
                   className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                  min={today}
                 />
               </div>
               <div>
@@ -186,6 +198,7 @@ useEffect(() => {
                   type="date"
                   {...register('returnDate')}
                   className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                  min={today}
                 />
               </div>
             </div>

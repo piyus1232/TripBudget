@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import SideBar from "../../components/SideBar/SideBar";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { useState,useEffect } from "react";
 import Card from "../../components/utils/Card";
 import axios from "axios";
@@ -10,6 +10,7 @@ function FullResponse() {
   const { trip } = location.state || {};
   const { id } = useParams();
   const [cityImage, setCityImage] = useState('');
+  const navigate = useNavigate();
     const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-GB', {
@@ -235,15 +236,14 @@ function FullResponse() {
             {/* Hotel Image */}
             <div className="w-full h-40">
               <img
-                src={hotel.photoURL || "/hotel.avif"}
+                src={hotel.photoURL || defaultImage}
                 alt={hotel.name}
                 className="w-full h-full object-cover"
-                // onError={(e) => (e.target.src = "/images/default-place.svg")}
               />
             </div>
 
             {/* Hotel Info */}
-            <div className="p-5">
+            <div className="p-5 flex flex-col flex-1">
               <h3 className="text-white text-lg font-semibold mb-1">
                 {hotel.name}
               </h3>
@@ -254,7 +254,7 @@ function FullResponse() {
               </p>
 
               {/* Address with Read More */}
-              <p className="text-gray-300 text-sm mt-2">
+              <p className="text-gray-300 text-sm mt-2 mb-4">
                 <span className="inline-block">
                   📍 {expanded ? hotel.address : hotel.address?.slice(0, 30)}
                 </span>
@@ -267,6 +267,20 @@ function FullResponse() {
                   </button>
                 )}
               </p>
+
+              {/* ✅ New Button */}
+              <button
+                className="mt-auto w-full py-3 px-4 bg-gradient-to-r from-teal-500 via-blue-600 to-indigo-700 
+                           text-white font-semibold rounded-xl shadow-md 
+                           hover:shadow-xl hover:scale-105 transition-all text-xs"
+                onClick={() =>
+                  navigate(`/hotelsavedfood/${hotel.id}`, {
+                    state: { hotel },
+                  })
+                }
+              >
+                View Hotel & Nearby Food
+              </button>
             </div>
           </div>
         );
@@ -276,6 +290,7 @@ function FullResponse() {
     )}
   </div>
 </section>
+
 
 
         {/* ======== Places to Visit ======== */}

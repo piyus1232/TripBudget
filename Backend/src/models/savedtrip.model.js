@@ -44,16 +44,28 @@ const trainSchema = new mongoose.Schema({
   fare: fareSchema,
   fares: mongoose.Schema.Types.Mixed
 }, { _id: false });
-
+const foodOptionSchema = new mongoose.Schema({
+  foodid: { type: String, required: true }, // 👈 unique identifier
+  name: String,
+  address: String,
+  rating: Number,
+  priceLevel: Number,
+  priceText: String,
+  photoURL: String
+}, { _id: false });
 const hotelSchema = new mongoose.Schema({
   name: String,
-   id: String,
+  id: String,
   price: String,
-  photoURL:String,
+  photoURL: String,
   starRating: Number,
   address: String,
-  amenities: [String]
-},{ _id: false });
+  amenities: [String],
+  foodOptions: [foodOptionSchema]   // 👈 new field
+}, { _id: false });
+
+
+
 
 const placeLocationSchema = new mongoose.Schema({
   lat: Number,

@@ -15,60 +15,48 @@ function Account() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-    const [searchParams] = useSearchParams();
-  // const [isVerified,setVerified]  = useState(false)
+  const [searchParams] = useSearchParams();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
-  
-// const toastId = toast.loading("Sending Email...");
 
-   
-const sendVerificationEmail = async () => {
-  // Show a loading toast and get its ID
-  const toastId = toast.loading("Sending verification email...");
+  const sendVerificationEmail = async () => {
+    const toastId = toast.loading("Sending verification email...", { autoClose: false });
+    try {
+      await axios.post(
+        "http://localhost:5000/api/v1/users/send-verification",
+        {},
+        { withCredentials: true }
+      );
+      toast.update(toastId, {
+        render: "Verification email sent. Check your inbox.",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    } catch (err) {
+      toast.update(toastId, {
+        render: err?.response?.data || "Error sending verification email",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    }
+  };
 
-  try {
-    await axios.post(
-      "http://localhost:5000/api/verify/send-verification",
-      {},
-      { withCredentials: true }
-    );
-
-    // Update the loading toast to success
-    toast.update(toastId, {
-      render: "Verification email sent. Check your inbox.",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
-  } catch (err) {
-    // Update the loading toast to error
-    toast.update(toastId, {
-      render: err?.response?.data || "Error sending verification email",
-      type: "error",
-      isLoading: false,
-      autoClose: 3000,
-    });
-  }
-};
- useEffect(() => {
-    const  verifyFromEmail= async () => {
+  useEffect(() => {
+    const verifyFromEmail = async () => {
       if (searchParams.get("verified") === "true") {
-        // Show loading toast
-        const toastId = toast.loading("Verifying your email...");
-
+        const toastId = toast.loading("Verifying your email...", { autoClose: false });
         try {
           const res = await axios.get(
             "http://localhost:5000/api/v1/users/getCurrentUser",
             { withCredentials: true }
           );
           setUser(res.data.data);
-
-          // Update toast to success
           toast.update(toastId, {
             render: "✅ Verified successfully!",
             type: "success",
@@ -76,7 +64,6 @@ const sendVerificationEmail = async () => {
             autoClose: 3000,
           });
         } catch (err) {
-          // Update toast to error
           toast.update(toastId, {
             render: "❌ Verification failed.",
             type: "error",
@@ -86,8 +73,7 @@ const sendVerificationEmail = async () => {
         }
       }
     };
-
-     verifyFromEmail();
+    verifyFromEmail();
   }, [searchParams]);
 
   useEffect(() => {
@@ -99,7 +85,7 @@ const sendVerificationEmail = async () => {
         );
         setUser(res.data.data);
       } catch {
-        toast.error("Session expired");
+        toast.error("Session expired", { autoClose: 3000 });
         navigate("/");
       } finally {
         setLoading(false);
@@ -108,34 +94,25 @@ const sendVerificationEmail = async () => {
     fetchUser();
   }, [navigate]);
 
-
-     const [trips, setTrips] = useState([]);
+  const [trips, setTrips] = useState([]);
   useEffect(() => {
-
-   const fetchAllTrips = async () => {
+    const fetchAllTrips = async () => {
       try {
         const res = await axios.get(
           "http://localhost:5000/api/v1/users/getsavetrip",
           { withCredentials: true }
         );
         let fetchedTrips = res.data.data || [];
-
-        // Sort newest first
         fetchedTrips.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-
         setTrips(fetchedTrips);
       } catch (err) {
         console.error("Error fetching trips:", err);
       }
     };
-
-   
-
-   fetchAllTrips();
-}, []);
-
+    fetchAllTrips();
+  }, []);
 
   const logout = async () => {
     try {
@@ -144,13 +121,12 @@ const sendVerificationEmail = async () => {
         {},
         { withCredentials: true }
       );
-      toast.success("User logged out successfully");
+      toast.success("User logged out successfully", { autoClose: 3000 });
       navigate("/");
     } catch {
-      toast.error("Error in logout");
+      toast.error("Error in logout", { autoClose: 3000 });
     }
   };
-
 
   const deleteAccount = async () => {
     try {
@@ -159,10 +135,10 @@ const sendVerificationEmail = async () => {
         {},
         { withCredentials: true }
       );
-      toast.success("Account deleted successfully");
+      toast.success("Account deleted successfully", { autoClose: 3000 });
       navigate("/register");
     } catch {
-      toast.error("Error deleting account");
+      toast.error("Error deleting account", { autoClose: 3000 });
     }
   };
 
@@ -173,11 +149,11 @@ const sendVerificationEmail = async () => {
         data,
         { withCredentials: true }
       );
-      toast.success(response.data.message || "Profile updated!");
+      toast.success(response.data.message || "Profile updated!", { autoClose: 3000 });
       setUser(response.data.data);
       setShowForm(false);
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed to update profile");
+      toast.error(err?.response?.data?.message || "Failed to update profile", { autoClose: 3000 });
     }
   };
 
@@ -187,7 +163,7 @@ const sendVerificationEmail = async () => {
 
     const formData = new FormData();
     formData.append("avatar", file);
-    const toastId = toast.loading("Uploading image...");
+    const toastId = toast.loading("Uploading image...", { autoClose: false });
 
     try {
       const response = await axios.post(
@@ -225,25 +201,46 @@ const sendVerificationEmail = async () => {
           overflow: hidden;
           height: 100%;
         }
+        .no-transition {
+          transition: none !important;
+        }
+        .verify-message-container {
+          min-height: 24px; /* Reserves space for the verification message */
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .verify-status-container {
+          min-height: 36px; /* Matches the height of the button/badge */
+          display: flex;
+          align-items: center;
+        }
+        .verify-button, .verified-badge {
+          width: 120px; /* Fixed width for consistency */
+          text-align: center;
+          padding: 8px 16px;
+          font-size: 14px;
+          line-height: 20px;
+        }
       `}</style>
       <div className="flex flex-col sm:flex-row bg-[#171221] text-white h-screen w-full overflow-hidden">
-        {/* Sidebar */}
         <SideBar />
-        {/* Main Content */}
-        <main className="flex-1 w-full py-10 transition-all duration-300 ml-0 sm:ml-[280px] md:ml-[300px] overflow-hidden">
-          <div className="max-w-full w-full mx-auto px-6  flex flex-col gap-4 h-full overflow-hidden" style={{ zoom: '0.75' }}>
-            { !user?.verified  && (
-            <p className="text-sm text-center text-gray-400 ">
-              You have not verified your email yet. Please verify your email to unlock all features.
-            </p>)
-}
-            <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
+        <main className="flex-1 w-full py-10 ml-0 sm:ml-[280px] md:ml-[300px] overflow-hidden">
+          <div className="max-w-full w-full mx-auto px-6 flex flex-col gap-4 h-full overflow-hidden" style={{ zoom: '0.75' }}>
+            <div className="verify-message-container">
+              {!user?.verified && (
+                <p className="text-sm text-center text-gray-400">
+                  You have not verified your email yet. Please verify your email to unlock all features.
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-6 mb-5">
               <div className="relative group">
                 <img
                   src={user?.avatar || "/profileicon.jpg"}
                   alt="avatar"
                   onClick={() => document.getElementById("avatarInput").click()}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-white cursor-pointer hover:opacity-80"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-white cursor-pointer no-transition"
                 />
                 <input
                   type="file"
@@ -252,7 +249,7 @@ const sendVerificationEmail = async () => {
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-xs bg-black/60 px-2 py-1 rounded-md text-white opacity-0 group-hover:opacity-100">
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-xs bg-black/60 px-2 py-1 rounded-md text-white">
                   Change
                 </span>
               </div>
@@ -265,7 +262,7 @@ const sendVerificationEmail = async () => {
 
               <div className="mt-4 sm:mt-0 sm:ml-auto">
                 <Button
-                  className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-600 text-white px-5"
+                  className="bg-gradient-to-r from-green-500 to-lime-500 text-white px-5 no-transition"
                   onClick={() => setShowForm(true)}
                 >
                   Edit Profile
@@ -274,24 +271,24 @@ const sendVerificationEmail = async () => {
             </div>
 
             {showForm && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
                 <div className="bg-[#171221] rounded-xl shadow-lg p-6 w-full max-w-xl border border-white/20">
                   <h2 className="text-lg font-semibold text-white mb-4">Edit Profile</h2>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <Input label="Full Name" type="text" defaultValue={user?.fullname} {...register("fullname")} />
                     <Input label="username" type="username" defaultValue={user?.username} {...register("username")} />
                     <div className="flex justify-end gap-3 pt-4">
-                      <Button type="button" onClick={() => setShowForm(false)} className="bg-gray-500">
+                      <Button type="button" onClick={() => setShowForm(false)} className="bg-gray-500 no-transition">
                         Cancel
                       </Button>
-                      <Button type="submit" className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-600">
+                      <Button type="submit" className="bg-gradient-to-r from-green-500 to-lime-500 no-transition">
                         Save Changes
                       </Button>
                     </div>
                   </form>
                   <button
                     onClick={() => setShowForm(false)}
-                    className="absolute top-2 right-3 text-white text-2xl font-bold"
+                    className="absolute top-2 right-3 text-white text-2xl font-bold no-transition"
                   >
                     &times;
                   </button>
@@ -300,11 +297,11 @@ const sendVerificationEmail = async () => {
             )}
 
             <div className="flex gap-4 justify-center sm:justify-start mb-6">
-              <div className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-200 px-4 py-2 rounded-xl text-center w-36">
+              <div className="bg-gradient-to-r from-green-500 to-lime-500 px-4 py-2 rounded-xl text-center w-36 no-transition">
                 <p className="text-sm">Groups Joined</p>
                 <p className="text-lg font-bold">0</p>
               </div>
-              <div className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-200 px-4 py-2 rounded-xl text-center w-36">
+              <div className="bg-gradient-to-r from-green-500 to-lime-500 px-4 py-2 rounded-xl text-center w-36 no-transition">
                 <p className="text-sm">Trips Planned</p>
                 <p className="text-lg font-bold">{trips.length}</p>
               </div>
@@ -316,23 +313,18 @@ const sendVerificationEmail = async () => {
                 <Input label="Full Name" defaultValue={user?.fullname} readOnly />
                 <Input label="Username" defaultValue={user?.username} readOnly />
                 <Input label="Email Address" defaultValue={user?.email} readOnly />
-                <div className="flex items-end">
-                  {user?.verified? (
-                  <span className="bg-gray-500
-                 text-white text-sm font-semibold 
-                 px-4 py-2 rounded-full shadow-md 
-                 inline-block mb-5">
-  Verified
-</span>
-
+                <div className="verify-status-container">
+                  {user?.verified ? (
+                    <span className="verified-badge bg-gray-500 text-white font-semibold rounded-full shadow-md inline-block  no-transition">
+                      Verified
+                    </span>
                   ) : (
                     <Button
-  className="bg-gradient-to-r from-green-500 to-lime-500 hover:from-green-600 hover:to-lime-600 text-sm mb-6"
-  onClick={sendVerificationEmail}
->
-  Verify Email
-</Button>
-
+                      className="verify-button bg-gradient-to-r from-green-500 to-lime-500 mb-6 no-transition"
+                      onClick={sendVerificationEmail}
+                    >
+                      Verify Email
+                    </Button>
                   )}
                 </div>
               </div>
@@ -341,30 +333,27 @@ const sendVerificationEmail = async () => {
               </p>
             </div>
 
-            <div className="mt-6 ">
-              <h3 className="text-lg font-semibold mb-4 ">Delete Account</h3>
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-4">Delete Account</h3>
               <p className="text-sm text-gray-400 mb-4">
                 Once you delete your account, there is no going back. Please be certain.
               </p>
               <div className="flex justify-between items-center mt-5">
                 <Button
-                  className="bg-red-600 text-white font-medium py-2 px-5 rounded-xl hover:bg-red-700"
+                  className="bg-red-600 text-white font-medium py-2 px-5 rounded-xl no-transition"
                   onClick={deleteAccount}
                 >
                   Delete Account
                 </Button>
-              
               </div>
-              <div className="flex justify-between items-center mt-16 ml-360 ">
-               <Button
-                  className="bg-red-600 px-5 py-2  font-medium rounded-xl text-white hover:bg-red-700 "
+              <div className="flex justify-between items-center mt-12 ml-360">
+                <Button
+                  className="bg-red-600 px-5 py-2 font-medium rounded-xl text-white no-transition"
                   onClick={logout}
                 >
                   Logout
                 </Button>
-              
               </div>
-                
             </div>
           </div>
         </main>

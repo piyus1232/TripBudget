@@ -5,7 +5,11 @@ import { uploadfilecloudnary } from "../utils/cloudnary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import jwt from "jsonwebtoken"
+import { sendEmail } from "../utils/sendemail.js";
 
+import crypto from 'crypto'
+import nodemailer from "nodemailer";
+import Token from "../models/token.js";
 
 import { User } from "../models/user.model.js";
 import { request } from "express";
@@ -288,7 +292,77 @@ const editProfile = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, updatedUser, "User updated successfully"));
 });
+const verifyEmail = asyncHandler(async (req, res) => {
+ 
+   try {
+      const user = await User.findById(req.user._id); // comes from verifyJWT middleware
+  
+      if (!user) return res.status(400).send("User not found");
+      if (user.verified) return res.status(400).send("Email already verified");
+  
+      // Generate token
+      const tokenValue = crypto.randomBytes(32).toString("hex");
+  
+      // Remove old token & save new one
+      await Token.findOneAndDelete({ userId: user._id });
+      await new Token({ userId: user._id, token: tokenValue }).save();
+  
+      // Create verification link
+      const link = `http://localhost:5000/api/v1/users/${tokenValue}`;
+
+await sendEmail({
+  email: user.email,
+  subject: "Email Verification",
+  html: 
+  `
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #6dd5fa, #2980b9); color: white; text-align: center; padding: 40px 20px;">
+      <h1 style="margin: 0; font-size: 28px;">Welcome to TripBudget!</h1>
+      <p style="margin: 10px 0 0 0; font-size: 16px;">Let's get started by verifying your email.</p>
+    </div>
+    <div style="padding: 30px 20px; text-align: center; background-color: #f9f9f9;">
+      <p style="font-size: 16px; color: #333;">Click the button below to verify your email and start your journey with TripBudget.</p>
+      <a href="${link}" style="display: inline-block; margin-top: 20px; padding: 12px 30px; font-size: 16px; color: white; background-color: #2980b9; border-radius: 6px; text-decoration: none; transition: background 0.3s;">
+        Verify Email
+      </a>
+    </div>
+    <div style="padding: 15px 20px; text-align: center; font-size: 12px; color: #999; background-color: #f1f1f1;">
+      If you did not sign up for TripBudget, please ignore this email.
+    </div>
+  </div>`
+  
+});
+
+     
+  
+      res.status(200).send("Verification email sent");
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
 
 
+  
 
-export {registerUser,loginUser,logoutUser,refreshtoken,getCurrentUser,updateProfile,deleteaccount,editProfile}
+});
+const getverifyemail = asyncHandler(async (req, res) => {
+ 
+   try {
+    const tokenDoc = await Token.findOne({ token: req.params.token });
+    if (!tokenDoc) return res.status(400).send("Invalid or expired token");
+
+    await User.findByIdAndUpdate(tokenDoc.userId, { verified: true });
+    await Token.deleteOne({ _id: tokenDoc._id });
+    res.redirect('http://localhost:5173/account?verified=true'); 
+
+    // res.send("Email verified successfully");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+
+
+  
+
+});
+
+ 
+export {registerUser,loginUser,logoutUser,refreshtoken,getCurrentUser,updateProfile,deleteaccount,editProfile,verifyEmail,getverifyemail}

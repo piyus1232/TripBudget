@@ -16,6 +16,8 @@ import FormResponse from './pages/formresponse/formresponse';
 import ExploreCities from './pages/ExploreCities/explorecities';
 import SavedTrips from './pages/SavedTrips/savedtrips';
 import FullResponse from './pages/fullresponse.jsx/fullresponse';
+import HotelWithFood from './pages/formresponse/SuggestFoodoptions';
+import HotelSavedFood from './pages/hotelsavedfood/hotelsavedfood';
 
 // Function to build router based on login state
 const buildRouter = (isLoggedIn) =>
@@ -34,6 +36,8 @@ const buildRouter = (isLoggedIn) =>
                  { path: '/MyTrips', element:  <SavedTrips/>},
 
                   { path: '/full-trip/:id', element: <FullResponse/> },
+                   { path: '/hotelfood', element: <HotelWithFood/> },
+                     { path: '/hotelsavedfood/:id', element: <HotelSavedFood/> },
 
              
                 // { path: '/Contact', element: <ContactPage/> },
@@ -55,6 +59,8 @@ const buildRouter = (isLoggedIn) =>
              { path: '/plantrip', element: <PlanTrip/> },
               { path: '/MyTrips', element:  <SavedTrips/>},
                 { path: '/full-trip/:id', element: <FullResponse/> },
+                   { path: '/hotelfood/:id', element: <HotelWithFood/> },
+                    { path: '/hotelsavedfood/:id', element: <HotelSavedFood/> },
           ],
     },
   ]);
