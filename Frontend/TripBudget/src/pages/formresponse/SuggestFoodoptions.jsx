@@ -1,5 +1,5 @@
 // HotelWithFood.jsx
-import React, { useEffect, useState  ,useLayoutEffect} from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { getCached, setCached, preload } from "../../../src/components/utils/imageCache.js";
@@ -7,13 +7,17 @@ import { getCached, setCached, preload } from "../../../src/components/utils/ima
 function HotelWithFood() {
   const { state } = useLocation();
   const { hotel, destination, hotelImage, preloadedFoodImages } = state || {};
-     const [expanded, setExpanded] = React.useState(false);
-  const defaultImage = "./hotel.avif";
 
-  // instant paint
+  // ⬇️ Track expand state per-card (by id)
+  const [expanded, setExpanded] = useState({});
+  const toggleExpand = (id) =>
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const defaultImage = "./hotel.avif";
   const [heroImage, setHeroImage] = useState(hotelImage || defaultImage);
   const [foodImages, setFoodImages] = useState(preloadedFoodImages || {});
-   useEffect(() => {
+
+  useEffect(() => {
     if ("scrollRestoration" in window.history) {
       const prev = window.history.scrollRestoration;
       window.history.scrollRestoration = "manual";
@@ -21,22 +25,18 @@ function HotelWithFood() {
     }
   }, []);
 
-  // Ensure page starts at top
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    // also cover Safari/older browsers
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, []);
 
-  // Background refresh (optional). Skips any that are already cached.
   useEffect(() => {
     if (!hotel?.id || !destination) return;
 
-    // refresh hero (hotel) image if not cached
     (async () => {
       const hotelKey = `${destination}:${hotel.id}`;
-      if (!getCached('hotel', hotelKey)) {
+      if (!getCached("hotel", hotelKey)) {
         try {
           const res = await axios.post("http://localhost:5000/api/hotel-image", {
             name: hotel.name, hotelId: hotel.id, city: destination,
@@ -45,7 +45,7 @@ function HotelWithFood() {
           const url = (res.data?.image && typeof res.data.image === "string")
             ? res.data.image : defaultImage;
 
-          setCached('hotel', hotelKey, url);
+          setCached("hotel", hotelKey, url);
           preload(url);
           setHeroImage(url);
         } catch {
@@ -54,7 +54,6 @@ function HotelWithFood() {
       }
     })();
 
-    // refresh food images if any missing from cache
     (async () => {
       const foods = hotel?.foodOptions || [];
       if (!foods.length) return;
@@ -62,7 +61,7 @@ function HotelWithFood() {
       const updates = {};
       await Promise.all(foods.map(async (food) => {
         const key = `${hotel.id}:${food.foodid}`;
-        if (getCached('food', key)) return; // already got the best we have
+        if (getCached("food", key)) return;
 
         try {
           const res = await axios.post("http://localhost:5000/api/foodimage", {
@@ -72,7 +71,7 @@ function HotelWithFood() {
           const url = (res.data?.image && typeof res.data.image === "string")
             ? res.data.image : defaultImage;
 
-          setCached('food', key, url);
+          setCached("food", key, url);
           preload(url);
           updates[food.name] = url;
         } catch {
@@ -81,7 +80,7 @@ function HotelWithFood() {
       }));
 
       if (Object.keys(updates).length) {
-        setFoodImages(prev => ({ ...prev, ...updates }));
+        setFoodImages((prev) => ({ ...prev, ...updates }));
       }
     })();
   }, [hotel?.id, destination]);
@@ -114,41 +113,50 @@ function HotelWithFood() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
         {hotel.foodOptions?.length ? (
-          hotel.foodOptions.map((food, idx) => (
-            <div key={idx} className="bg-[#1b1730] rounded-2xl shadow-md hover:shadow-xl transition-all">
-              <div className="w-full h-40 rounded-t-2xl overflow-hidden">
-                <img
-                  src={foodImages[food.name] || defaultImage}
-                  alt={food.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-white font-semibold text-base line-clamp-1">{food.name}</h4>
-                  <span className="text-yellow-400 text-sm">⭐ {food.rating}</span>
+          hotel.foodOptions.map((food, idx) => {
+            const id = food.foodid ?? idx;           // stable key
+            const isOpen = !!expanded[id];
+            const addr = food.address || "";         // use food's address
+            const shortAddr = addr.slice(0, 30);
+
+            return (
+              <div key={id} className="bg-[#1b1730] rounded-2xl shadow-md hover:shadow-xl transition-all">
+                <div className="w-full h-40 rounded-t-2xl overflow-hidden">
+                  <img
+                    src={foodImages[food.name] || defaultImage}
+                    alt={food.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
-                 <p className="text-gray-300 text-sm mt-2 mb-4">
-                <span className="inline-block">
-                  📍 {expanded ? food.address : hotel.address?.slice(0, 30)}
-                </span>
-                {hotel.address?.length > 30 && (
-                  <button
-                    className="ml-1 text-teal-400 hover:underline text-xs"
-                    onClick={() => setExpanded(!expanded)}
-                  >
-                    {expanded ? "Show less" : "Read more"}
-                  </button>
-                )}
-              </p>
-                <span className="text-gray-300 text-sm bg-gray-700 px-2 py-1 rounded mt-3 inline-block">
-                  {food.priceText}
-                </span>
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="text-white font-semibold text-base line-clamp-1">{food.name}</h4>
+                    <span className="text-yellow-400 text-sm">⭐ {food.rating}</span>
+                  </div>
+
+                  <p className="text-gray-300 text-sm mt-2 mb-4">
+                    <span className="inline-block">
+                      📍 {isOpen ? addr : shortAddr}
+                    </span>
+                    {addr.length > 30 && (
+                      <button
+                        className="ml-1 text-teal-400 hover:underline text-xs"
+                        onClick={() => toggleExpand(id)}
+                      >
+                        {isOpen ? "Show less" : "Read more"}
+                      </button>
+                    )}
+                  </p>
+
+                  <span className="text-gray-300 text-sm bg-gray-700 px-2 py-1 rounded mt-3 inline-block">
+                    {food.priceText}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-gray-400">No food options available.</p>
         )}

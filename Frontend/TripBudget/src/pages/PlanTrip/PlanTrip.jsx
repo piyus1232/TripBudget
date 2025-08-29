@@ -88,17 +88,17 @@ const onSubmit = async (data) => {
   "Ahmedabad", "Jaipur", "Lucknow", "Chandigarh", "Bhopal", "Indore", "Nagpur",
   "Goa", "Varanasi", "Amritsar", "Surat", "Kanpur", "Patna", "Ranchi", "Raipur",
   "Jodhpur", "Guwahati", "Dehradun", "Shimla", "Manali", "Udaipur", "Agra",
-  "Noida", "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
+   "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
   "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
-  "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur",
+  "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur","Pushkar",
   "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu","Kathgodam"
 ];
   const indianCitiess = [
-  "Jaipur", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune",
+  "Jaipur", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Pushkar",
   "Ahmedabad", "Jaipur", "Lucknow", "Chandigarh", "Bhopal", "Indore", "Nagpur",
   "Goa", "Varanasi", "Amritsar", "Surat", "Kanpur", "Patna", "Ranchi", "Raipur",
   "Jodhpur", "Guwahati", "Dehradun", "Shimla", "Manali", "Udaipur", "Agra", "Delhi",
-  "Noida", "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
+   "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
   "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
   "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur",
   "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu","Kathgodam"

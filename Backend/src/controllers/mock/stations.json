@@ -45,6 +45,16 @@
     "city": "Ahmedabad"
   },
   {
+  "code": "UHL",
+  "station_name": "Una Himachal Jn",
+  "city": "Una Himachal"
+},
+{
+  "code": "JDNX",
+  "station_name": "Joginder Nagar",
+  "city": "Joginder Nagar"
+},
+  {
     "station_name": "AJMER",
     "code": "AII",
     "city": "Ajmer"

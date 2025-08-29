@@ -8,6 +8,13 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 import fs from 'fs';
+// ADD: nearest-station overrides (destinationCity -> [preferred station codes])
+import overrideRaw from '../data/nearestStationOverride.js';
+const overrideMap= overrideRaw?.default || overrideRaw; 
+
+const overrideLower = Object.fromEntries(
+  Object.entries(overrideMap).map(([k, v]) => [k.toLowerCase(), v])
+);
 
 const prettify = new Prettify();
 
@@ -387,7 +394,33 @@ const getRoundTripTrains = async (req) => {
     }
 
     const fromCode = await getStationCode(source);
-    const toCode = await getStationCode(destination);
+  let toCode;
+const destKey = String(destination || '').trim();
+
+try {
+  // Try normal city -> station code first
+  toCode = await getStationCode(destKey);
+} catch (err) {
+  // Case-insensitive override lookup
+  const candidates =
+    overrideMap[destKey] ||
+    overrideMap[destKey.toUpperCase?.()] ||
+    overrideLower[destKey.toLowerCase?.()];
+
+  if (!Array.isArray(candidates) || candidates.length === 0) {
+    console.log('[NEAREST-FALLBACK] No override for', JSON.stringify(destKey),
+                'Available keys:', Object.keys(overrideMap));
+    // Preserve your original behavior if we truly have no override
+    throw err;
+  }
+
+  toCode = candidates[0];
+  console.log(`[NEAREST-FALLBACK] Using nearest-station for "${destKey}": ${toCode}`);
+}
+
+
+
+    // const toCode = await getStationCode(destination);
 
     // Normalize and validate dates
     const normalizedStartDate = new Date(startDate).toISOString().split('T')[0];
@@ -432,15 +465,18 @@ const getRoundTripTrains = async (req) => {
       throw new ApiError(404, "No trains found");
     }
 
-    const outTrains = outTrainData.data || [];
-    const returnTrains = returnTrainData.data || [];
+    // const outTrains = outTrainData.data || [];
+    // const returnTrains = returnTrainData.data || [];
+    const outTrains = Array.isArray(outTrainData?.data) ? outTrainData.data : [];
+const returnTrains = Array.isArray(returnTrainData?.data) ? returnTrainData.data : [];
+
     console.log("Out Trains:", outTrains.length);
     console.log("Return Trains:", returnTrains.length);
 
     const filteredOutTrains = outTrains.filter(train => {
       const runDays = decodeRunDays(train.train_base?.running_days);
       return runDays[startDay] === true;
-    }).slice(0, 5); // Increased to 5 for more options
+    }).slice(0, 8); // Increased to 5 for more options
 
     const filteredReturnTrains = returnTrains.filter(train => {
       const runDays = decodeRunDays(train.train_base?.running_days);

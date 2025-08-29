@@ -3,7 +3,7 @@ import { Router } from "express";
 import {upload} from "../middleware/multer.middleware.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import userform from "../controllers/form.controller.js";
-// import { scrapeRedbusBuses } from "../controllers/buses.controller.js";
+import { getBusData} from "../controllers/buses.controller.js";
 import { getHotelData, getNearbyHotels } from "../controllers/hotel.controller.js";
 
 
@@ -31,6 +31,7 @@ router.route("/updateProfile").post(
 );
 router.route("/train").post(verifyJWT,finalcontroller);
 router.route("/hotel").post(getNearbyHotels);
+router.route("/bus").post(getBusData);
 // router.route("/places").post(getPlacesController);
 
 // router.get("/test-token", (req, res) => {

@@ -68,7 +68,7 @@ const finalcontroller = async (req, res) => {
 
     // Generate cache key (for debugging)
     const cacheKey = `${normalizedSource}-${normalizedDestination}-${normalizedStartDate}-${normalizedReturnDate}-${classCodes.join(',')}`;
-    console.log(`finalcontroller Cache Key: ${cacheKey}`);
+    // console.log(`finalcontroller Cache Key: ${cacheKey}`);
 
     // Call findCheapestRoundTripTrains with normalized inputs
     const trains = await findCheapestRoundTripTrains({
@@ -90,7 +90,7 @@ const finalcontroller = async (req, res) => {
       const secondCheapestOutTrainfare = secondCheapestOutTrain?.fare?.fare?.totalFare.general.SL;
       const cheapestReturnTrainfare = cheapestReturnTrain?.fare?.fare?.totalFare.general.SL;
       const secondCheapestReturnTrainfare = secondCheapestReturnTrain?.fare?.fare?.totalFare.general.SL;
-      const sum = parseInt(cheapestOutTrainfare) + parseInt(cheapestReturnTrainfare);
+      const sum = parseInt(cheapestOutTrainfare) || 0 + parseInt(cheapestReturnTrainfare) || 0;
 
       return sum;
     };

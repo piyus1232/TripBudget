@@ -97,7 +97,7 @@ const processHotels = (hotelData, maxPrice = 10000) => {
     .filter(hotel => hotel.ratesSummary?.minPrice && !isNaN(parseFloat(hotel.ratesSummary.minPrice)))
     .filter(hotel => parseFloat(hotel.ratesSummary.minPrice) <= maxPrice) // filter expensive hotels
     .sort((a, b) => parseFloat(a.ratesSummary.minPrice) - parseFloat(b.ratesSummary.minPrice))
-    .slice(0, 8)
+    .slice(0, 12)
     .map(hotel => ({
       name: hotel.name,
       latitude: hotel.location.latitude,

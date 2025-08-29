@@ -1,7 +1,8 @@
 // src/utils/imageCache.js
 export const imgCache = {
   hotel: new Map(), // key: `${city}:${hotelId}`
-  food: new Map(),  // key: `${hotelId}:${foodId}`
+  food: new Map(),
+   place: new Map(),  // key: `${hotelId}:${foodId}`
 };
 
 export const getCached = (scope, key) => (imgCache[scope].get(key) || null);

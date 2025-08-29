@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userrouter from "./src/routes/user.routes.js"
 import hotelrouter from './src/routes/hotel.images.js';
+import transportrouter from './src/routes/transport.routes.js';
 // import verifyrouter from './src/routes/verifyemail.js';
 
 const app = express();
@@ -20,6 +21,7 @@ app.use('/api/v1/users', userrouter);
 // app.use('/api/verify', verifyrouter);
 
 app.use('/api', hotelrouter);
+app.use('/api/v2', transportrouter);
 
 
 export { app };
