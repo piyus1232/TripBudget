@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './Backend/.env' });
 
 const testGoogleKey = async () => {
-  const key = process.env.GEOCODE_API_KEY || 'AIzaSyBeHk-GWW25JdXShUzUSvc4bFF3EtFIRyg';
+  const key = process.env.GEOCODE_API_KEY ;
   console.log(`Testing key: ${key.substring(0, 10)}...`);
   
   try {
