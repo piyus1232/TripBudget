@@ -1,0 +1,64 @@
+import { registerUser } from "../controllers/user.controller.js";
+import { Router } from "express";
+import {upload} from "../middleware/multer.middleware.js"
+import { verifyJWT } from "../middleware/auth.middleware.js";
+import userform from "../controllers/form.controller.js";
+import { getBusData} from "../controllers/buses.controller.js";
+import { getHotelData, getNearbyHotels } from "../controllers/hotel.controller.js";
+
+
+import { loginUser,logoutUser ,getCurrentUser,updateProfile,deleteaccount,editProfile,verifyEmail,getverifyemail} from "../controllers/user.controller.js";
+// import {  getPlacesController } from "../controllers/places.controller.js";
+import { getCheapestRoundTripTrains } from "../controllers/getcheapesttrain.js";
+import { finalcontroller } from "../controllers/finalcontroller.js";
+// import { savedtrip } from "../controllers/savedtrip.controller.js";
+import {
+  deletedtrips,
+  getSavedTrips,
+  deleteAllTrips,
+} from "../controllers/savetripfind.controller.js";
+
+// import { getNearbyFoodOptions } from "../controllers/hotel.controller.js";
+
+
+
+const router = Router();
+ router.route("/register").post(registerUser)
+router.route("/login").post(loginUser)
+router.route("/getCurrentUser").get(verifyJWT,getCurrentUser)
+router.route("/updateProfile").post(
+  verifyJWT, 
+  upload.fields([
+    { name: "avatar", maxCount: 1 }
+  ]),        
+  updateProfile 
+);
+router.route("/train").post(verifyJWT,finalcontroller);
+router.route("/hotel").post(getNearbyHotels);
+router.route("/bus").post(getBusData);
+// router.route("/places").post(getPlacesController);
+
+// router.get("/test-token", (req, res) => {
+//   res.json({ cookies: req.cookies });
+// });
+
+
+
+
+
+router.route("/logout").post(verifyJWT,  logoutUser)
+
+router.route("/form").post(userform) 
+
+// router.route("/savetrip").post(savedtrip)
+router.route("/getsavetrip").get(verifyJWT, getSavedTrips);
+router.delete("/getsavetrip/all", verifyJWT, deleteAllTrips);
+router.delete("/getsavetrip/:id", verifyJWT, deletedtrips);
+
+router.route("/deleteaccount").post(verifyJWT,  deleteaccount)
+router.route("/editprofile").put(verifyJWT,editProfile)
+router.route("/send-verification").post(verifyJWT,verifyEmail)
+router.route("/:token").get(getverifyemail)
+
+
+export default router

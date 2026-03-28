@@ -1,0 +1,330 @@
+import React, {  useState } from 'react';
+import { useForm } from 'react-hook-form';
+import SideBar from '../../components/SideBar/SideBar';
+import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from "react-toastify";
+import axios from 'axios';
+import { apiUrl } from '../../conf/api.js';
+import Button from '../../components/utils/Button';
+import TypingText from '../../framermotion/TypingText';
+import { Verified } from 'lucide-react';
+
+function PlanTrip() {
+  const location = useLocation();
+  const prefillDestination =
+    typeof location.state?.destination === 'string' ? location.state.destination : '';
+
+  const { register, handleSubmit, reset, getValues } = useForm({
+    defaultValues: {
+      destination: prefillDestination,
+    },
+  });
+  const [budget, setBudget] = useState(1000);
+  const [travelers, setTravelers] = useState(2);
+  const [transport, setTransport] = useState('');
+  const [accommodation, setAccommodation] = useState('');
+  const [loading, setLoading] = useState(false);
+  const[load,setload]= useState(true)
+  const [user,setUser] =useState(null)
+  const navigate = useNavigate(); 
+  const today=new Date().toISOString().split("T")[0];
+
+  useEffect(() => {
+    const d = location.state?.destination;
+    if (typeof d === 'string' && d) {
+      reset({
+        ...getValues(),
+        destination: d,
+      });
+    }
+  }, [location.state, location.key, reset, getValues]);
+const onSubmit = async (data) => {
+  // ✅ Validation for empty fields
+  if (!data.source || !data.destination || !data.startDate || !data.returnDate || !transport || !accommodation) {
+    toast.error("All fields are required.");
+    return;
+  }
+
+  // ✅ Validation for same start and end date
+  if (data.startDate === data.returnDate) {
+    toast.error("Start date and end date should not be the same.");
+    return;
+  }
+
+  // ✅ Validation for same From & To
+  if (data.source === data.destination) {
+    toast.error("Source and destination should not be the same.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const formatDate = (date) => new Date(date).toISOString().split('T')[0];
+
+    const finalData = {
+      ...data,
+      startDate: formatDate(data.startDate),
+      returnDate: formatDate(data.returnDate),
+      budget,
+      travelers,
+      transport,
+      accommodation,
+    };
+
+    const res = await axios.post(
+      apiUrl("/api/v1/users/train"),
+      finalData,
+      { withCredentials: true }
+    );
+
+    navigate('/response', {
+      state: {
+        data: res.data.data,
+        cacheStatus: res.headers['x-cache-status'],
+        originalInputs: {
+          source: data.source,
+          destination: data.destination,
+          startDate: finalData.startDate,
+          returnDate: finalData.returnDate,
+        },
+      },
+    });
+
+  } catch (error) {
+    console.error("Error in trip submission:", error);
+    toast.error("Something went wrong while planning the trip.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const indianCities = [
+  "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune",
+  "Ahmedabad", "Jaipur", "Lucknow", "Chandigarh", "Bhopal", "Indore", "Nagpur",
+  "Goa", "Varanasi", "Amritsar", "Surat", "Kanpur", "Patna", "Ranchi", "Raipur",
+  "Jodhpur", "Guwahati", "Dehradun", "Shimla", "Manali", "Udaipur", "Agra",
+   "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
+  "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
+  "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur","Pushkar",
+  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu","Kathgodam"
+];
+  const indianCitiess = [
+  "Jaipur", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Pushkar",
+  "Ahmedabad", "Jaipur", "Lucknow", "Chandigarh", "Bhopal", "Indore", "Nagpur",
+  "Goa", "Varanasi", "Amritsar", "Surat", "Kanpur", "Patna", "Ranchi", "Raipur",
+  "Jodhpur", "Guwahati", "Dehradun", "Shimla", "Manali", "Udaipur", "Agra", "Delhi",
+   "Gurgaon", "Thiruvananthapuram", "Kochi", "Mysore", "Madurai",
+  "Visakhapatnam", "Vijayawada", "Coimbatore", "Allahabad", "Haridwar",
+  "Rishikesh", "Srinagar", "Leh", "Puri", "Bhubaneswar", "Gwalior", "Jabalpur",
+  "Dharamshala", "Kodaikanal", "Ooty", "Shillong", "Tirupati", "Nashik","MIDNAPORE","Jammu","Kathgodam"
+];
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get(apiUrl("/api/v1/users/getCurrentUser"), {
+        withCredentials: true,
+      });
+     
+      setUser(res.data.data);
+    } catch {
+     
+      toast.error("Session expired");
+    
+    } finally {
+      setload(false);
+    }
+  };
+
+  fetchUser(); 
+}, []);
+
+useEffect(() => {
+  if (!load && !user) {
+
+    navigate("/");
+    toast.error("Session expired");
+
+  }
+}, [load,user, navigate]);
+
+  return (
+    <div className="relative min-h-screen min-w-0 overflow-x-hidden w-screen max-w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]">
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#2e2a47,#1c1b2e)] bg-cover" />
+      <SideBar />
+      {/* w-full + large ml overflows the row; use explicit width = parent minus sidebar so mx-auto centers in the real column */}
+      <main className="box-border min-w-0 pt-14 pb-8 sm:pt-8 ml-0 w-full sm:ml-[260px] sm:w-[calc(100%-260px)] md:ml-[280px] md:w-[calc(100%-280px)] lg:ml-[300px] lg:w-[calc(100%-300px)] px-4 sm:px-8 flex justify-center">
+        <motion.form
+          onSubmit={handleSubmit(onSubmit)}
+          className="relative bg-[#191726]/90 text-white rounded-3xl p-4 sm:p-8 shadow-lg w-full max-w-4xl shrink-0 border border-purple-800/30 
+                     before:absolute before:inset-0 before:rounded-3xl before:border before:border-purple-500/20 
+                     before:pointer-events-none before:shadow-[0_0_20px_rgba(168,85,247,0.15)] backdrop-blur-md"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5, delay: 0.3, ease: 'easeInOut' }}
+        >
+         <h2  className="text-2xl font-bold mb-4">
+           <TypingText
+          delay={0.1}
+           text=" 🗺️ Plan Your Trip"
+         /> 
+         </h2>
+         {prefillDestination ? (
+           <p className="mb-4 text-sm text-cyan-300/90">
+             Destination set to <span className="font-semibold text-white">{prefillDestination}</span> — you can change it below.
+           </p>
+         ) : null}
+
+          <div className="grid grid-cols-1 gap-4">
+            {/* Departure City and Destination */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm mb-1">From</label>
+                <select
+                  {...register('source')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                >
+                   {indianCities.map((city) => (
+    <option key={city} value={city}>{city}</option>
+  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm mb-1">To</label>
+                <select
+                  {...register('destination')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                >
+                    {indianCitiess.map((city) => (
+    <option key={city} value={city}>{city}</option>
+  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Travel Dates */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm mb-1">Start Date</label>
+                <input
+                  type="date"
+                  {...register('startDate')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                  min={today}
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">End Date</label>
+                <input
+                  type="date"
+                  {...register('returnDate')}
+                  className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+                  min={today}
+                />
+              </div>
+            </div>
+
+            {/* Budget */}
+            <div>
+              <label className="block text-sm mb-1">Preferred Budget</label>
+              <input
+                type="range"
+                min={500}
+                max={10000}
+                step={500}
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                className="w-full accent-green-500 h-3"
+              />
+              <p className="text-right text-sm font-medium text-green-400 mt-1">₹{budget}</p>
+            </div>
+
+            {/* Mode of Travel */}
+            <div>
+              <label className="block text-sm mb-1">Mode of Travel</label>
+              <div className="flex gap-2">
+                {['Flight', 'Train', 'Bus'].map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setTransport(mode)}
+                    className={`flex-1 py-2 px-3 rounded-md border text-sm transition duration-200 ${
+                      transport === mode
+                        ? 'bg-green-500 text-black font-semibold'
+                        : 'bg-[#242236] border-[#444] text-white'
+                    }`}
+                  >
+                    {mode}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Accommodation Preference */}
+            <div>
+              <label className="block text-sm mb-1">Accommodation</label>
+              <select
+                onChange={(e) => setAccommodation(e.target.value)}
+                value={accommodation}
+                className="w-full bg-[#242236] border border-[#444] rounded-md px-3 py-2 text-sm focus:outline-none"
+              >
+                <option value="">Select accommodation</option>
+                <option value="Hotel">Hotel</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Homestay">Homestay</option>
+              </select>
+            </div>
+
+            {/* Number of Travelers */}
+            <div>
+              <label className="block text-sm mb-1">Travelers</label>
+              <div className="flex items-center justify-start gap-3 bg-[#242236] border border-[#444] px-3 py-2 rounded-md w-fit">
+                <button
+                  type="button"
+                  onClick={() => setTravelers(Math.max(1, travelers - 1))}
+                  className="text-white text-lg"
+                >
+                  −
+                </button>
+                <span className="text-sm">{travelers}</span>
+                <button
+                  type="button"
+                  onClick={() => setTravelers(travelers + 1)}
+                  className="text-white text-lg"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+         
+
+         { user?.verified ?  (
+         <div className="pt-4">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full text-black font-bold py-2.5 rounded-md shadow-md shadow-green-500/30 transition text-sm"
+            >
+              {loading ? 'Planning...' : '📍 Plan My Trip'}
+            </Button>
+
+          </div>
+  )
+ :
+ <Button disabled className="text-r-500 text-sm mt-2 w-full  font-bold py-2.5 rounded-md shadow-md shadow-green-500/30 transition ">🔒 Verify to Unlock</Button>
+}
+            
+
+        </motion.form>
+      </main>
+    </div>
+  );
+}
+
+export default PlanTrip;
