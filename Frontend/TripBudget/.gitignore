@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Logs
 logs
 *.log
@@ -28,8 +28,8 @@ dist-ssr
 **/node_modules/
 
 # Ignore build folders
-**/dist/
-**/build/
+# **/dist/
+# **/build/
 
 # Ignore environment files
 *.env
@@ -40,4 +40,4 @@ dist-ssr
 # Ignore IDE/editor files
 .vscode/
 .DS_Store
->>>>>>> eac070adbfc80ba1df295a67ae3ffb5b141eed99
+
