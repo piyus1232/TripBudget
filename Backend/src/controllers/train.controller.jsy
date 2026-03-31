@@ -1,3 +1,4 @@
+
 import dayjs from "dayjs";
 import { ApiError } from "../utils/ApiError.js";
 import { Prettify } from "../utils/prettify.js";
@@ -7,7 +8,9 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 import fs from 'fs';
+// ADD: nearest-station overrides (destinationCity -> [preferred station codes])
 import overrideRaw from '../data/nearestStationOverride.js';
+
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -17,66 +20,82 @@ const __dirname = path.dirname(__filename);
 const stations = JSON.parse(
   fs.readFileSync(path.join(__dirname, 'mock/stations.json'), 'utf-8')
 );
+const overrideMap= overrideRaw?.default || overrideRaw; 
 
-const overrideMap = overrideRaw?.default || overrideRaw;
 const overrideLower = Object.fromEntries(
   Object.entries(overrideMap).map(([k, v]) => [k.toLowerCase(), v])
 );
 
 const prettify = new Prettify();
 
-// ✅ FIX 1: Register StealthPlugin ONCE at module level — never inside a function
-puppeteer.use(StealthPlugin());
+// Helper function to normalize train name for comparison
+const normalizeTrainName = (name) => {
+  return name
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .replace(/EXPRESS|EXP|MAIL/g, '')
+    .trim();
+};
 
-// ─────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────
-
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const normalizeTrainName = (name) =>
-  name.toUpperCase().replace(/\s+/g, ' ').replace(/EXPRESS|EXP|MAIL/g, '').trim();
-
+// Helper function to get station code
 async function getStationCode(cityName) {
   if (typeof cityName !== 'string' || !cityName.trim()) {
     throw new Error('City name must be a non-empty string');
   }
+
   const city = cityName.toUpperCase().trim();
   const station = stations.find((s) => s.city.toUpperCase() === city);
-  if (!station) throw new Error(`No station found for city: ${cityName}`);
+
+  if (!station) {
+    throw new Error(`No station found for city: ${cityName}`);
+  }
+
   return station.code;
 }
 
-const getDay = (date) => dayjs(date).format('ddd');
+// Helper function to get day of the week
+const getDay = (date) => {
+  return dayjs(date).format("ddd");
+};
 
+// Helper function to decode run days
 const decodeRunDays = (binary) => {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  if (!binary || typeof binary !== 'string') {
-    return days.reduce((acc, day) => { acc[day] = false; return acc; }, {});
-  }
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const result = {};
-  for (let i = 0; i < binary.length && i < days.length; i++) {
-    result[days[i]] = binary[i] === '1';
+  console.log("Decoding run days for binary:", binary);
+  if (!binary || typeof binary !== 'string') {
+    return days.reduce((acc, day) => {
+      acc[day] = false;
+      return acc;
+    }, {});
   }
+  for (let i = 0; i < binary.length && i < days.length; i++) {
+    result[days[i]] = binary[i] === "1";
+  }
+  console.log("Decoded run days:", result);
   return result;
 };
 
+// Helper function to convert time string (HH.MM) to minutes since midnight
 const timeToMinutes = (timeStr) => {
   const [hours, minutes] = timeStr.split('.').map(Number);
   return hours * 60 + minutes;
 };
 
+// Helper function to check if return time is 6-7 hours after outbound time
 const isValidReturnTimeGap = (outTime, returnTime) => {
-  const gap = (timeToMinutes(returnTime) - timeToMinutes(outTime) + 1440) % 1440;
-  return gap >= 360 && gap <= 420;
+  const outMinutes = timeToMinutes(outTime);
+  const returnMinutes = timeToMinutes(returnTime);
+  const gapMinutes = (returnMinutes - outMinutes + 1440) % 1440; // Handle day wrap-around
+  return gapMinutes >= 360 && gapMinutes <= 420; // 6-7 hours in minutes
 };
 
-// ─────────────────────────────────────────────────────────
-// Fare extraction
-// ─────────────────────────────────────────────────────────
-
+// Helper function to extract fare data
 async function extractFareData($, classCode) {
-  const fareData = { totalFare: {}, individualFare: {} };
+  const fareData = {
+    totalFare: {},
+    individualFare: {},
+  };
 
   const processFareTable = (panelSelector, fareObject) => {
     $(`${panelSelector} .tableSingleFare`).each((i, table) => {
@@ -94,11 +113,21 @@ async function extractFareData($, classCode) {
       if (validHeaders.length === 0) return;
 
       $table.find('tbody tr').each((i, row) => {
-        const cols = $(row).find('td').map((i, el) => $(el).text().trim()).get();
+        const $row = $(row);
+        const cols = $row.find('td').map((i, el) => $(el).text().trim()).get();
         if (cols.length <= 1) return;
 
         const type = cols[0].toLowerCase().replace(/\s+/g, '_');
-        const fareTypes = ['general', 'tatkal', 'adult', 'child', 'adult_tatkal', 'child_tatkal', 'sen_female', 'sen_male'];
+        const fareTypes = [
+          'general',
+          'tatkal',
+          'adult',
+          'child',
+          'adult_tatkal',
+          'child_tatkal',
+          'sen_female',
+          'sen_male',
+        ];
 
         if (fareTypes.includes(type)) {
           const fares = {};
@@ -108,7 +137,9 @@ async function extractFareData($, classCode) {
             }
           });
           console.log(`Extracted fare for ${type}:`, fares);
-          if (Object.keys(fares).length > 0) fareObject[type] = fares;
+          if (Object.keys(fares).length > 0) {
+            fareObject[type] = fares;
+          }
         }
       });
     });
@@ -116,11 +147,16 @@ async function extractFareData($, classCode) {
 
   processFareTable('.panel-success', fareData.totalFare);
   processFareTable('.panel-warning', fareData.individualFare);
+
   return fareData;
 }
 
+// Helper function to find potential fares
 function findPotentialFares($) {
-  const result = { totalFare: {}, individualFare: {} };
+  const result = {
+    totalFare: {},
+    individualFare: {},
+  };
 
   $('table').each((i, table) => {
     const $table = $(table);
@@ -134,11 +170,22 @@ function findPotentialFares($) {
           const cols = $(row).find('td').map((i, el) => $(el).text().trim()).get();
           if (cols.length > 1) {
             const key = cols[0].toLowerCase().replace(/\s+/g, '_');
-            const fareTypes = ['general', 'tatkal', 'adult', 'child', 'adult_tatkal', 'child_tatkal', 'sen_female', 'sen_male'];
+            const fareTypes = [
+              'general',
+              'tatkal',
+              'adult',
+              'child',
+              'adult_tatkal',
+              'child_tatkal',
+              'sen_female',
+              'sen_male',
+            ];
             if (fareTypes.includes(key)) {
               const fares = {};
               cols.slice(1).forEach((fare, index) => {
-                if (index < headers.length) fares[headers[index]] = fare || '-';
+                if (index < headers.length) {
+                  fares[headers[index]] = fare || '-';
+                }
               });
               console.log(`Fallback fare for ${key}:`, fares);
               if ($table.closest('.panel-success').length) {
@@ -156,24 +203,23 @@ function findPotentialFares($) {
   return Object.keys(result.totalFare).length || Object.keys(result.individualFare).length ? result : null;
 }
 
-// ─────────────────────────────────────────────────────────
-// HTTP fare fetch (lightweight, no browser — always tried first)
-// ─────────────────────────────────────────────────────────
-
+// Helper function to fetch fare via lightweight HTTP client
 async function fetchFareViaHttp(trainNo, from, to, classCode = null) {
   try {
     const url = `https://erail.in/train-fare/${trainNo}?from=${from}&to=${to}`;
     console.log(`Fetching HTTP fare for trainNo=${trainNo}, from=${from}, to=${to}, url=${url}`);
-
+    const userAgent = new UserAgent();
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'User-Agent': new UserAgent().toString(),
+        'User-Agent': userAgent.toString(),
         'Accept': 'text/html',
       },
     });
 
-    if (!response.ok) throw new Error(`HTTP request failed: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP request failed: ${response.status}`);
+    }
 
     const html = await response.text();
     const $ = cheerio.load(html);
@@ -185,7 +231,11 @@ async function fetchFareViaHttp(trainNo, from, to, classCode = null) {
         return {
           success: true,
           fare: fallbackData,
-          metadata: { note: 'Fares extracted using fallback method (HTTP)', sourceUrl: url, scrapedAt: new Date().toISOString() },
+          metadata: {
+            note: 'Fares extracted using fallback method (HTTP)',
+            sourceUrl: url,
+            scrapedAt: new Date().toISOString(),
+          },
         };
       }
       throw new Error('No fare tables found in HTTP response');
@@ -194,7 +244,10 @@ async function fetchFareViaHttp(trainNo, from, to, classCode = null) {
     return {
       success: true,
       fare: fareData,
-      metadata: { sourceUrl: url, scrapedAt: new Date().toISOString() },
+      metadata: {
+        sourceUrl: url,
+        scrapedAt: new Date().toISOString(),
+      },
     };
   } catch (error) {
     console.log(`HTTP fetch failed for trainNo=${trainNo}: ${error.message}`);
@@ -202,22 +255,13 @@ async function fetchFareViaHttp(trainNo, from, to, classCode = null) {
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// Puppeteer fare fetch (fallback only when HTTP fails)
-// ─────────────────────────────────────────────────────────
-
+// Helper function to fetch fare for a single train
 async function addFare(trainNo, from, to, classCode = null, browser) {
-  // Always try HTTP first — no browser needed, much faster
   const httpFare = await fetchFareViaHttp(trainNo, from, to, classCode);
-  if (httpFare?.success) return httpFare;
-
-  // ✅ FIX 2: Guard — if browser wasn't launched, skip gracefully
-  if (!browser) {
-    console.log(`[SKIP] No browser available for Puppeteer fare fetch of ${trainNo}`);
-    return { success: false, fare: null, metadata: { error: 'No browser available' } };
+  if (httpFare && httpFare.success) {
+    return httpFare;
   }
 
-  // ✅ FIX 3: Declare page before try so the catch block can safely reference it
   let page;
   try {
     console.log(`Fetching fare via Puppeteer for trainNo=${trainNo}, from=${from}, to=${to}, classCode=${classCode || 'none'}`);
@@ -253,14 +297,15 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
         if (fareTables.length > 0) {
           console.log(`Found ${fareTables.length} fare tables on ${url}`);
           finalHtml = await page.content();
-          lastUrl = page.url();
+y          lastUrl = page.url();
           break;
         }
 
         const formExists = await page.$('#form1');
         if (formExists) {
-          console.log(`Submitting form with from=${from}, to=${to}`);
+          console.log(`Submitting form with from=${from}, to=${to}, adult=1, child=0, sfemale=0, smale=0`);
           await page.evaluate((from, to) => {
+            console.log(`Setting form: from=${from}, to=${to}`);
             document.querySelector('select[name="from"]').value = from;
             document.querySelector('select[name="to"]').value = to;
             document.querySelector('select[name="adult"]').value = '1';
@@ -274,12 +319,11 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
             console.log('No navigation occurred, continuing with current page');
           });
 
-          await page.waitForSelector(
-            '.panel-success .tableSingleFare tbody tr td, .panel-warning .tableSingleFare tbody tr td',
-            { timeout: 15000 }
-          ).catch(() => console.log('Fare selector timeout, continuing'));
+          await page.waitForSelector('.panel-success .tableSingleFare tbody tr td, .panel-warning .tableSingleFare tbody tr td', {
+            timeout: 15000,
+          });
 
-          await delay(2000);
+          await new Promise((resolve) => setTimeout(resolve, 2000));
         } else {
           console.log(`Form #form1 not found on ${url}, checking for fare tables`);
         }
@@ -289,10 +333,7 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
         console.log('HTML fetched, length:', finalHtml.length);
         console.log('Final URL after navigation:', lastUrl);
 
-        // ✅ FIX 4: Only write debug files outside production
-        if (process.env.NODE_ENV !== 'production') {
-          fs.writeFileSync(`debug_${trainNo}_${from}_${to}.html`, finalHtml);
-        }
+        fs.writeFileSync(`debug_${trainNo}_${from}_${to}.html`, finalHtml);
         break;
       } catch (err) {
         console.log(`Attempt failed for ${url}: ${err.message}`);
@@ -300,7 +341,9 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
       }
     }
 
-    if (!finalHtml) throw new Error('All URL attempts failed');
+    if (!finalHtml) {
+      throw new Error('All URL attempts failed');
+    }
 
     const $ = cheerio.load(finalHtml);
     const fareData = await extractFareData($, classCode);
@@ -308,118 +351,117 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
     if (!Object.keys(fareData.totalFare).length && !Object.keys(fareData.individualFare).length) {
       const fallbackData = findPotentialFares($);
       if (fallbackData) {
-        // ✅ FIX 5: Always guard page.close()
-        if (page) await page.close().catch(() => {});
+        await page.close();
         return {
           success: true,
           fare: fallbackData,
-          metadata: { note: 'Fares extracted using fallback method', sourceUrl: lastUrl, scrapedAt: new Date().toISOString() },
+          metadata: {
+            note: 'Fares extracted using fallback method',
+            sourceUrl: lastUrl,
+            scrapedAt: new Date().toISOString(),
+          },
         };
       }
       throw new Error('No fare tables found in HTML');
     }
 
-    // ✅ FIX 5: Always guard page.close()
-    if (page) await page.close().catch(() => {});
+    await page.close();
     return {
       success: true,
       fare: fareData,
-      metadata: { sourceUrl: lastUrl, scrapedAt: new Date().toISOString() },
+      metadata: {
+        sourceUrl: lastUrl,
+        scrapedAt: new Date().toISOString(),
+      },
     };
-
   } catch (error) {
     console.error('Fare fetch error:', error);
-    // ✅ FIX 5: page may be undefined if browser.newPage() itself threw — guard it
-    if (page) await page.close().catch(() => {});
+    await page.close().catch(() => {});
     return {
       success: false,
       fare: null,
       metadata: {
         error: error.message,
         debugSuggestions: [
+          `Check debug HTML file (debug_${trainNo}_${from}_${to}.html) for table structure`,
           `Verify train number and station codes at https://erail.in/train-fare/${trainNo}`,
           'Check fare table content in logs for correct fares',
+          'Increase delay if fares are not updated in DOM',
         ],
       },
     };
   }
 }
 
-// ─────────────────────────────────────────────────────────
 // Main controller
-// ─────────────────────────────────────────────────────────
-
 const getRoundTripTrains = async (req) => {
   let browser = null;
   try {
     const { source, destination, startDate, returnDate, classCode = 'SL', forceRefresh = false } = req.body;
 
     if (!source || !destination || !startDate || !returnDate) {
-      throw new ApiError(400, 'All fields are required');
+      throw new ApiError(400, "All fields are required");
     }
 
-    // Resolve source station code
     const fromCode = await getStationCode(source);
+  let toCode;
+const destKey = String(destination || '').trim();
 
-    // Resolve destination with nearest-station override fallback
-    let toCode;
-    const destKey = String(destination || '').trim();
-    try {
-      toCode = await getStationCode(destKey);
-    } catch (err) {
-      const candidates =
-        overrideMap[destKey] ||
-        overrideMap[destKey.toUpperCase?.()] ||
-        overrideLower[destKey.toLowerCase?.()];
+try {
+  // Try normal city -> station code first
+  toCode = await getStationCode(destKey);
+} catch (err) {
+  // Case-insensitive override lookup
+  const candidates =
+    overrideMap[destKey] ||
+    overrideMap[destKey.toUpperCase?.()] ||
+    overrideLower[destKey.toLowerCase?.()];
 
-      if (!Array.isArray(candidates) || candidates.length === 0) {
-        console.log('[NEAREST-FALLBACK] No override for', JSON.stringify(destKey),
-          'Available keys:', Object.keys(overrideMap));
-        throw err;
-      }
-      toCode = candidates[0];
-      console.log(`[NEAREST-FALLBACK] Using nearest-station for "${destKey}": ${toCode}`);
-    }
+  if (!Array.isArray(candidates) || candidates.length === 0) {
+    console.log('[NEAREST-FALLBACK] No override for', JSON.stringify(destKey),
+                'Available keys:', Object.keys(overrideMap));
+    // Preserve your original behavior if we truly have no override
+    throw err;
+  }
 
-    // Normalize dates
+  toCode = candidates[0];
+  console.log(`[NEAREST-FALLBACK] Using nearest-station for "${destKey}": ${toCode}`);
+}
+
+
+
+    // const toCode = await getStationCode(destination);
+
+    // Normalize and validate dates
     const normalizedStartDate = new Date(startDate).toISOString().split('T')[0];
     const normalizedReturnDate = new Date(returnDate).toISOString().split('T')[0];
     const isSameDay = normalizedStartDate === normalizedReturnDate;
+    console.log("Normalized Start Date:", normalizedStartDate);
+    console.log("Normalized Return Date:", normalizedReturnDate);
+    console.log("Is Same Day:", isSameDay);
+
     const startDay = getDay(startDate);
     const returnDay = getDay(returnDate);
-
-    console.log('Normalized Start Date:', normalizedStartDate);
-    console.log('Normalized Return Date:', normalizedReturnDate);
-    console.log('Is Same Day:', isSameDay);
     console.log(`Start day: ${startDay}, Return day: ${returnDay}`);
 
-    // ✅ FIX 1: StealthPlugin already registered at top — do NOT call puppeteer.use() here
-    // ✅ FIX 6: Use system Chrome binary + Lightsail-safe launch args
+    puppeteer.use(StealthPlugin());
     browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/usr/bin/google-chrome-stable',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-zygote',
-        '--disable-extensions',
-        '--disable-background-networking',
-        '--disable-default-apps',
-        '--mute-audio',
-      ],
-      timeout: 120000,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      timeout: 60000,
     });
 
-    // Fetch train lists in parallel (no browser needed here)
     const fetchTrainData = async (from, to) => {
       const URL_Trains = `https://erail.in/rail/getTrains.aspx?Station_From=${from}&Station_To=${to}&DataSource=0&Language=0&Cache=false`;
       console.log(`Fetching train data for ${from} to ${to}, URL: ${URL_Trains}`);
+      const userAgent = new UserAgent();
       const response = await fetch(URL_Trains, {
         method: 'GET',
-        headers: { 'User-Agent': new UserAgent().toString() },
+        headers: {
+          'User-Agent': userAgent.toString(),
+        },
       });
+
       const data = await response.text();
       return prettify.BetweenStation(data);
     };
@@ -429,102 +471,89 @@ const getRoundTripTrains = async (req) => {
       fetchTrainData(toCode, fromCode),
     ]);
 
-    if (!outTrainData || !returnTrainData) throw new ApiError(404, 'No trains found');
+    if (!outTrainData || !returnTrainData) {
+      throw new ApiError(404, "No trains found");
+    }
 
+    // const outTrains = outTrainData.data || [];
+    // const returnTrains = returnTrainData.data || [];
     const outTrains = Array.isArray(outTrainData?.data) ? outTrainData.data : [];
-    const returnTrains = Array.isArray(returnTrainData?.data) ? returnTrainData.data : [];
+const returnTrains = Array.isArray(returnTrainData?.data) ? returnTrainData.data : [];
 
-    console.log('Out Trains:', outTrains.length);
-    console.log('Return Trains:', returnTrains.length);
+    console.log("Out Trains:", outTrains.length);
+    console.log("Return Trains:", returnTrains.length);
 
-    // Filter by running day
-    const filteredOutTrains = outTrains
-      .filter((train) => {
-        const runDays = decodeRunDays(train.train_base?.running_days);
-        return runDays[startDay] === true;
-      })
-      .slice(0, 8);
+    const filteredOutTrains = outTrains.filter(train => {
+      const runDays = decodeRunDays(train.train_base?.running_days);
+      return runDays[startDay] === true;
+    }).slice(0, 8); // Increased to 5 for more options
 
-    const filteredReturnTrains = returnTrains
-      .filter((train) => {
-        const runDays = decodeRunDays(train.train_base?.running_days);
-        return runDays[returnDay] === true;
-      })
-      .slice(0, 8);
+    const filteredReturnTrains = returnTrains.filter(train => {
+      const runDays = decodeRunDays(train.train_base?.running_days);
+      return runDays[returnDay] === true;
+    }).slice(0, 8); // Increased to 8 for more options
 
-    // Deduplicate return trains by normalized name
-    const outTrainNames = new Set(filteredOutTrains.map((t) => normalizeTrainName(t.train_base?.train_name)));
+    // Deduplicate return trains based on normalized train name
+    const outTrainNames = new Set(filteredOutTrains.map(train => normalizeTrainName(train.train_base?.train_name)));
+
+    // Apply 6-7 hour gap filter if same day
     let filteredReturnTrainsUnique = filteredReturnTrains.filter(
-      (t) => !outTrainNames.has(normalizeTrainName(t.train_base?.train_name))
+      train => !outTrainNames.has(normalizeTrainName(train.train_base?.train_name))
     );
-
-    // Same-day 6-7 hour gap filter
     if (isSameDay && filteredOutTrains.length > 0) {
-      const outTimes = filteredOutTrains.map((t) => t.train_base.from_time);
-      const gapFiltered = filteredReturnTrainsUnique.filter((t) =>
-        outTimes.some((outTime) => isValidReturnTimeGap(outTime, t.train_base.from_time))
-      );
-      if (gapFiltered.length === 0) {
-        console.log('No return trains in 6-7 hr gap; using all available return trains');
-        filteredReturnTrainsUnique = filteredReturnTrainsUnique.slice(0, 5);
-      } else {
-        filteredReturnTrainsUnique = gapFiltered;
+      const outTimes = filteredOutTrains.map(train => train.train_base.from_time);
+      filteredReturnTrainsUnique = filteredReturnTrainsUnique.filter(train => {
+        const returnTime = train.train_base.from_time;
+        return outTimes.some(outTime => isValidReturnTimeGap(outTime, returnTime));
+      });
+      if (filteredReturnTrainsUnique.length === 0) {
+        console.log("No return trains found within 6-7 hour gap, using all available return trains");
+        filteredReturnTrainsUnique = filteredReturnTrains.filter(
+          train => !outTrainNames.has(normalizeTrainName(train.train_base?.train_name))
+        ).slice(0, 5);
       }
     } else {
       filteredReturnTrainsUnique = filteredReturnTrainsUnique.slice(0, 5);
     }
 
-    console.log('Filtered Outbound Trains:', filteredOutTrains.map((t) => ({
+    console.log("Filtered Outbound Trains:", filteredOutTrains.map(t => ({
       train_no: t.train_base?.train_no,
       train_name: t.train_base?.train_name,
-      normalized_name: normalizeTrainName(t.train_base?.train_name),
+      normalized_name: normalizeTrainName(t.train_base?.train_name)
     })));
-    console.log('Filtered Return Trains:', filteredReturnTrainsUnique.map((t) => ({
+    console.log("Filtered Return Trains:", filteredReturnTrainsUnique.map(t => ({
       train_no: t.train_base?.train_no,
       train_name: t.train_base?.train_name,
-      normalized_name: normalizeTrainName(t.train_base?.train_name),
+      normalized_name: normalizeTrainName(t.train_base?.train_name)
     })));
 
-    // ✅ FIX 7: Sequential fare fetching instead of Promise.all — prevents browser overload
-    const outTrainsWithFares = [];
-    for (const train of filteredOutTrains.slice(0, 3)) {
-      try {
+    const outTrainsWithFares = await Promise.all(
+      filteredOutTrains.map(async (train) => {
         const fareData = await addFare(train.train_base?.train_no, fromCode, toCode, classCode, browser);
         console.log(`Fare for outbound train ${train.train_base?.train_no}:`, fareData?.fare);
-        outTrainsWithFares.push({ ...train, fare: fareData });
-      } catch (err) {
-        console.log(`Outbound fare error [${train.train_base?.train_no}]:`, err.message);
-        outTrainsWithFares.push({ ...train, fare: null });
-      }
-      await delay(800);
-    }
+        return { ...train, fare: fareData };
+      })
+    );
 
-    const returnTrainsWithFares = [];
-    for (const train of filteredReturnTrainsUnique.slice(0, 3)) {
-      try {
+    const returnTrainsWithFares = await Promise.all(
+      filteredReturnTrainsUnique.map(async (train) => {
         const fareData = await addFare(train.train_base?.train_no, toCode, fromCode, classCode, browser);
         console.log(`Fare for return train ${train.train_base?.train_no}:`, fareData?.fare);
-        returnTrainsWithFares.push({ ...train, fare: fareData });
-      } catch (err) {
-        console.log(`Return fare error [${train.train_base?.train_no}]:`, err.message);
-        returnTrainsWithFares.push({ ...train, fare: null });
-      }
-      await delay(800);
-    }
+        return { ...train, fare: fareData };
+      })
+    );
 
     return {
       success: true,
       filteredOutTrains: outTrainsWithFares,
       filteredReturnTrains: returnTrainsWithFares,
-      isSameDay,
+      isSameDay: isSameDay,
     };
-
   } catch (error) {
-    console.error('Error in getRoundTripTrains:', error);
+    console.error("Error in getRoundTripTrains:", error);
     throw error;
   } finally {
-    // ✅ FIX 8: Safe browser close — catches errors so finally never throws
-    if (browser) await browser.close().catch((e) => console.log('Browser close error:', e.message));
+    if (browser) await browser.close();
   }
 };
 

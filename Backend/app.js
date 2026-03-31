@@ -9,9 +9,7 @@ import transportrouter from './src/routes/transport.routes.js';
 const app = express();
 const corsOrigins = process.env.CORS_ORIGIN?.trim();
 app.use(cors({
-  origin: corsOrigins
-    ? corsOrigins.split(',').map((s) => s.trim()).filter(Boolean)
-    : true,
+  origin: "https://tripbudget.in",
   credentials: true,
 }));
 app.use(cookieParser());
@@ -25,6 +23,19 @@ app.use('/api/v1/users', userrouter);
 
 app.use('/api', hotelrouter);
 app.use('/api/v2', transportrouter);
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
+
+app.use(express.static(path.join(__dirname, "../Frontend/TripBudget/dist")));
+
+app.use((req, res) => {
+  res.sendFile(
+    path.join(__dirname, "../Frontend/TripBudget/dist/index.html")
+  );
+});
 export { app };

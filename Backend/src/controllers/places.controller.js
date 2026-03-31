@@ -2,9 +2,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique place IDs
 import { ApiError } from '../utils/ApiError.js';
 import { googlePlacesRapidApiKey } from '../utils/googlePlacesRapidApiKey.js';
-import dotenv from 'dotenv';
 
-dotenv.config();
 
 // Haversine distance calculation
 const calculateDistance = (lat1, lon1, lat2, lon2) => {

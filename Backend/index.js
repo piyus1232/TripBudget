@@ -1,17 +1,17 @@
+// 🔥 MUST BE FIRST
+import "./config.js";
 
-import { app } from './app.js';
-import dotenv from 'dotenv';
+import { app } from "./app.js";
 import connectdb from "./src/db/database.js";
-dotenv.config({ path: '.env' });
-dotenv.config({ path: './env' });
 
+const PORT = process.env.PORT || 3000;
 
 connectdb()
-.then(() => {
-    app.listen(process.env.PORT || 3000, () => {
-        console.log(`⚙️ Server is running at port : ${process.env.PORT}`);
-    })
-})
-.catch((err) => {
-    console.log("MONGO db connection failed !!! ", err);
-})
+  .then(() => {
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server is running at port : ${PORT}`);
+});
+  })
+  .catch((err) => {
+    console.log("❌ MONGO db connection failed !!!", err);
+  });

@@ -2,35 +2,29 @@ import nodemailer from 'nodemailer';
 import dotenv from "dotenv";
 dotenv.config();
 
-
- const sendEmail = async ({ email, subject, html}) => {
+const sendEmail = async ({ email, subject, html }) => {
   try {
-    // Create a transporter object using your email service
     const transporter = nodemailer.createTransport({
-     host:process.env.HOST,
-     service:process.env.SERVICE,
-     port:Number(process.env.EMAIL_PORT),
-     secure:Boolean(process.env.SECURE),
-     auth:{
-      user:process.env.USER,
-      pass:process.env.PASS
-     }
-
+      host: process.env.EMAIL_HOST,          // ✅ was HOST
+      port: Number(process.env.EMAIL_PORT),
+      secure: process.env.EMAIL_SECURE === 'true',  // ✅ proper boolean check
+      auth: {
+        user: process.env.EMAIL_USER,        // ✅ was USER (reserved by Node.js!)
+        pass: process.env.EMAIL_PASS,        // ✅ was PASS
+      },
     });
+
     await transporter.sendMail({
-      from:process.env.USER,
-      to:email,
-      subject:subject,
-      html:html
-    })
-    console.log("email sent");
-    
+      from: process.env.EMAIL_USER,          // ✅ same fix
+      to: email,
+      subject: subject,
+      html: html,
+    });
 
+    console.log("Email sent successfully");
+  } catch (error) {
+    console.log("Email error:", error);
   }
-  catch(error){
-    console.log(error);
-    
+};
 
-  }
-}
-export {sendEmail}
+export { sendEmail };
