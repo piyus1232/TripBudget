@@ -5,7 +5,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { getCityID, getCoordinates, getHotelData, processHotels, getNearbyFoodOptions } from "./hotel.controller.js";
 import { SavedTrip } from "../models/savedtrip.model.js";
 import { PlanCache } from "../models/planCache.model.js";
-import { log } from "console";
 import NodeCache from "node-cache";
 import {
   cacheDateKey,
@@ -17,6 +16,9 @@ import {
   diskFullGet,
   diskFullSet,
 } from "../utils/planCacheDisk.js";
+import { USD_TO_INR } from "../utils/currency.js";
+import { FareJob } from "../models/fareJob.model.js";
+import { scheduleFareJobProcessing } from "../services/fareJobProcessor.js";
 
 const PLAN_CACHE_TTL_SEC =
   Number(process.env.PLAN_CACHE_TTL_SEC) ||
@@ -28,11 +30,16 @@ const fullPlanCache = new NodeCache({ stdTTL: PLAN_CACHE_TTL_SEC });
 const DISK = process.env.PLAN_CACHE_DISK === "1";
 /** 1 = store full plan in MongoDB — survives restart/redeploy (recommended production) */
 const MONGO_PLAN = process.env.PLAN_CACHE_MONGO === "1";
-/** When train+hotels+places all cache hit, wait at least this many ms before respond. 0 = off */
+/** When train+hotels+places all cache hit, wait at least this many ms before respond. 0 = off (default for snappy demos) */
 const MIN_PLAN_RESPONSE_MS =
   process.env.MIN_PLAN_RESPONSE_MS !== undefined && process.env.MIN_PLAN_RESPONSE_MS !== ''
     ? Number(process.env.MIN_PLAN_RESPONSE_MS)
-    : 10000;
+    : 0;
+
+const isProd = process.env.NODE_ENV === 'production';
+const devLog = (...args) => {
+  if (!isProd) console.log(...args);
+};
 
 function cloneForCache(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -49,6 +56,14 @@ async function createSavedTripIfNew(userId, planKey, payload) {
 const normalizeInput = (str) => {
   return str?.toUpperCase().trim() || '';
 };
+
+/** Per-person general fare for the requested class (matches getcheapesttrain.js). */
+function parseGeneralFareForClass(train, classCode) {
+  const raw = train?.fare?.fare?.totalFare?.general?.[classCode];
+  if (raw == null || raw === '-') return 0;
+  const n = parseInt(String(raw).replace(/[^\d]/g, ''), 10);
+  return Number.isFinite(n) ? n : 0;
+}
 
 const finalcontroller = async (req, res) => {
   const planStartedAt = Date.now();
@@ -67,6 +82,8 @@ const finalcontroller = async (req, res) => {
       rooms = 1,
       adults = 2,
       radius = 10,
+      /** When true (default), train lists return fast; fares run in background — poll GET /fare-job/:id */
+      asyncFares = true,
     } = req.body;
 
     // Input validation
@@ -112,14 +129,14 @@ const finalcontroller = async (req, res) => {
           if (doc?.payload) {
             snap = doc.payload;
             fullPlanCache.set(fullKey, snap);
-            console.log(`FULL plan Mongo hit: ${fullKey}`);
+            devLog(`FULL plan Mongo hit: ${fullKey}`);
           }
         } catch (e) {
           console.warn("PlanCache Mongo read:", e.message);
         }
       }
       if (snap) {
-        console.log(`FULL plan cache hit: ${fullKey}`);
+        devLog(`FULL plan cache hit: ${fullKey}`);
         const {
           cheapestOutTrain,
           secondCheapestOutTrain,
@@ -128,6 +145,7 @@ const finalcontroller = async (req, res) => {
           hotels,
           places,
           totalfare: tf,
+          fareJobId: snapFareJobId,
         } = snap;
         await createSavedTripIfNew(req.user._id, fullKey, {
           userId: req.user._id,
@@ -142,6 +160,8 @@ const finalcontroller = async (req, res) => {
           totalfare: tf,
           travelers,
           places,
+          fareJobId: snapFareJobId,
+          classCodes,
         });
         res.setHeader("X-Cache-Status", "full:hit;train:hit;hotels:hit;places:hit");
         const pad =
@@ -154,6 +174,7 @@ const finalcontroller = async (req, res) => {
             destination,
             startDate,
             returnDate,
+            classCodes,
             cheapestOutTrain,
             secondCheapestOutTrain,
             cheapestReturnTrain,
@@ -169,7 +190,7 @@ const finalcontroller = async (req, res) => {
       }
     }
 
-    console.log("finalcontroller Raw Inputs:", {
+    devLog("finalcontroller Raw Inputs:", {
       source,
       destination,
       startDate,
@@ -177,7 +198,7 @@ const finalcontroller = async (req, res) => {
       classCodes,
       forceRefresh,
     });
-    console.log("finalcontroller Normalized Inputs:", {
+    devLog("finalcontroller Normalized Inputs:", {
       normalizedSource,
       normalizedDestination,
       normalizedStartDate,
@@ -197,21 +218,60 @@ const finalcontroller = async (req, res) => {
       returnDate: normalizedReturnDate,
       classCodes,
       forceRefresh,
+      skipFareFetch: asyncFares,
     });
 
-    console.log("finalcontroller Trains Response:", JSON.stringify(trains, null, 2));
+    devLog("finalcontroller Trains Response:", JSON.stringify(trains, null, 2));
 
     // Destructure the trains response
-    const { secondCheapestOutTrain, cheapestOutTrain, cheapestReturnTrain, secondCheapestReturnTrain } = trains;
+    const {
+      secondCheapestOutTrain,
+      cheapestOutTrain,
+      cheapestReturnTrain,
+      secondCheapestReturnTrain,
+      fromCode: trainFromCode,
+      toCode: trainToCode,
+    } = trains;
+    const primaryClass = classCodes[0] || 'SL';
+
+    let fareJobId = null;
+    if (asyncFares && trains.__skipFareFetch && trainFromCode && trainToCode) {
+      const legs = [];
+      const seen = new Set();
+      const pushLeg = (tr, isOutbound) => {
+        if (!tr?.train_base?.train_no) return;
+        const from = tr.train_base.from_stn_code || (isOutbound ? trainFromCode : trainToCode);
+        const to = tr.train_base.to_stn_code || (isOutbound ? trainToCode : trainFromCode);
+        const leg = {
+          trainNo: String(tr.train_base.train_no),
+          from: String(from),
+          to: String(to),
+          classCode: primaryClass,
+        };
+        const k = `${leg.trainNo}|${leg.from}|${leg.to}`;
+        if (seen.has(k)) return;
+        seen.add(k);
+        legs.push(leg);
+      };
+      pushLeg(cheapestOutTrain, true);
+      pushLeg(secondCheapestOutTrain, true);
+      pushLeg(cheapestReturnTrain, false);
+      pushLeg(secondCheapestReturnTrain, false);
+      if (legs.length > 0) {
+        const job = await FareJob.create({
+          userId: req.user._id,
+          legs,
+          status: "pending",
+        });
+        scheduleFareJobProcessing(job._id.toString());
+        fareJobId = job._id;
+      }
+    }
 
     const gettotaltrainfare = function () {
-      const cheapestOutTrainfare = cheapestOutTrain?.fare?.fare?.totalFare.general.SL;
-      const secondCheapestOutTrainfare = secondCheapestOutTrain?.fare?.fare?.totalFare.general.SL;
-      const cheapestReturnTrainfare = cheapestReturnTrain?.fare?.fare?.totalFare.general.SL;
-      const secondCheapestReturnTrainfare = secondCheapestReturnTrain?.fare?.fare?.totalFare.general.SL;
-      const sum = parseInt(cheapestOutTrainfare) || 0 + parseInt(cheapestReturnTrainfare) || 0;
-
-      return sum;
+      const out = parseGeneralFareForClass(cheapestOutTrain, primaryClass);
+      const ret = parseGeneralFareForClass(cheapestReturnTrain, primaryClass);
+      return out + ret;
     };
 
     const hotelsCacheKey = `h:${normalizedDestination}:${normalizedStartDate}:${normalizedReturnDate}:${r}:${a}:${rad}`;
@@ -227,7 +287,7 @@ const finalcontroller = async (req, res) => {
       if (cachedHotels) {
         hotels = cloneForCache(cachedHotels);
         hotelsCacheHit = true;
-        console.log(`Hotels cache hit: ${hotelsCacheKey}`);
+        devLog(`Hotels cache hit: ${hotelsCacheKey}`);
       }
     }
 
@@ -256,7 +316,7 @@ const finalcontroller = async (req, res) => {
 
       try {
         hotels = await processHotels(hotelData);
-        console.log(
+        devLog(
           "Hotels from processHotels:",
           hotels.hotels.map((h) => ({
             name: h.name,
@@ -274,11 +334,11 @@ const finalcontroller = async (req, res) => {
           const lat = hotel.latitude;
           const lon = hotel.longitude;
           if (lat && lon) {
-            console.log(`Fetching food options for hotel ${hotel.name} at (${lat}, ${lon})`);
+            devLog(`Fetching food options for hotel ${hotel.name} at (${lat}, ${lon})`);
             try {
               const foodOptions = await getNearbyFoodOptions(lat, lon);
               hotel.foodOptions = foodOptions || [];
-              console.log(`Appended ${hotel.foodOptions.length} food options to hotel ${hotel.name}`);
+              devLog(`Appended ${hotel.foodOptions.length} food options to hotel ${hotel.name}`);
             } catch (err) {
               console.warn(`Failed to fetch food options for hotel ${hotel.name}: ${err.message}`);
               hotel.foodOptions = [];
@@ -302,35 +362,52 @@ const finalcontroller = async (req, res) => {
       const hCopy = cloneForCache(hotels);
       hotelsPlanCache.set(hotelsCacheKey, hCopy);
       if (DISK) diskHotelsSet(hotelsCacheKey, hCopy, PLAN_CACHE_TTL_SEC);
-      console.log(`Hotels cached: ${hotelsCacheKey} disk=${DISK}`);
+      devLog(`Hotels cached: ${hotelsCacheKey} disk=${DISK}`);
+    }
+
+    /**
+     * Cache hits skip the block above — older disk/memory entries often have no `foodOptions`.
+     * Fresh fetches can still get [] if RapidAPI fails; retry when still empty.
+     */
+    if (hotels?.hotels?.length) {
+      const needsFood = hotels.hotels.some(
+        (h) => !Array.isArray(h.foodOptions) || h.foodOptions.length === 0
+      );
+      if (needsFood) {
+        try {
+          for (const hotel of hotels.hotels) {
+            const lat = hotel.latitude;
+            const lon = hotel.longitude;
+            if (!lat || !lon) continue;
+            if (Array.isArray(hotel.foodOptions) && hotel.foodOptions.length > 0) continue;
+            const foodOptions = await getNearbyFoodOptions(lat, lon);
+            hotel.foodOptions = foodOptions || [];
+            devLog(
+              `[food] enrich: ${hotel.foodOptions.length} options for ${hotel.name}`
+            );
+          }
+        } catch (e) {
+          console.warn('Food enrichment:', e?.message);
+        }
+        hotels.hotels.forEach((h) => {
+          if (!h.foodOptions) h.foodOptions = [];
+        });
+        const hCopy = cloneForCache(hotels);
+        hotelsPlanCache.set(hotelsCacheKey, hCopy);
+        if (DISK) diskHotelsSet(hotelsCacheKey, hCopy, PLAN_CACHE_TTL_SEC);
+        devLog(`Hotels cache refreshed after food enrichment: ${hotelsCacheKey}`);
+      }
     }
 
     const getTotalHotelFare = function () {
-      const conversionRate = 87.58; // USD → INR (update dynamically if possible)
+      const list = hotels?.hotels || [];
+      const prices = list
+        .map((h) => parseFloat(h.price))
+        .filter((p) => Number.isFinite(p) && p > 0);
+      if (prices.length === 0) return 0;
 
-      const hotelprice1 = hotels?.hotels[0]?.price || 0;
-      const hotelprice2 = hotels?.hotels[1]?.price || 0;
-      const hotelprice3 = hotels?.hotels[2]?.price || 0;
-      const hotelprice4 = hotels?.hotels[3]?.price || 0;
-      const hotelprice5 = hotels?.hotels[4]?.price || 0;
-      const hotelprice6 = hotels?.hotels[5]?.price || 0;
-      const hotelprice7 = hotels?.hotels[6]?.price || 0;
-      const hotelprice8 = hotels?.hotels[7]?.price || 0;
-
-      // Average price in USD for one room per night
-      const avgPriceUSD = (
-        parseFloat(hotelprice1) +
-        parseFloat(hotelprice2) +
-        parseFloat(hotelprice3) +
-        parseFloat(hotelprice4) +
-        parseFloat(hotelprice5) +
-        parseFloat(hotelprice6) +
-        parseFloat(hotelprice7) +
-        parseFloat(hotelprice8)
-      ) / 8;
-
-      // Convert to INR
-      const avgPriceINR = avgPriceUSD * conversionRate;
+      const avgPriceUSD = prices.reduce((a, b) => a + b, 0) / prices.length;
+      const avgPriceINR = avgPriceUSD * USD_TO_INR;
 
       // Number of rooms needed (1 room for 2 travelers)
       const roomsNeeded = Math.ceil(travelers / 2);
@@ -344,19 +421,18 @@ const finalcontroller = async (req, res) => {
       return avgPriceINR * roomsNeeded * totalDays;
     };
 
-    const hotelprice1 = hotels?.hotels[0]?.price;
-    console.log("hotelprice1", hotelprice1);
+    devLog("hotel sample price", hotels?.hotels[0]?.price);
 
     const hotelfare = getTotalHotelFare();
     const totalhotelfare = hotelfare;
-    console.log("hotelfare", totalhotelfare);
+    devLog("hotelfare", totalhotelfare);
 
     const trainfare = gettotaltrainfare();
     const totaltrainfare = trainfare * travelers;
-    console.log("trainfare", totaltrainfare);
+    devLog("trainfare", totaltrainfare);
 
     const totalfare = totalhotelfare + totaltrainfare;
-    console.log("totalfare", totalfare);
+    devLog("totalfare", totalfare);
 
     const placesCacheKey = `p:${normalizedDestination}`;
     let places;
@@ -371,7 +447,7 @@ const finalcontroller = async (req, res) => {
       if (cachedPlaces) {
         places = cloneForCache(cachedPlaces);
         placesCacheHit = true;
-        console.log(`Places cache hit: ${placesCacheKey}`);
+        devLog(`Places cache hit: ${placesCacheKey}`);
       }
     }
 
@@ -381,12 +457,12 @@ const finalcontroller = async (req, res) => {
         const pCopy = cloneForCache(places);
         placesPlanCache.set(placesCacheKey, pCopy);
         if (DISK) diskPlacesSet(placesCacheKey, pCopy, PLAN_CACHE_TTL_SEC);
-        console.log(`Places cached: ${placesCacheKey}`);
+        devLog(`Places cached: ${placesCacheKey}`);
       } catch (err) {
         throw new ApiError(400, `Failed to retrieve places data: ${err.message}`);
       }
     }
-    console.log(places);
+    devLog(places);
 
     const fullSnap = {
       cheapestOutTrain,
@@ -396,26 +472,32 @@ const finalcontroller = async (req, res) => {
       hotels: cloneForCache(hotels),
       places: cloneForCache(places),
       totalfare,
+      fareJobId,
+      farePending: !!asyncFares && !!trains.__skipFareFetch,
     };
-    fullPlanCache.set(fullKey, fullSnap);
-    if (DISK) diskFullSet(fullKey, fullSnap, PLAN_CACHE_TTL_SEC);
-    if (MONGO_PLAN) {
-      try {
-        await PlanCache.findOneAndUpdate(
-          { key: fullKey },
-          {
-            key: fullKey,
-            payload: fullSnap,
-            expiresAt: new Date(Date.now() + PLAN_CACHE_TTL_SEC * 1000),
-          },
-          { upsert: true }
-        );
-        console.log(`FULL plan Mongo cached: ${fullKey}`);
-      } catch (e) {
-        console.warn("PlanCache Mongo write:", e.message);
+    if (!asyncFares || !trains.__skipFareFetch) {
+      fullPlanCache.set(fullKey, fullSnap);
+      if (DISK) diskFullSet(fullKey, fullSnap, PLAN_CACHE_TTL_SEC);
+      if (MONGO_PLAN) {
+        try {
+          await PlanCache.findOneAndUpdate(
+            { key: fullKey },
+            {
+              key: fullKey,
+              payload: fullSnap,
+              expiresAt: new Date(Date.now() + PLAN_CACHE_TTL_SEC * 1000),
+            },
+            { upsert: true }
+          );
+          devLog(`FULL plan Mongo cached: ${fullKey}`);
+        } catch (e) {
+          console.warn("PlanCache Mongo write:", e.message);
+        }
       }
+      devLog(`FULL plan cached: ${fullKey}`);
+    } else {
+      devLog(`FULL plan cache skipped (async fares pending): ${fullKey}`);
     }
-    console.log(`FULL plan cached: ${fullKey}`);
 
     await createSavedTripIfNew(req.user._id, fullKey, {
       userId: req.user._id,
@@ -430,6 +512,8 @@ const finalcontroller = async (req, res) => {
       totalfare,
       travelers,
       places,
+      fareJobId,
+      classCodes,
     });
 
     res.setHeader(
@@ -440,13 +524,21 @@ const finalcontroller = async (req, res) => {
         placesCacheHit ? "places:hit" : "places:miss",
       ].join(";")
     );
-    console.log('Hotels before sending:', hotels.hotels.map(h => ({
-      name: h.name,
-      id: h.id,
-      latitude: h.latitude,
-      longitude: h.longitude,
-      foodOptions: h.foodOptions.map(fo => ({ name: fo.name, rating: fo.rating, priceText: fo.priceText }))
-    })));
+    devLog(
+      'Hotels before sending:',
+      hotels.hotels.map((h) => ({
+        name: h.name,
+        id: h.id,
+        latitude: h.latitude,
+        longitude: h.longitude,
+        foodCount: (h.foodOptions || []).length,
+        foodOptions: (h.foodOptions || []).map((fo) => ({
+          name: fo.name,
+          rating: fo.rating,
+          priceText: fo.priceText,
+        })),
+      }))
+    );
 
     const fullCacheHit =
       !!trains.__fromCache && hotelsCacheHit && placesCacheHit;
@@ -463,6 +555,7 @@ const finalcontroller = async (req, res) => {
           destination,
           startDate,
           returnDate,
+          classCodes,
           cheapestOutTrain,
           secondCheapestOutTrain,
           cheapestReturnTrain,
@@ -473,6 +566,8 @@ const finalcontroller = async (req, res) => {
           places,
           placeCount: places.count,
           coordinates: places.coordinates,
+          fareJobId,
+          farePending: !!asyncFares && !!trains.__skipFareFetch,
         },
         "Travel details fetched successfully"
       )

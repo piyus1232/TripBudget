@@ -13,6 +13,11 @@ const TRAIN_CACHE_TTL_SEC =
 const trainCache = new NodeCache({ stdTTL: TRAIN_CACHE_TTL_SEC });
 const DISK = process.env.PLAN_CACHE_DISK === '1';
 
+const isProd = process.env.NODE_ENV === 'production';
+const devLog = (...args) => {
+  if (!isProd) console.log(...args);
+};
+
 // Helper function to normalize train name for comparison
 const normalizeTrainName = (name) => {
   return name
@@ -32,7 +37,7 @@ function getFareValue(train, classCodes = ['SL']) {
   const fares = {};
   try {
     if (!train.fare || !train.fare.success || !train.fare.fare || !train.fare.fare.totalFare) {
-      console.log(`Invalid fare data for train ${train.train_base?.train_no}`);
+      devLog(`Invalid fare data for train ${train.train_base?.train_no}`);
       classCodes.forEach(code => fares[code] = Infinity);
       return fares;
     }
@@ -42,7 +47,7 @@ function getFareValue(train, classCodes = ['SL']) {
       if (fare && fare !== '-' && !isNaN(parseFloat(fare))) {
         fares[code] = parseFloat(fare);
       } else {
-        console.log(`No valid fare for ${code} in train ${train.train_base?.train_no}`);
+        devLog(`No valid fare for ${code} in train ${train.train_base?.train_no}`);
         fares[code] = Infinity;
       }
     });
@@ -69,7 +74,15 @@ const isValidReturnTimeGap = (outTime, returnTime) => {
 };
 
 // Core logic to find the cheapest round-trip trains
-const findCheapestRoundTripTrains = async ({ source, destination, startDate, returnDate, classCodes = ['SL'], forceRefresh = false }) => {
+const findCheapestRoundTripTrains = async ({
+  source,
+  destination,
+  startDate,
+  returnDate,
+  classCodes = ['SL'],
+  forceRefresh = false,
+  skipFareFetch = false,
+}) => {
   try {
     // Validate inputs
     if (!source || !destination || !startDate || !returnDate || !classCodes || classCodes.length === 0) {
@@ -83,7 +96,7 @@ const findCheapestRoundTripTrains = async ({ source, destination, startDate, ret
     const normalizedReturnDate = cacheDateKey(returnDate);
     const isSameDay = normalizedStartDate === normalizedReturnDate;
     const classKey = stableClassKey(classCodes);
-    console.log('Normalized Inputs:', {
+    devLog('Normalized Inputs:', {
       normalizedSource,
       normalizedDestination,
       normalizedStartDate,
@@ -93,24 +106,24 @@ const findCheapestRoundTripTrains = async ({ source, destination, startDate, ret
     });
 
     const cacheKey = `${normalizedSource}-${normalizedDestination}-${normalizedStartDate}-${normalizedReturnDate}-${classKey}`;
-    console.log(`Train cache key: ${cacheKey}`);
+    devLog(`Train cache key: ${cacheKey}`);
 
-    if (!forceRefresh) {
+    if (!forceRefresh && !skipFareFetch) {
       let cached = trainCache.get(cacheKey);
       if (!cached && DISK) {
         cached = diskTrainGet(cacheKey, TRAIN_CACHE_TTL_SEC);
         if (cached) {
           trainCache.set(cacheKey, cached);
-          console.log(`Train disk cache hit → memory: ${cacheKey}`);
+          devLog(`Train disk cache hit → memory: ${cacheKey}`);
         }
       }
       if (cached) {
-        console.log(`Train cache hit: ${cacheKey}`);
+        devLog(`Train cache hit: ${cacheKey}`);
         return { ...cached, __fromCache: true, __cacheKey: cacheKey };
       }
-      console.log(`Train cache miss: ${cacheKey}`);
+      devLog(`Train cache miss: ${cacheKey}`);
     } else {
-      console.log(`forceRefresh enabled, bypassing cache for key: ${cacheKey}`);
+      devLog(`forceRefresh enabled, bypassing cache for key: ${cacheKey}`);
     }
 
     // Fetch round-trip trains
@@ -122,15 +135,146 @@ const findCheapestRoundTripTrains = async ({ source, destination, startDate, ret
         returnDate: normalizedReturnDate,
         classCode: classCodes[0],
         forceRefresh,
+        skipFareFetch,
       },
     });
 
-    const { filteredOutTrains = [], filteredReturnTrains = [], isSameDay: upstreamIsSameDay } = roundTripResponse;
+    const {
+      filteredOutTrains = [],
+      filteredReturnTrains = [],
+      isSameDay: upstreamIsSameDay,
+      fromCode,
+      toCode,
+    } = roundTripResponse;
     const isSameDayFinal = isSameDay || upstreamIsSameDay;
 
     // Debug: Log input data
-    console.log("Filtered Outbound Trains:", JSON.stringify(filteredOutTrains, null, 2));
-    console.log("Filtered Return Trains:", JSON.stringify(filteredReturnTrains, null, 2));
+    devLog("Filtered Outbound Trains:", JSON.stringify(filteredOutTrains, null, 2));
+    devLog("Filtered Return Trains:", JSON.stringify(filteredReturnTrains, null, 2));
+
+    if (skipFareFetch) {
+      const sortByDep = (a, b) =>
+        timeToMinutes(a.train_base.from_time) - timeToMinutes(b.train_base.from_time);
+
+      const validOutTrains = [...filteredOutTrains].sort(sortByDep);
+      const validReturnTrains = [...filteredReturnTrains].sort(sortByDep);
+
+      let cheapestOutTrain = validOutTrains[0] || null;
+      let secondCheapestOutTrain = validOutTrains[1] || null;
+
+      let cheapestReturnTrain = null;
+      let secondCheapestReturnTrain = null;
+
+      if (cheapestOutTrain && validReturnTrains.length > 0) {
+        const sortedReturnTrains = [...validReturnTrains].sort(sortByDep);
+
+        let filteredReturnTrainsWithGap = sortedReturnTrains;
+        if (isSameDayFinal) {
+          filteredReturnTrainsWithGap = sortedReturnTrains.filter((train) =>
+            isValidReturnTimeGap(cheapestOutTrain.train_base.from_time, train.train_base.from_time)
+          );
+          if (filteredReturnTrainsWithGap.length === 0) {
+            devLog("No return trains found within 6-7 hour gap for cheapest, using earliest available");
+            filteredReturnTrainsWithGap = [sortedReturnTrains[0]];
+          }
+        }
+        cheapestReturnTrain = filteredReturnTrainsWithGap[0];
+
+        let filteredSecondReturnTrainsWithGap = null;
+        if (secondCheapestOutTrain && validReturnTrains.length > 1) {
+          filteredSecondReturnTrainsWithGap = sortedReturnTrains.filter(
+            (train) => train.train_base.train_no !== cheapestReturnTrain?.train_base.train_no
+          );
+          if (isSameDayFinal) {
+            filteredSecondReturnTrainsWithGap = filteredSecondReturnTrainsWithGap.filter((train) => {
+              const gap = isValidReturnTimeGap(
+                secondCheapestOutTrain.train_base.from_time,
+                train.train_base.from_time
+              );
+              if (!gap) devLog(`Train ${train.train_base.train_no} at ${train.train_base.from_time} does not meet 6-7 hour gap`);
+              return gap;
+            });
+            if (filteredSecondReturnTrainsWithGap.length === 0) {
+              devLog("No return trains found within 6-7 hour gap for second outbound, using next available");
+              filteredSecondReturnTrainsWithGap = sortedReturnTrains.filter((train) => {
+                const gap = isValidReturnTimeGap(
+                  secondCheapestOutTrain.train_base.from_time,
+                  train.train_base.from_time
+                );
+                return train.train_base.train_no !== cheapestReturnTrain?.train_base.train_no && gap;
+              });
+              if (filteredSecondReturnTrainsWithGap.length === 0) {
+                filteredSecondReturnTrainsWithGap = [
+                  sortedReturnTrains.find(
+                    (train) => train.train_base.train_no !== cheapestReturnTrain?.train_base.train_no
+                  ) || sortedReturnTrains[1] || sortedReturnTrains[0],
+                ];
+              }
+            }
+          }
+          secondCheapestReturnTrain = filteredSecondReturnTrainsWithGap[0];
+        } else {
+          secondCheapestReturnTrain =
+            sortedReturnTrains.length > 1 &&
+            sortedReturnTrains[1]?.train_base.train_no !== cheapestReturnTrain?.train_base.train_no
+              ? sortedReturnTrains[1]
+              : null;
+        }
+
+        const outTrainName = normalizeTrainName(cheapestOutTrain.train_base?.train_name || "");
+        if (
+          cheapestReturnTrain &&
+          normalizeTrainName(cheapestReturnTrain.train_base?.train_name || "") === outTrainName
+        ) {
+          const differentTrains = filteredReturnTrainsWithGap.filter(
+            (train) => normalizeTrainName(train.train_base?.train_name || "") !== outTrainName
+          );
+          cheapestReturnTrain = differentTrains[0] || cheapestReturnTrain;
+        }
+        if (
+          secondCheapestReturnTrain &&
+          normalizeTrainName(secondCheapestReturnTrain.train_base?.train_name || "") === outTrainName
+        ) {
+          const pool = filteredSecondReturnTrainsWithGap || sortedReturnTrains;
+          const differentTrains = pool.filter(
+            (train) => normalizeTrainName(train.train_base?.train_name || "") !== outTrainName
+          );
+          secondCheapestReturnTrain = differentTrains[0] || secondCheapestReturnTrain;
+        }
+      }
+
+      const response = {
+        success: true,
+        secondCheapestOutTrain: secondCheapestOutTrain
+          ? { ...secondCheapestOutTrain, fares: getFareValue(secondCheapestOutTrain, classCodes) }
+          : null,
+        cheapestOutTrain: cheapestOutTrain
+          ? { ...cheapestOutTrain, fares: getFareValue(cheapestOutTrain, classCodes) }
+          : null,
+        cheapestReturnTrain: cheapestReturnTrain
+          ? { ...cheapestReturnTrain, fares: getFareValue(cheapestReturnTrain, classCodes) }
+          : null,
+        secondCheapestReturnTrain: secondCheapestReturnTrain
+          ? { ...secondCheapestReturnTrain, fares: getFareValue(secondCheapestReturnTrain, classCodes) }
+          : null,
+        note: isSameDayFinal
+          ? "Fares loading in background; trains ranked by departure time until prices arrive."
+          : null,
+        fromCode,
+        toCode,
+      };
+
+      if (!response.cheapestOutTrain && !response.cheapestReturnTrain) {
+        throw new ApiError(404, "No trains found for the specified route and dates");
+      }
+
+      return {
+        ...response,
+        __fromCache: false,
+        __skipFareFetch: true,
+        __cacheKey: cacheKey,
+      };
+    }
 
     // Filter trains with valid fares for at least one requested class
     const validOutTrains = filteredOutTrains.filter(train => {
@@ -170,7 +314,7 @@ const findCheapestRoundTripTrains = async ({ source, destination, startDate, ret
           isValidReturnTimeGap(cheapestOutTrain.train_base.from_time, train.train_base.from_time)
         );
         if (filteredReturnTrainsWithGap.length === 0) {
-          console.log("No return trains found within 6-7 hour gap for cheapest, using cheapest available");
+          devLog("No return trains found within 6-7 hour gap for cheapest, using cheapest available");
           filteredReturnTrainsWithGap = [sortedReturnTrains[0]];
         }
       }
@@ -184,17 +328,17 @@ const findCheapestRoundTripTrains = async ({ source, destination, startDate, ret
         if (isSameDayFinal) {
           filteredSecondReturnTrainsWithGap = filteredSecondReturnTrainsWithGap.filter(train => {
             const gap = isValidReturnTimeGap(secondCheapestOutTrain.train_base.from_time, train.train_base.from_time);
-            if (!gap) console.log(`Train ${train.train_base.train_no} at ${train.train_base.from_time} does not meet 6-7 hour gap`);
+            if (!gap) devLog(`Train ${train.train_base.train_no} at ${train.train_base.from_time} does not meet 6-7 hour gap`);
             return gap;
           });
           if (filteredSecondReturnTrainsWithGap.length === 0) {
-            console.log("No return trains found within 6-7 hour gap for second-cheapest, using next available");
+            devLog("No return trains found within 6-7 hour gap for second-cheapest, using next available");
             filteredSecondReturnTrainsWithGap = sortedReturnTrains.filter(train => {
               const gap = isValidReturnTimeGap(secondCheapestOutTrain.train_base.from_time, train.train_base.from_time);
               return train.train_base.train_no !== cheapestReturnTrain?.train_base.train_no && gap;
             });
             if (filteredSecondReturnTrainsWithGap.length === 0) {
-              console.log("No valid second-cheapest return train found, using next cheapest available");
+              devLog("No valid second-cheapest return train found, using next cheapest available");
               filteredSecondReturnTrainsWithGap = [sortedReturnTrains.find(train => 
                 train.train_base.train_no !== cheapestReturnTrain?.train_base.train_no
               ) || sortedReturnTrains[1] || sortedReturnTrains[0]];
@@ -247,7 +391,9 @@ const findCheapestRoundTripTrains = async ({ source, destination, startDate, ret
         ? "No return train found within 6-7 hour gap for cheapest, using cheapest available."
         : isSameDayFinal && secondCheapestOutTrain && !isValidReturnTimeGap(secondCheapestOutTrain?.train_base.from_time, secondCheapestReturnTrain?.train_base.from_time)
           ? "No return train found within 6-7 hour gap for second-cheapest, using next cheapest available."
-          : isSameDayFinal ? "Return trains selected with 6-7 hour gap from outbound departures." : null
+          : isSameDayFinal ? "Return trains selected with 6-7 hour gap from outbound departures." : null,
+      fromCode: roundTripResponse.fromCode,
+      toCode: roundTripResponse.toCode,
     };
 
     if (!response.cheapestOutTrain && !response.cheapestReturnTrain) {
@@ -257,12 +403,12 @@ const findCheapestRoundTripTrains = async ({ source, destination, startDate, ret
     const toStore = { ...response, __fromCache: false };
     trainCache.set(cacheKey, toStore);
     if (DISK) diskTrainSet(cacheKey, toStore, TRAIN_CACHE_TTL_SEC);
-    console.log(`Train cached: ${cacheKey} TTL ${TRAIN_CACHE_TTL_SEC}s disk=${DISK}`);
+    devLog(`Train cached: ${cacheKey} TTL ${TRAIN_CACHE_TTL_SEC}s disk=${DISK}`);
 
-    console.log("Cheapest Outbound Train:", response.cheapestOutTrain?.train_base?.train_no, response.cheapestOutTrain?.train_base?.train_name);
-    console.log("Second Cheapest Outbound Train:", response.secondCheapestOutTrain?.train_base?.train_no, response.secondCheapestOutTrain?.train_base?.train_name);
-    console.log("Cheapest Return Train:", response.cheapestReturnTrain?.train_base?.train_no, response.cheapestReturnTrain?.train_base?.train_name);
-    console.log("Second Cheapest Return Train:", response.secondCheapestReturnTrain?.train_base?.train_no, response.secondCheapestReturnTrain?.train_base?.train_name);
+    devLog("Cheapest Outbound Train:", response.cheapestOutTrain?.train_base?.train_no, response.cheapestOutTrain?.train_base?.train_name);
+    devLog("Second Cheapest Outbound Train:", response.secondCheapestOutTrain?.train_base?.train_no, response.secondCheapestOutTrain?.train_base?.train_name);
+    devLog("Cheapest Return Train:", response.cheapestReturnTrain?.train_base?.train_no, response.cheapestReturnTrain?.train_base?.train_name);
+    devLog("Second Cheapest Return Train:", response.secondCheapestReturnTrain?.train_base?.train_no, response.secondCheapestReturnTrain?.train_base?.train_name);
 
     return { ...response, __fromCache: false };
   } catch (error) {

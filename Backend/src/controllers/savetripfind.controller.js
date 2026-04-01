@@ -1,15 +1,18 @@
 import { SavedTrip } from "../models/savedtrip.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { enrichSavedTripsWithFareJobs } from "../utils/savedTripFareEnrich.js";
 
 // GET all saved trips
 const getSavedTrips = asyncHandler(async (req, res) => {
-  const trips = await SavedTrip.find({ userId: req.user._id }).sort({ createdAt: -1 });
-// console.log(trips);
+  const trips = await SavedTrip.find({ userId: req.user._id })
+    .sort({ createdAt: -1 })
+    .lean();
+  const data = await enrichSavedTripsWithFareJobs(trips);
 
   res.status(200).json({
     success: true,
-    count: trips.length,
-    data: trips
+    count: data.length,
+    data,
   });
 });
 const deletedtrips = asyncHandler(async (req, res) => {

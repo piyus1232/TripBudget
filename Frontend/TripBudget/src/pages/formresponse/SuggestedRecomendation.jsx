@@ -5,10 +5,11 @@ import { apiUrl } from '../../conf/api.js';
 import Card from '../../components/utils/Card';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { imgCache, getCached, setCached, preload } from '../../../src/components/utils/imageCache.js';
+import { USD_TO_INR } from '../../config/currency.js';
 
-function SuggestedRecommendation() {
+function SuggestedRecommendation({ planData }) {
   const location = useLocation();
-  const { data } = location.state || {};
+  const data = planData ?? location.state?.data;
   const navigate = useNavigate();
 
   const hotels = data?.hotels?.hotels || [];
@@ -146,7 +147,7 @@ function SuggestedRecommendation() {
                 </div>
 
                 <p className="text-green-400 text-sm font-medium tabular-nums">
-                  ₹{Math.round(parseFloat(hotel.price) * 87.68)}
+                  ₹{Math.round(parseFloat(hotel.price) * USD_TO_INR)}
                   <span className="text-gray-400"> per night</span>
                 </p>
 

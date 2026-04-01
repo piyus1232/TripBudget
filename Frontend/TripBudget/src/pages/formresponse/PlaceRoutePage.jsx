@@ -151,16 +151,22 @@ export default function PlaceRoutePage() {
   };
 
   const getHotelCoords = (h) => {
-    const lat = Number(h?.latitude);
-    const lng = Number(h?.longitude);
-    if (!Number.isNaN(lat) && !Number.isNaN(lng)) return [lat, lng];
+    if (!h) return null;
+    const lat = Number(
+      h.latitude ?? h.lat ?? h.location?.latitude ?? h.location?.lat
+    );
+    const lng = Number(
+      h.longitude ?? h.lng ?? h.location?.longitude ?? h.location?.lng
+    );
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
     return null;
   };
 
   const getPlaceCoords = (p) => {
-    const lat = Number(p?.location?.lat);
-    const lng = Number(p?.location?.lng);
-    if (!Number.isNaN(lat) && !Number.isNaN(lng)) return [lat, lng];
+    if (!p) return null;
+    const lat = Number(p?.location?.lat ?? p?.lat);
+    const lng = Number(p?.location?.lng ?? p?.location?.lon ?? p?.lng);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
     return null;
   };
 
@@ -218,14 +224,28 @@ export default function PlaceRoutePage() {
       if (!hotel || !placeName) return;
       setLoading(true);
       try {
-        const body = { hotel: hotel.name, place: placeName, city: destination, mode };
+        let preciseFrom = getHotelCoords(hotel);
+        if (!preciseFrom && hotel?.name && destination) {
+          const q = [hotel.name, hotel.address, destination].filter(Boolean).join(", ");
+          preciseFrom = await geocodeAddress(q);
+        }
+        const preciseTo = getPlaceCoords(placeFromState);
+
+        const body = {
+          hotel: hotel.name,
+          place: placeName,
+          city: destination,
+          mode,
+          hotelLat: preciseFrom?.[0],
+          hotelLng: preciseFrom?.[1],
+          placeLat: preciseTo?.[0],
+          placeLng: preciseTo?.[1],
+        };
         const { data } = await axios.post(apiUrl("/api/v2/transport"), body, {
           withCredentials: true,
         });
         setRoute(data);
         if (data?.from && data?.to) {
-          const preciseFrom = getHotelCoords(hotel);
-          const preciseTo = getPlaceCoords(placeFromState);
           loadMapRoute(data.from, data.to, preciseFrom, preciseTo);
         } else {
           setMapRoute([]);
@@ -244,7 +264,7 @@ export default function PlaceRoutePage() {
       }
     };
     fetchRoute();
-  }, [hotel, placeName, mode, destination]);
+  }, [hotel, placeName, mode, destination, placeFromState?.placeid]);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-[#171221] to-[#171221] text-white flex flex-col">

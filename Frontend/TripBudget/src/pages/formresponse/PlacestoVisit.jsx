@@ -4,15 +4,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../../conf/api.js';
 import { getCached, setCached, preload } from '../../components/utils/imageCache.js';
+import { placeFallbackUrl } from '../../config/placeImageFallback.js';
 
-/** Always loads — never triggers onError loops */
-const PLACEHOLDER =
-  'data:image/svg+xml,' +
-  encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect fill="#252038" width="400" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#64748b" font-size="12" font-family="system-ui">Loading…</text></svg>'
-  );
-
-/** Only if batch fails entirely */
+/** If batch fails completely */
 const STOCK_LANDSCAPE =
   'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80';
 
@@ -47,10 +41,10 @@ export function HotelPickerModal({ open, hotels, onClose, onSelect }) {
   );
 }
 
-function PlacestoVisit() {
+function PlacestoVisit({ planData }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { data } = location.state || {};
+  const data = planData ?? location.state?.data;
   const destination = data?.destination;
   const places = data?.places?.places || [];
   const hotels = data?.hotels?.hotels || [];
@@ -204,13 +198,14 @@ function PlacestoVisit() {
         )}
       </div>
       <p className="text-gray-500 text-xs ml-6 mb-3">
-        Photos from Wikipedia when available; otherwise a stock scene.
+        Stock photos show right away; Wikipedia thumbnails replace them when found.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-1">
         {places.length ? (
           places.map((place, index) => {
             const id = rowKey(place);
-            const src = placeImages[id] || PLACEHOLDER;
+            const src =
+              placeImages[id] || placeFallbackUrl(place.placeid, place.name);
             return (
               <Card
                 key={`place-${index}-${id}`}

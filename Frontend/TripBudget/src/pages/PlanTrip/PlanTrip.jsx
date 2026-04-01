@@ -1,15 +1,25 @@
-import React, {  useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import SideBar from '../../components/SideBar/SideBar';
-import { motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from "react-toastify";
 import axios from 'axios';
 import { apiUrl } from '../../conf/api.js';
 import Button from '../../components/utils/Button';
 import TypingText from '../../framermotion/TypingText';
-import { Verified } from 'lucide-react';
+const PLAN_STAGES = [
+  'Mapping routes and train options…',
+  'Finding stays that fit your budget…',
+  'Loading places and local highlights…',
+  'Crunching your trip estimate…',
+];
+
+function formatElapsed(totalSec) {
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
 
 function PlanTrip() {
   const location = useLocation();
@@ -26,6 +36,7 @@ function PlanTrip() {
   const [transport, setTransport] = useState('');
   const [accommodation, setAccommodation] = useState('');
   const [loading, setLoading] = useState(false);
+  const [planElapsedSec, setPlanElapsedSec] = useState(0);
   const[load,setload]= useState(true)
   const [user,setUser] =useState(null)
   const navigate = useNavigate(); 
@@ -40,6 +51,30 @@ function PlanTrip() {
       });
     }
   }, [location.state, location.key, reset, getValues]);
+
+  useEffect(() => {
+    if (!loading) {
+      setPlanElapsedSec(0);
+      return undefined;
+    }
+    setPlanElapsedSec(0);
+    const id = setInterval(() => {
+      setPlanElapsedSec((n) => n + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [loading]);
+
+  const planStageIndex = Math.min(
+    PLAN_STAGES.length - 1,
+    Math.floor(planElapsedSec / 3)
+  );
+  const planStageText = PLAN_STAGES[planStageIndex];
+  /** Eases toward ~94% so it never looks “stuck at 100%” before navigation */
+  const planProgressPct = useMemo(
+    () => Math.min(94, 6 + planElapsedSec * 2.2),
+    [planElapsedSec]
+  );
+
 const onSubmit = async (data) => {
   // ✅ Validation for empty fields
   if (!data.source || !data.destination || !data.startDate || !data.returnDate || !transport || !accommodation) {
@@ -72,17 +107,24 @@ const onSubmit = async (data) => {
       travelers,
       transport,
       accommodation,
+      /** Fast first response: train list + hotels/places; fares load in background */
+      asyncFares: true,
     };
 
     const res = await axios.post(
       apiUrl("/api/v1/users/train"),
       finalData,
-      { withCredentials: true }
+      {
+        withCredentials: true,
+        /** Train lists + hotels are fast; large timeout for slow hotel/place APIs */
+        timeout: 120000,
+      }
     );
 
     navigate('/response', {
       state: {
         data: res.data.data,
+        fareJobId: res.data.data?.fareJobId,
         cacheStatus: res.headers['x-cache-status'],
         originalInputs: {
           source: data.source,
@@ -95,7 +137,17 @@ const onSubmit = async (data) => {
 
   } catch (error) {
     console.error("Error in trip submission:", error);
-    toast.error("Something went wrong while planning the trip.");
+    const code = error?.code;
+    const status = error?.response?.status;
+    if (code === "ECONNABORTED" || error?.message?.includes("timeout")) {
+      toast.error("Request timed out. Train fares can take 1–2 minutes on first load — try again or pick a different date.");
+    } else if (status >= 500) {
+      toast.error("Server error while planning. Please try again in a moment.");
+    } else if (status === 401) {
+      toast.error("Session expired. Please log in again.");
+    } else {
+      toast.error(error?.response?.data?.message || "Something went wrong while planning the trip.");
+    }
   } finally {
     setLoading(false);
   }
@@ -153,11 +205,80 @@ useEffect(() => {
 
   return (
     <div className="relative min-h-screen min-w-0 overflow-x-hidden w-screen max-w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]">
+      <AnimatePresence>
+        {loading ? (
+          <Motion.div
+            key="plan-overlay"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6"
+          >
+            <div className="absolute inset-0 bg-[#0f0d18]/85 backdrop-blur-md" />
+            <Motion.div
+              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#1a1728]/95 p-6 sm:p-8 shadow-2xl shadow-teal-900/20"
+            >
+              <div className="flex items-start gap-4">
+                <div className="relative mt-0.5 h-12 w-12 shrink-0">
+                  <div className="absolute inset-0 rounded-full border-2 border-teal-500/25" />
+                  <Motion.div
+                    className="absolute inset-0 rounded-full border-2 border-transparent border-t-teal-400 border-r-cyan-400/80"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-lg font-semibold text-white tracking-tight">
+                    Building your trip
+                  </p>
+                  <Motion.p
+                    key={planStageText}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="mt-1 text-sm text-gray-400 leading-snug"
+                  >
+                    {planStageText}
+                  </Motion.p>
+                  <p className="mt-3 text-xs text-gray-500">
+                    Train fares may finish on the next screen — you can browse the plan right away.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-2">
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>Elapsed</span>
+                  <span className="font-mono tabular-nums text-teal-300/90">
+                    {formatElapsed(planElapsedSec)}
+                  </span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-white/5 ring-1 ring-white/10">
+                  <Motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-teal-600 via-cyan-500 to-emerald-400"
+                    initial={{ width: '0%' }}
+                    animate={{ width: `${planProgressPct}%` }}
+                    transition={{ duration: 0.45, ease: 'easeOut' }}
+                  />
+                </div>
+              </div>
+            </Motion.div>
+          </Motion.div>
+        ) : null}
+      </AnimatePresence>
+
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#2e2a47,#1c1b2e)] bg-cover" />
       <SideBar />
       {/* w-full + large ml overflows the row; use explicit width = parent minus sidebar so mx-auto centers in the real column */}
       <main className="box-border min-w-0 pt-14 pb-8 sm:pt-8 ml-0 w-full sm:ml-[260px] sm:w-[calc(100%-260px)] md:ml-[280px] md:w-[calc(100%-280px)] lg:ml-[300px] lg:w-[calc(100%-300px)] px-4 sm:px-8 flex justify-center">
-        <motion.form
+        <Motion.form
           onSubmit={handleSubmit(onSubmit)}
           className="relative bg-[#191726]/90 text-white rounded-3xl p-4 sm:p-8 shadow-lg w-full max-w-4xl shrink-0 border border-purple-800/30 
                      before:absolute before:inset-0 before:rounded-3xl before:border before:border-purple-500/20 
@@ -306,6 +427,9 @@ useEffect(() => {
 
          { user?.verified ?  (
          <div className="pt-4">
+            <p className="text-xs text-gray-500 mb-2 text-center">
+              We load your route and stays first; train fares fill in on the next screen (usually under a minute).
+            </p>
             <Button
               type="submit"
               disabled={loading}
@@ -317,11 +441,25 @@ useEffect(() => {
           </div>
   )
  :
- <Button disabled className="text-r-500 text-sm mt-2 w-full  font-bold py-2.5 rounded-md shadow-md shadow-green-500/30 transition ">🔒 Verify to Unlock</Button>
+ <div className="pt-4 space-y-3">
+   <p className="text-xs text-center text-gray-400 leading-relaxed px-1">
+     Tap to verify email and unlock trip planning.
+   </p>
+   <Button
+     type="button"
+     className="text-sm w-full font-bold py-2.5 rounded-md shadow-md shadow-amber-500/25 transition bg-gradient-to-r from-amber-500 to-orange-500 text-black"
+     onClick={() => navigate("/account?section=verify")}
+   >
+     Tap to verify email
+   </Button>
+   <p className="text-xs text-center text-gray-500">
+     Opens Account — send the link, then check your inbox.
+   </p>
+ </div>
 }
             
 
-        </motion.form>
+        </Motion.form>
       </main>
     </div>
   );

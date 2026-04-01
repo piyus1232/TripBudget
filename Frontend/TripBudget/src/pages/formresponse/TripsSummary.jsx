@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Card from '../../components/utils/Card';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   getUnsplashAccessKey,
   CITY_HERO_FALLBACK_IMAGE,
 } from '../../conf/api.js';
 
-function TripsSummary() {
+function TripsSummary({ planData }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-GB', {
@@ -17,8 +17,25 @@ function TripsSummary() {
   };
 
   const location = useLocation();
-  const { data } = location.state || {};
-  const { source, destination, startDate, returnDate,totalfare,travelers } = data;
+  const navigate = useNavigate();
+  const data = planData ?? location.state?.data;
+
+  if (!data) {
+    return (
+      <div className="ml-0 sm:ml-4 md:ml-10 mb-10 rounded-2xl bg-[#1f1a2e] border border-white/10 p-6 max-w-lg">
+        <p className="text-gray-300 mb-4">No trip plan loaded. This page needs data from &quot;Plan my trip&quot; (or refresh cleared it).</p>
+        <button
+          type="button"
+          onClick={() => navigate('/plantrip')}
+          className="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-500"
+        >
+          Plan a trip
+        </button>
+      </div>
+    );
+  }
+
+  const { destination, startDate, returnDate, totalfare, travelers, farePending } = data;
   const fstartDate = formatDate(startDate);
   const freturnDate = formatDate(returnDate);
 
@@ -69,6 +86,9 @@ function TripsSummary() {
         <p className="text-gray-400 mb-1">{`${fstartDate} - ${freturnDate}`}</p>
                 <p className="text-gray-400 mb-1">{` ${travelers} people`}</p>
         <p className="text-lg font-semibold text-green-400">₹{Math.round(totalfare)}</p>
+        {farePending ? (
+          <p className="text-xs text-amber-400/90 mt-1">Estimate — train fares still loading</p>
+        ) : null}
       </div>
 
       {/* Right: City Image from Unsplash */}

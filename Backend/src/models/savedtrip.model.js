@@ -60,6 +60,9 @@ const hotelSchema = new mongoose.Schema({
   photoURL: String,
   starRating: Number,
   address: String,
+  /** Priceline / plan response — required for accurate maps & routes on saved trips */
+  latitude: Number,
+  longitude: Number,
   amenities: [String],
   foodOptions: [foodOptionSchema]   // 👈 new field
 }, { _id: false });
@@ -116,7 +119,10 @@ const savedTripSchema = new mongoose.Schema({
   travelers:Number,
   places: placesSchema,
   placeCount: Number,
-  coordinates: placeLocationSchema
+  coordinates: placeLocationSchema,
+  /** Background fare scrape for async train prices — merged on read (and when job completes). */
+  fareJobId: { type: mongoose.Schema.Types.ObjectId, ref: "FareJob" },
+  classCodes: [{ type: String }],
 }, { timestamps: true });
 
 savedTripSchema.index({ userId: 1, planKey: 1 });

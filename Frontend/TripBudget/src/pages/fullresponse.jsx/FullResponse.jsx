@@ -1,37 +1,308 @@
-import React from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SideBar from "../../components/SideBar/SideBar";
-import { useParams,useNavigate } from "react-router-dom";
-import { useState,useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Card from "../../components/utils/Card";
 import axios from "axios";
-import { getUnsplashAccessKey, CITY_HERO_FALLBACK_IMAGE } from "../../conf/api.js";
+import { getUnsplashAccessKey, CITY_HERO_FALLBACK_IMAGE, apiUrl } from "../../conf/api.js";
 import { HotelPickerModal } from "../formresponse/PlacestoVisit";
+import { USD_TO_INR } from "../../config/currency.js";
+import {
+  poolHotelImageUrl,
+  ensureHotelImageUrl,
+  isUsableRemoteImageUrl,
+} from "../../config/hotelImageFallback.js";
+import { getCached, setCached, preload } from "../../components/utils/imageCache.js";
+import { placeFallbackUrl } from "../../config/placeImageFallback.js";
 
-/** HTTPS so it always loads; ./hotel.avif breaks on routes like /full-trip/:id */
-const SAVED_HOTEL_FALLBACK =
-  "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
 const SAVED_PLACE_FALLBACK =
   "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80";
+
+function hotelRowKey(hotel) {
+  return hotel?.id != null ? String(hotel.id) : String(hotel?.name || "").trim() || "x";
+}
+
+function SavedTripHotelCard({ hotel, navigate, imageSrc }) {
+  const [expanded, setExpanded] = React.useState(false);
+  const perHotelFallback = poolHotelImageUrl(hotel.id ?? hotel.name, hotel.name);
+  const hotelSrc = ensureHotelImageUrl(imageSrc, hotel.id ?? hotel.name, hotel.name);
+
+  return (
+    <div className="p-0 flex flex-col overflow-hidden bg-[#1f1a2e] hover:shadow-xl transition-all rounded-lg">
+      <div className="w-full h-40 bg-[#252038]">
+        <img
+          src={hotelSrc}
+          alt={hotel.name}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            const alt = poolHotelImageUrl(
+              `${hotel.id ?? hotel.name}:err`,
+              hotel.name
+            );
+            e.currentTarget.src = alt !== hotelSrc ? alt : perHotelFallback;
+          }}
+        />
+      </div>
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="text-white text-lg font-semibold mb-1">{hotel.name}</h3>
+        <p className="text-gray-400 text-sm mb-1">{hotel.hoteltype}</p>
+        <p className="text-green-400 text-sm font-medium">
+          ₹{hotel.price ? Math.round(parseFloat(hotel.price) * USD_TO_INR) : "N/A"}{" "}
+          <span className="text-gray-400">per night</span>
+        </p>
+        <p className="text-gray-300 text-sm mt-2 mb-4">
+          <span className="inline-block">
+            📍 {expanded ? hotel.address : hotel.address?.slice(0, 30)}
+          </span>
+          {hotel.address?.length > 30 && (
+            <button
+              type="button"
+              className="ml-1 text-teal-400 hover:underline text-xs"
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? "Show less" : "Read more"}
+            </button>
+          )}
+        </p>
+        <button
+          type="button"
+          className="mt-auto w-full py-3 px-4 bg-gradient-to-r from-teal-500 via-blue-600 to-indigo-700 
+                     text-white font-semibold rounded-xl shadow-md 
+                     hover:shadow-xl hover:scale-105 transition-all text-xs"
+          onClick={() =>
+            navigate(`/hotelsavedfood/${hotel.id}`, {
+              state: { hotel },
+            })
+          }
+        >
+          View Hotel & Nearby Food
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function FullResponse() {
   const location = useLocation();
   const { trip } = location.state || {};
-  const { id } = useParams();
   const [cityImage, setCityImage] = useState(CITY_HERO_FALLBACK_IMAGE);
   const navigate = useNavigate();
 
   const hotelsList = trip?.hotels?.hotels || [];
+  const placesList = useMemo(
+    () => (Array.isArray(trip?.places?.places) ? trip.places.places : []),
+    [trip?.places?.places]
+  );
   const destinationName = trip?.destination || "";
   const [activeHotel, setActiveHotel] = useState(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pendingPlace, setPendingPlace] = useState(null);
+  const [placeImages, setPlaceImages] = useState({});
+  const [hotelImages, setHotelImages] = useState({});
+  const placeImagesDoneRef = useRef(null);
+
+  const hotelsStableKey = useMemo(
+    () => hotelsList.map((h) => hotelRowKey(h)).join("|"),
+    [hotelsList]
+  );
+
+  const stablePlacesKey = useMemo(
+    () =>
+      `${destinationName}|${placesList
+        .map((p) => `${p.placeid || ""}:${(p.name || "").trim()}`)
+        .join(";")}`,
+    [destinationName, placesList]
+  );
+
+  const rowKeyPlace = (place) =>
+    String(place.placeid || (place.name || "").trim().toLowerCase());
 
   useEffect(() => {
     setActiveHotel(hotelsList[0] || null);
     setPendingPlace(null);
     setPickerOpen(false);
+    placeImagesDoneRef.current = null;
+    setPlaceImages({});
+    setHotelImages({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when saved trip identity changes; hotel list is derived from trip
   }, [trip?._id]);
+
+  /** Match SuggestedRecomendation: /api/hotel-image per hotel so cards are not one shared stock photo. */
+  useEffect(() => {
+    if (!hotelsList.length || !destinationName) return;
+    let cancelled = false;
+    const defaultImage = "/hotel.avif";
+
+    const run = async () => {
+      const updates = {};
+      const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      for (const hotel of hotelsList) {
+        if (cancelled) break;
+        const rowKey = hotelRowKey(hotel);
+        const cacheKey = `${destinationName}:${hotel.id}`;
+
+        let cached = getCached("hotel", cacheKey);
+        const isGeneric =
+          !cached ||
+          cached === defaultImage ||
+          cached.endsWith("/hotel.avif") ||
+          cached.endsWith("hotel.avif") ||
+          !isUsableRemoteImageUrl(cached);
+
+        if (cached && !isGeneric && isUsableRemoteImageUrl(cached)) {
+          const fixed = ensureHotelImageUrl(cached, hotel.id, hotel.name);
+          updates[rowKey] = fixed;
+          preload(fixed);
+          await delay(40);
+          continue;
+        }
+
+        const pu = hotel.photoURL;
+        if (
+          pu &&
+          isUsableRemoteImageUrl(pu) &&
+          !String(pu).includes("/place/photo")
+        ) {
+          const fixed = ensureHotelImageUrl(pu, hotel.id, hotel.name);
+          setCached("hotel", cacheKey, fixed);
+          preload(fixed);
+          updates[rowKey] = fixed;
+          await delay(40);
+          continue;
+        }
+
+        try {
+          const res = await axios.post(
+            apiUrl("/api/hotel-image"),
+            {
+              name: hotel.name,
+              hotelId: hotel.id,
+              city: destinationName,
+            },
+            { withCredentials: true }
+          );
+          const raw =
+            res.data?.image && typeof res.data.image === "string"
+              ? res.data.image
+              : "";
+          const url = ensureHotelImageUrl(
+            raw,
+            hotel.id ?? hotel.name,
+            hotel.name
+          );
+          setCached("hotel", cacheKey, url);
+          preload(url);
+          updates[rowKey] = url;
+        } catch {
+          updates[rowKey] = poolHotelImageUrl(hotel.id ?? hotel.name, hotel.name);
+        }
+        await delay(100);
+      }
+
+      if (!cancelled && Object.keys(updates).length) {
+        setHotelImages((prev) => ({ ...prev, ...updates }));
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [destinationName, hotelsStableKey, trip?._id]);
+
+  const savedHotelDisplaySrc = (hotel) => {
+    const key = hotelRowKey(hotel);
+    if (hotelImages[key]) {
+      return ensureHotelImageUrl(hotelImages[key], hotel.id, hotel.name);
+    }
+    const u = hotel.photoURL;
+    if (u && isUsableRemoteImageUrl(u) && !String(u).includes("/place/photo")) {
+      return ensureHotelImageUrl(u, hotel.id, hotel.name);
+    }
+    return poolHotelImageUrl(hotel.id ?? hotel.name, hotel.name);
+  };
+
+  /** Same source as live plan response: /api/places-images-batch (saved DB rows rarely have usable photoURL). */
+  useEffect(() => {
+    if (!placesList.length || !destinationName) return;
+    if (placeImagesDoneRef.current === stablePlacesKey) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      const updates = {};
+      for (const p of placesList) {
+        const id = rowKeyPlace(p);
+        const cacheKey = `${destinationName}:${p.placeid || id}`;
+        const cached = getCached("place", cacheKey);
+        if (cached && cached.startsWith("http")) {
+          updates[id] = cached;
+        }
+      }
+
+      const allCached = placesList.every((p) => {
+        const id = rowKeyPlace(p);
+        return Boolean(updates[id]);
+      });
+      if (allCached) {
+        if (!cancelled) {
+          setPlaceImages(updates);
+          placeImagesDoneRef.current = stablePlacesKey;
+        }
+        return;
+      }
+
+      try {
+        const res = await axios.post(
+          apiUrl("/api/places-images-batch"),
+          {
+            city: destinationName,
+            places: placesList.map((p) => ({
+              name: p.name,
+              placeid: p.placeid,
+              lat: p.location?.lat,
+              lng: p.location?.lng,
+            })),
+          },
+          { withCredentials: true }
+        );
+
+        if (cancelled) return;
+
+        const map = res.data?.images || {};
+        for (const p of placesList) {
+          const id = rowKeyPlace(p);
+          if (updates[id]) continue;
+          const url = map[id] || map[p.placeid] || map[String(p.placeid)];
+          const final =
+            url && String(url).startsWith("http") ? url : SAVED_PLACE_FALLBACK;
+          updates[id] = final;
+          setCached("place", `${destinationName}:${p.placeid || id}`, final);
+          preload(final);
+        }
+      } catch {
+        if (cancelled) return;
+        for (const p of placesList) {
+          const id = rowKeyPlace(p);
+          if (!updates[id]) updates[id] = SAVED_PLACE_FALLBACK;
+        }
+      }
+
+      if (cancelled) return;
+      setPlaceImages(updates);
+      placeImagesDoneRef.current = stablePlacesKey;
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [stablePlacesKey, destinationName]);
 
   const goPlaceRoutes = (place, hotel) => {
     navigate(`/place/${encodeURIComponent(place.placeid || place.name)}`, {
@@ -107,6 +378,25 @@ function FullResponse() {
     }
   }, [trip?.destination]);
 
+  if (!trip) {
+    return (
+      <div className="min-h-screen bg-[#171221] text-white flex flex-col sm:flex-row w-full max-w-[100vw] min-w-0">
+        <SideBar />
+        <div className="flex-1 min-w-0 pt-24 sm:pt-8 ml-0 sm:ml-[280px] px-6">
+          <p className="text-gray-300 mb-4">No trip data loaded. Open this page from Saved Trips or plan a new trip.</p>
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard")}
+            className="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-500"
+          >
+            Back to dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const fareClass = trip?.classCodes?.[0] || "SL";
 
   return (
     <div className="min-h-screen bg-[#171221] text-white flex flex-col sm:flex-row w-full max-w-[100vw] min-w-0">
@@ -148,7 +438,9 @@ function FullResponse() {
   <h2 className="text-2xl font-semibold text-white border-l-4 border-teal-400 pl-3 mb-6">
     Top Train Recommendations
   </h2>
-
+  <p className="text-gray-500 text-xs mb-4 ml-0 sm:ml-1">
+    Fares shown for class <span className="text-gray-400 font-medium">{fareClass}</span> (general).
+  </p>
 
   {(() => {
     // --- Helper to convert "09.25" to "09:25 AM" ---
@@ -220,7 +512,7 @@ function FullResponse() {
                     {`${formatRailwayTime(train?.train_base?.from_time)} - ${formatRailwayTime(train?.train_base?.to_time)}`}
                   </td>
                   <td className="px-6 py-4 text-cyan-400 font-medium">
-                    ₹{train?.fare?.fare?.totalFare?.general?.SL || 'N/A'}
+                    ₹{train?.fare?.fare?.totalFare?.general?.[fareClass] ?? 'N/A'}
                   </td>
                   <td className="px-6 py-4">
                     {calculateDuration(train?.train_base?.from_time, train?.train_base?.to_time)}
@@ -255,7 +547,7 @@ function FullResponse() {
                     {`${formatRailwayTime(train?.train_base?.from_time)} - ${formatRailwayTime(train?.train_base?.to_time)}`}
                   </td>
                   <td className="px-6 py-4 text-cyan-400 font-medium">
-                    ₹{train?.fare?.fare?.totalFare?.general?.SL || 'N/A'}
+                    ₹{train?.fare?.fare?.totalFare?.general?.[fareClass] ?? 'N/A'}
                   </td>
                   <td className="px-6 py-4">
                     {calculateDuration(train?.train_base?.from_time, train?.train_base?.to_time)}
@@ -280,76 +572,14 @@ function FullResponse() {
 
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-0 sm:ml-3 md:ml-7">
     {trip?.hotels?.hotels?.length > 0 ? (
-      trip.hotels.hotels.map((hotel, index) => {
-        const [expanded, setExpanded] = React.useState(false);
-        const hotelSrc =
-          hotel.photoURL &&
-          String(hotel.photoURL).startsWith("http") &&
-          !String(hotel.photoURL).includes("/place/photo")
-            ? hotel.photoURL
-            : SAVED_HOTEL_FALLBACK;
-
-        return (
-          <div
-            key={index}
-            className="p-0 flex flex-col overflow-hidden bg-[#1f1a2e] hover:shadow-xl transition-all rounded-lg"
-          >
-            {/* Hotel Image — Google Place URLs often 403 after save; onError → stock */}
-            <div className="w-full h-40 bg-[#252038]">
-              <img
-                src={hotelSrc}
-                alt={hotel.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = SAVED_HOTEL_FALLBACK;
-                }}
-              />
-            </div>
-
-            {/* Hotel Info */}
-            <div className="p-5 flex flex-col flex-1">
-              <h3 className="text-white text-lg font-semibold mb-1">
-                {hotel.name}
-              </h3>
-              <p className="text-gray-400 text-sm mb-1">{hotel.hoteltype}</p>
-              <p className="text-green-400 text-sm font-medium">
-                ₹{hotel.price ? Math.round(parseFloat(hotel.price) * 87.68) : "N/A"}{" "}
-                <span className="text-gray-400">per night</span>
-              </p>
-
-              {/* Address with Read More */}
-              <p className="text-gray-300 text-sm mt-2 mb-4">
-                <span className="inline-block">
-                  📍 {expanded ? hotel.address : hotel.address?.slice(0, 30)}
-                </span>
-                {hotel.address?.length > 30 && (
-                  <button
-                    className="ml-1 text-teal-400 hover:underline text-xs"
-                    onClick={() => setExpanded(!expanded)}
-                  >
-                    {expanded ? "Show less" : "Read more"}
-                  </button>
-                )}
-              </p>
-
-              {/* ✅ New Button */}
-              <button
-                className="mt-auto w-full py-3 px-4 bg-gradient-to-r from-teal-500 via-blue-600 to-indigo-700 
-                           text-white font-semibold rounded-xl shadow-md 
-                           hover:shadow-xl hover:scale-105 transition-all text-xs"
-                onClick={() =>
-                  navigate(`/hotelsavedfood/${hotel.id}`, {
-                    state: { hotel },
-                  })
-                }
-              >
-                View Hotel & Nearby Food
-              </button>
-            </div>
-          </div>
-        );
-      })
+      trip.hotels.hotels.map((hotel, index) => (
+        <SavedTripHotelCard
+          key={hotel.id != null ? `hotel-${hotel.id}` : `hotel-${index}`}
+          hotel={hotel}
+          navigate={navigate}
+          imageSrc={savedHotelDisplaySrc(hotel)}
+        />
+      ))
     ) : (
       <p className="text-white ml-0 sm:ml-4 md:ml-10">No hotel recommendations found.</p>
     )}
@@ -387,24 +617,32 @@ function FullResponse() {
   </div>
   <p className="text-gray-500 text-xs ml-0 sm:ml-3 md:ml-6 mb-3">
     Open a place for hotel → place distance, steps, and map (same as when you first planned).
+    Stock photos show immediately; Wikipedia thumbnails load in the background.
   </p>
 
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-1">
     {trip?.places?.places?.length > 0 ? (
       trip.places.places.map((place, index) => {
+        const pk = rowKeyPlace(place);
+        const src =
+          placeImages[pk] ||
+          (place.photoURL &&
+          isUsableRemoteImageUrl(place.photoURL) &&
+          !String(place.photoURL).includes("/place/photo")
+            ? place.photoURL
+            : placeFallbackUrl(place.placeid, place.name));
         return (
           <div
             key={`saved-place-${index}-${place.placeid || place.name || "x"}`}
             className="p-5 flex flex-col items-start bg-[#1f1a2e] hover:shadow-xl transition-all ml-2 rounded-lg"
           >
             <img
-              src={
-                place.photoURL && String(place.photoURL).startsWith("http")
-                  ? place.photoURL
-                  : SAVED_PLACE_FALLBACK
-              }
+              src={src}
               alt={place.name}
-              className="mb-4 w-full h-36 object-cover rounded-md"
+              className="mb-4 w-full h-36 object-cover rounded-md bg-[#252038]"
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
               onError={(e) => {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = SAVED_PLACE_FALLBACK;

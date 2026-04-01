@@ -7,11 +7,22 @@ import transportrouter from './src/routes/transport.routes.js';
 // import verifyrouter from './src/routes/verifyemail.js';
 
 const app = express();
-const corsOrigins = process.env.CORS_ORIGIN?.trim();
-app.use(cors({
-  origin: "https://tripbudget.in",
-  credentials: true,
-}));
+const corsEnv = process.env.CORS_ORIGIN?.trim();
+const defaultOrigins = ['http://localhost:5173', 'https://tripbudget.in'];
+const allowedOrigins = corsEnv
+  ? corsEnv.split(',').map((o) => o.trim()).filter(Boolean)
+  : defaultOrigins;
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(null, false);
+    },
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true }));

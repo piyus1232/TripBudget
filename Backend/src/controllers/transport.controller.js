@@ -23,17 +23,30 @@ async function geocodeNominatim(queries) {
   return null;
 }
 
-async function osrmFallbackRoute(origin, destination, hotel, place, city) {
+function toCoord(lat, lng) {
+  const a = Number(lat);
+  const b = Number(lng);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+  return { lat: a, lon: b };
+}
+
+async function osrmFallbackRoute(origin, destination, hotel, place, city, fromCoord, toCoordHint) {
   const cityOnly = city ? `${city}` : "";
   const placeOnly = place ? `${place}, ${city}` : destination;
   const hotelOnly = hotel ? `${hotel}, ${city}` : origin;
   const trimmedHotel = hotel ? hotel.split(",")[0].trim() : "";
   const trimmedPlace = place ? place.split(",")[0].trim() : "";
 
-  const [from, to] = await Promise.all([
-    geocodeNominatim([origin, hotelOnly, `${trimmedHotel}, ${cityOnly}`, cityOnly]),
-    geocodeNominatim([destination, placeOnly, `${trimmedPlace}, ${cityOnly}`, cityOnly]),
+  const [fromGeo, toGeo] = await Promise.all([
+    fromCoord
+      ? Promise.resolve({ ...fromCoord, label: hotelOnly || origin })
+      : geocodeNominatim([origin, hotelOnly, `${trimmedHotel}, ${cityOnly}`, cityOnly]),
+    toCoordHint
+      ? Promise.resolve({ ...toCoordHint, label: placeOnly || destination })
+      : geocodeNominatim([destination, placeOnly, `${trimmedPlace}, ${cityOnly}`, cityOnly]),
   ]);
+  const from = fromGeo;
+  const to = toGeo;
   if (!from || !to) throw new Error("Fallback geocoding failed");
 
   const url = `https://router.project-osrm.org/route/v1/driving/${from.lon},${from.lat};${to.lon},${to.lat}?overview=false&steps=true`;
@@ -68,8 +81,17 @@ async function osrmFallbackRoute(origin, destination, hotel, place, city) {
 
 export const getTransitRoute = async (req, res) => {
   try {
-    const { hotel, place, city, mode = "transit" } = req.body;
-    console.log("[transport] incoming request", { hotel, place, city, mode });
+    const {
+      hotel,
+      place,
+      city,
+      mode = "transit",
+      hotelLat,
+      hotelLng,
+      placeLat,
+      placeLng,
+    } = req.body;
+    console.log("[transport] incoming request", { hotel, place, city, mode, hotelLat, hotelLng, placeLat, placeLng });
 
     if (!hotel || !place || !city) {
       return res.status(400).json({
@@ -77,8 +99,34 @@ export const getTransitRoute = async (req, res) => {
       });
     }
 
-    const origin = `${hotel}, ${city}`;
-    const destination = `${place}, ${city}`;
+    const fromCoord = toCoord(hotelLat, hotelLng);
+    const toCoordResolved = toCoord(placeLat, placeLng);
+    const origin = fromCoord ? `${fromCoord.lat},${fromCoord.lon}` : `${hotel}, ${city}`;
+    const destination = toCoordResolved ? `${toCoordResolved.lat},${toCoordResolved.lon}` : `${place}, ${city}`;
+
+    /** When both ends are known, OSRM is accurate and avoids RapidAPI quota (429) on Directions. */
+    const skipRapidForCoords =
+      process.env.TRANSPORT_SKIP_RAPID_WHEN_COORDS !== "0" && fromCoord && toCoordResolved;
+    if (skipRapidForCoords) {
+      try {
+        const direct = await osrmFallbackRoute(
+          origin,
+          destination,
+          hotel,
+          place,
+          city,
+          fromCoord,
+          toCoordResolved
+        );
+        direct.source = "osrm-coords";
+        direct.note =
+          "Road route between hotel and place coordinates. Set TRANSPORT_SKIP_RAPID_WHEN_COORDS=0 to try Google Directions (transit) via RapidAPI.";
+        return res.json(direct);
+      } catch (e) {
+        console.warn("[transport] OSRM with coords failed, trying RapidAPI:", e.message);
+      }
+    }
+
     const key = googlePlacesRapidApiKey();
     if (!key) {
       console.error("[transport] missing GOOGLE_PLACES_RAPIDAPI_KEY or RAPIDAPI_KEY");
@@ -146,7 +194,15 @@ export const getTransitRoute = async (req, res) => {
     if (!data?.routes?.length) {
       console.error("[transport] all RapidAPI modes failed; trying OSRM fallback", lastDebug);
       try {
-        const fallback = await osrmFallbackRoute(origin, destination, hotel, place, city);
+        const fallback = await osrmFallbackRoute(
+          origin,
+          destination,
+          hotel,
+          place,
+          city,
+          fromCoord,
+          toCoordResolved
+        );
         console.log("[transport] fallback success", {
           from: fallback.from,
           to: fallback.to,

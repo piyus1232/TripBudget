@@ -17,6 +17,7 @@ import {
   getSavedTrips,
   deleteAllTrips,
 } from "../controllers/savetripfind.controller.js";
+import { createFareJob, getFareJob } from "../controllers/fareJob.controller.js";
 
 // import { getNearbyFoodOptions } from "../controllers/hotel.controller.js";
 
@@ -34,6 +35,8 @@ router.route("/updateProfile").post(
   updateProfile 
 );
 router.route("/train").post(verifyJWT,finalcontroller);
+router.route("/fare-job").post(verifyJWT, createFareJob);
+router.route("/fare-job/:id").get(verifyJWT, getFareJob);
 router.route("/hotel").post(getNearbyHotels);
 router.route("/bus").post(getBusData);
 // router.route("/places").post(getPlacesController);

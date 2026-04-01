@@ -311,6 +311,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
       // Create verification link
 // ✅ Correct — send user to frontend page, which then calls the API
 const link = `https://tripbudget.in/api/v1/users/${tokenValue}`;
+// const link = `http://localhost:5000/api/v1/users/${tokenValue}`;
 await sendEmail({
   email: user.email,
   subject: "Email Verification",

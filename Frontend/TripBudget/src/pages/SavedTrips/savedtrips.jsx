@@ -118,6 +118,11 @@ function SavedTrips() {
     return trips.filter((trip) => tripSearchBlob(trip).includes(q));
   }, [trips, searchQuery]);
 
+  const formatTotalFare = (tf) => {
+    const n = Number(tf);
+    return Number.isFinite(n) ? Math.round(n) : '—';
+  };
+
   const exportPDF = (trip) => {
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -164,7 +169,7 @@ function SavedTrips() {
     yOffset += 10;
     doc.text(`Return Date: ${trip.returnDate}`, 10, yOffset);
     yOffset += 10;
-    doc.text(`Total Fare: ${trip.totalfare}`, 10, yOffset);
+    doc.text(`Total Fare: ${formatTotalFare(trip.totalfare)}`, 10, yOffset);
 
     doc.save(`${trip.destination}-trip.pdf`);
   };
@@ -379,7 +384,7 @@ function SavedTrips() {
                       </p>
                       <p className="flex items-center gap-1">
                         <FaRupeeSign className="text-yellow-400 text-lg" />{' '}
-                        {Math.round(trip.totalfare)}
+                        {formatTotalFare(trip.totalfare)}
                       </p>
                       <p className="flex items-center gap-1">
                         <FaUsers className="text-blue-400 text-lg" />{' '}

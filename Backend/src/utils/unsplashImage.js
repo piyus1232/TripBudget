@@ -170,3 +170,6 @@ export async function fetchUnsplashRestaurantImage(foodName, city, foodid) {
     return poolFoodUrl(foodid, foodName);
   }
 }
+
+/** Stable HTTPS fallbacks for controllers (never use relative `/hotel.avif` on the API response). */
+export { poolHotelUrl, poolFoodUrl };

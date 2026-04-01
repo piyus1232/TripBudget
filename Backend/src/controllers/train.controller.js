@@ -25,6 +25,33 @@ const overrideLower = Object.fromEntries(
 
 const prettify = new Prettify();
 
+const isProd = process.env.NODE_ENV === 'production';
+const devLog = (...args) => {
+  if (!isProd) console.log(...args);
+};
+
+/** Same as fareJobProcessor — optional CHROME_PATH; omit to let Puppeteer resolve Chrome/Chromium. */
+function getPuppeteerLaunchOptions() {
+  const launchOpts = {
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--no-zygote',
+      '--disable-extensions',
+      '--disable-background-networking',
+      '--disable-default-apps',
+      '--mute-audio',
+    ],
+    timeout: 120000,
+  };
+  const chrome = process.env.CHROME_PATH || process.env.PUPPETEER_EXECUTABLE_PATH;
+  if (chrome) launchOpts.executablePath = chrome;
+  return launchOpts;
+}
+
 // ✅ FIX 1: Register StealthPlugin ONCE at module level — never inside a function
 puppeteer.use(StealthPlugin());
 
@@ -86,7 +113,7 @@ async function extractFareData($, classCode) {
         .map((i, el) => $(el).text().trim())
         .get()
         .slice(1);
-      console.log(`Headers in ${panelSelector}:`, headers);
+      devLog(`Headers in ${panelSelector}:`, headers);
 
       if (headers.length < 1) return;
 
@@ -107,7 +134,7 @@ async function extractFareData($, classCode) {
               fares[headers[index]] = fare || '-';
             }
           });
-          console.log(`Extracted fare for ${type}:`, fares);
+          devLog(`Extracted fare for ${type}:`, fares);
           if (Object.keys(fares).length > 0) fareObject[type] = fares;
         }
       });
@@ -140,7 +167,7 @@ function findPotentialFares($) {
               cols.slice(1).forEach((fare, index) => {
                 if (index < headers.length) fares[headers[index]] = fare || '-';
               });
-              console.log(`Fallback fare for ${key}:`, fares);
+              devLog(`Fallback fare for ${key}:`, fares);
               if ($table.closest('.panel-success').length) {
                 result.totalFare[key] = fares;
               } else if ($table.closest('.panel-warning').length) {
@@ -163,7 +190,7 @@ function findPotentialFares($) {
 async function fetchFareViaHttp(trainNo, from, to, classCode = null) {
   try {
     const url = `https://erail.in/train-fare/${trainNo}?from=${from}&to=${to}`;
-    console.log(`Fetching HTTP fare for trainNo=${trainNo}, from=${from}, to=${to}, url=${url}`);
+    devLog(`Fetching HTTP fare for trainNo=${trainNo}, from=${from}, to=${to}, url=${url}`);
 
     const response = await fetch(url, {
       method: 'GET',
@@ -197,7 +224,7 @@ async function fetchFareViaHttp(trainNo, from, to, classCode = null) {
       metadata: { sourceUrl: url, scrapedAt: new Date().toISOString() },
     };
   } catch (error) {
-    console.log(`HTTP fetch failed for trainNo=${trainNo}: ${error.message}`);
+    devLog(`HTTP fetch failed for trainNo=${trainNo}: ${error.message}`);
     return null;
   }
 }
@@ -213,14 +240,14 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
 
   // ✅ FIX 2: Guard — if browser wasn't launched, skip gracefully
   if (!browser) {
-    console.log(`[SKIP] No browser available for Puppeteer fare fetch of ${trainNo}`);
+    devLog(`[SKIP] No browser available for Puppeteer fare fetch of ${trainNo}`);
     return { success: false, fare: null, metadata: { error: 'No browser available' } };
   }
 
   // ✅ FIX 3: Declare page before try so the catch block can safely reference it
   let page;
   try {
-    console.log(`Fetching fare via Puppeteer for trainNo=${trainNo}, from=${from}, to=${to}, classCode=${classCode || 'none'}`);
+    devLog(`Fetching fare via Puppeteer for trainNo=${trainNo}, from=${from}, to=${to}, classCode=${classCode || 'none'}`);
 
     const URL_PATTERNS = [
       `https://erail.in/train-fare/${trainNo}?from=${from}&to=${to}`,
@@ -246,12 +273,12 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
 
     for (const url of URL_PATTERNS) {
       try {
-        console.log(`Trying URL: ${url}`);
+        devLog(`Trying URL: ${url}`);
         await page.goto(url, { waitUntil: 'networkidle0', timeout: 15000 });
 
         const fareTables = await page.$$('.panel-success .tableSingleFare, .panel-warning .tableSingleFare');
         if (fareTables.length > 0) {
-          console.log(`Found ${fareTables.length} fare tables on ${url}`);
+          devLog(`Found ${fareTables.length} fare tables on ${url}`);
           finalHtml = await page.content();
           lastUrl = page.url();
           break;
@@ -259,7 +286,7 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
 
         const formExists = await page.$('#form1');
         if (formExists) {
-          console.log(`Submitting form with from=${from}, to=${to}`);
+          devLog(`Submitting form with from=${from}, to=${to}`);
           await page.evaluate((from, to) => {
             document.querySelector('select[name="from"]').value = from;
             document.querySelector('select[name="to"]').value = to;
@@ -271,31 +298,30 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
           }, from, to);
 
           await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }).catch(() => {
-            console.log('No navigation occurred, continuing with current page');
+            devLog('No navigation occurred, continuing with current page');
           });
 
           await page.waitForSelector(
             '.panel-success .tableSingleFare tbody tr td, .panel-warning .tableSingleFare tbody tr td',
             { timeout: 15000 }
-          ).catch(() => console.log('Fare selector timeout, continuing'));
+          ).catch(() => devLog('Fare selector timeout, continuing'));
 
           await delay(2000);
         } else {
-          console.log(`Form #form1 not found on ${url}, checking for fare tables`);
+          devLog(`Form #form1 not found on ${url}, checking for fare tables`);
         }
 
         finalHtml = await page.content();
         lastUrl = page.url();
-        console.log('HTML fetched, length:', finalHtml.length);
-        console.log('Final URL after navigation:', lastUrl);
+        devLog('HTML fetched, length:', finalHtml.length);
+        devLog('Final URL after navigation:', lastUrl);
 
-        // ✅ FIX 4: Only write debug files outside production
-        if (process.env.NODE_ENV !== 'production') {
+        if (process.env.DEBUG_SCRAPE === '1') {
           fs.writeFileSync(`debug_${trainNo}_${from}_${to}.html`, finalHtml);
         }
         break;
       } catch (err) {
-        console.log(`Attempt failed for ${url}: ${err.message}`);
+        devLog(`Attempt failed for ${url}: ${err.message}`);
         continue;
       }
     }
@@ -352,7 +378,15 @@ async function addFare(trainNo, from, to, classCode = null, browser) {
 const getRoundTripTrains = async (req) => {
   let browser = null;
   try {
-    const { source, destination, startDate, returnDate, classCode = 'SL', forceRefresh = false } = req.body;
+    const {
+      source,
+      destination,
+      startDate,
+      returnDate,
+      classCode = 'SL',
+      forceRefresh = false,
+      skipFareFetch = false,
+    } = req.body;
 
     if (!source || !destination || !startDate || !returnDate) {
       throw new ApiError(400, 'All fields are required');
@@ -373,12 +407,12 @@ const getRoundTripTrains = async (req) => {
         overrideLower[destKey.toLowerCase?.()];
 
       if (!Array.isArray(candidates) || candidates.length === 0) {
-        console.log('[NEAREST-FALLBACK] No override for', JSON.stringify(destKey),
+        devLog('[NEAREST-FALLBACK] No override for', JSON.stringify(destKey),
           'Available keys:', Object.keys(overrideMap));
         throw err;
       }
       toCode = candidates[0];
-      console.log(`[NEAREST-FALLBACK] Using nearest-station for "${destKey}": ${toCode}`);
+      devLog(`[NEAREST-FALLBACK] Using nearest-station for "${destKey}": ${toCode}`);
     }
 
     // Normalize dates
@@ -388,34 +422,15 @@ const getRoundTripTrains = async (req) => {
     const startDay = getDay(startDate);
     const returnDay = getDay(returnDate);
 
-    console.log('Normalized Start Date:', normalizedStartDate);
-    console.log('Normalized Return Date:', normalizedReturnDate);
-    console.log('Is Same Day:', isSameDay);
-    console.log(`Start day: ${startDay}, Return day: ${returnDay}`);
+    devLog('Normalized Start Date:', normalizedStartDate);
+    devLog('Normalized Return Date:', normalizedReturnDate);
+    devLog('Is Same Day:', isSameDay);
+    devLog(`Start day: ${startDay}, Return day: ${returnDay}`);
 
-    // ✅ FIX 1: StealthPlugin already registered at top — do NOT call puppeteer.use() here
-    // ✅ FIX 6: Use system Chrome binary + Lightsail-safe launch args
-    browser = await puppeteer.launch({
-      headless: true,
-      executablePath: '/usr/bin/google-chrome-stable',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-zygote',
-        '--disable-extensions',
-        '--disable-background-networking',
-        '--disable-default-apps',
-        '--mute-audio',
-      ],
-      timeout: 120000,
-    });
-
-    // Fetch train lists in parallel (no browser needed here)
+    // Fetch train lists in parallel (HTTP only — browser is only for fare scrape below)
     const fetchTrainData = async (from, to) => {
       const URL_Trains = `https://erail.in/rail/getTrains.aspx?Station_From=${from}&Station_To=${to}&DataSource=0&Language=0&Cache=false`;
-      console.log(`Fetching train data for ${from} to ${to}, URL: ${URL_Trains}`);
+      devLog(`Fetching train data for ${from} to ${to}, URL: ${URL_Trains}`);
       const response = await fetch(URL_Trains, {
         method: 'GET',
         headers: { 'User-Agent': new UserAgent().toString() },
@@ -434,8 +449,8 @@ const getRoundTripTrains = async (req) => {
     const outTrains = Array.isArray(outTrainData?.data) ? outTrainData.data : [];
     const returnTrains = Array.isArray(returnTrainData?.data) ? returnTrainData.data : [];
 
-    console.log('Out Trains:', outTrains.length);
-    console.log('Return Trains:', returnTrains.length);
+    devLog('Out Trains:', outTrains.length);
+    devLog('Return Trains:', returnTrains.length);
 
     // Filter by running day
     const filteredOutTrains = outTrains
@@ -465,7 +480,7 @@ const getRoundTripTrains = async (req) => {
         outTimes.some((outTime) => isValidReturnTimeGap(outTime, t.train_base.from_time))
       );
       if (gapFiltered.length === 0) {
-        console.log('No return trains in 6-7 hr gap; using all available return trains');
+        devLog('No return trains in 6-7 hr gap; using all available return trains');
         filteredReturnTrainsUnique = filteredReturnTrainsUnique.slice(0, 5);
       } else {
         filteredReturnTrainsUnique = gapFiltered;
@@ -474,26 +489,48 @@ const getRoundTripTrains = async (req) => {
       filteredReturnTrainsUnique = filteredReturnTrainsUnique.slice(0, 5);
     }
 
-    console.log('Filtered Outbound Trains:', filteredOutTrains.map((t) => ({
+    devLog('Filtered Outbound Trains:', filteredOutTrains.map((t) => ({
       train_no: t.train_base?.train_no,
       train_name: t.train_base?.train_name,
       normalized_name: normalizeTrainName(t.train_base?.train_name),
     })));
-    console.log('Filtered Return Trains:', filteredReturnTrainsUnique.map((t) => ({
+    devLog('Filtered Return Trains:', filteredReturnTrainsUnique.map((t) => ({
       train_no: t.train_base?.train_no,
       train_name: t.train_base?.train_name,
       normalized_name: normalizeTrainName(t.train_base?.train_name),
     })));
+
+    const pendingFare = { status: 'pending', success: false };
+
+    if (skipFareFetch) {
+      const outTrainsWithFares = filteredOutTrains
+        .slice(0, 3)
+        .map((t) => ({ ...t, fare: pendingFare }));
+      const returnTrainsWithFares = filteredReturnTrainsUnique
+        .slice(0, 3)
+        .map((t) => ({ ...t, fare: pendingFare }));
+      return {
+        success: true,
+        filteredOutTrains: outTrainsWithFares,
+        filteredReturnTrains: returnTrainsWithFares,
+        isSameDay,
+        fromCode,
+        toCode,
+        skipFareFetch: true,
+      };
+    }
+
+    browser = await puppeteer.launch(getPuppeteerLaunchOptions());
 
     // ✅ FIX 7: Sequential fare fetching instead of Promise.all — prevents browser overload
     const outTrainsWithFares = [];
     for (const train of filteredOutTrains.slice(0, 3)) {
       try {
         const fareData = await addFare(train.train_base?.train_no, fromCode, toCode, classCode, browser);
-        console.log(`Fare for outbound train ${train.train_base?.train_no}:`, fareData?.fare);
+        devLog(`Fare for outbound train ${train.train_base?.train_no}:`, fareData?.fare);
         outTrainsWithFares.push({ ...train, fare: fareData });
       } catch (err) {
-        console.log(`Outbound fare error [${train.train_base?.train_no}]:`, err.message);
+        devLog(`Outbound fare error [${train.train_base?.train_no}]:`, err.message);
         outTrainsWithFares.push({ ...train, fare: null });
       }
       await delay(800);
@@ -503,10 +540,10 @@ const getRoundTripTrains = async (req) => {
     for (const train of filteredReturnTrainsUnique.slice(0, 3)) {
       try {
         const fareData = await addFare(train.train_base?.train_no, toCode, fromCode, classCode, browser);
-        console.log(`Fare for return train ${train.train_base?.train_no}:`, fareData?.fare);
+        devLog(`Fare for return train ${train.train_base?.train_no}:`, fareData?.fare);
         returnTrainsWithFares.push({ ...train, fare: fareData });
       } catch (err) {
-        console.log(`Return fare error [${train.train_base?.train_no}]:`, err.message);
+        devLog(`Return fare error [${train.train_base?.train_no}]:`, err.message);
         returnTrainsWithFares.push({ ...train, fare: null });
       }
       await delay(800);
@@ -517,6 +554,9 @@ const getRoundTripTrains = async (req) => {
       filteredOutTrains: outTrainsWithFares,
       filteredReturnTrains: returnTrainsWithFares,
       isSameDay,
+      fromCode,
+      toCode,
+      skipFareFetch: false,
     };
 
   } catch (error) {
@@ -524,8 +564,8 @@ const getRoundTripTrains = async (req) => {
     throw error;
   } finally {
     // ✅ FIX 8: Safe browser close — catches errors so finally never throws
-    if (browser) await browser.close().catch((e) => console.log('Browser close error:', e.message));
+    if (browser) await browser.close().catch((e) => devLog('Browser close error:', e.message));
   }
 };
 
-export { getRoundTripTrains };
+export { getRoundTripTrains, addFare };

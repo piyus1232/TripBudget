@@ -31,8 +31,10 @@ node_modules
 # **/dist/
 # **/build/
 
-# Ignore environment files
-# *.env
+# Environment files (never commit API keys)
+.env
+.env.*
+!.env.example
 
 # Ignore log files
 *.log

@@ -32,19 +32,23 @@ function calculateDuration(startStr, endStr) {
   return `${diffHrs}h ${diffMins}m`;
 }
 
-function TrainRecommendation() {
+function TrainRecommendation({ planData }) {
   const location = useLocation();
-  const { data } = location.state || {};
+  const data = planData ?? location.state?.data;
+
+  if (!data) {
+    return null;
+  }
 
   const {
-    destination,
-    startDate,
-    returnDate,
     cheapestOutTrain,
     secondCheapestOutTrain,
     cheapestReturnTrain,
     secondCheapestReturnTrain,
-  } = data || {};
+    classCodes,
+  } = data;
+
+  const fareClass = classCodes?.[0] || 'SL';
 
   // Filter out null/undefined trains
   const outboundTrains = [cheapestOutTrain, secondCheapestOutTrain].filter(Boolean);
@@ -55,6 +59,12 @@ function TrainRecommendation() {
       <h2 className="text-2xl font-semibold text-white border-l-4 border-teal-400 pl-3 mb-6">
         Top Train Recommendations
       </h2>
+      <p className="text-gray-500 text-xs mb-4">
+        Fares for class <span className="text-gray-400 font-medium">{fareClass}</span> (general).
+        {data.farePending ? (
+          <span className="text-amber-400/90 ml-2">Updating…</span>
+        ) : null}
+      </p>
 
       {/* 🚆 Outbound Trains */}
       <h3 className="text-xl font-semibold text-white mb-2">🚆 Outbound Trains (To Destination)</h3>
@@ -78,7 +88,9 @@ function TrainRecommendation() {
                   {`${formatRailwayTime(train.train_base.from_time)} - ${formatRailwayTime(train.train_base.to_time)}`}
                 </td>
                 <td className="px-6 py-4 text-cyan-400 font-medium">
-                  ₹{train?.fare?.fare?.totalFare?.general?.SL || 'N/A'}
+                  {train?.fare?.status === 'pending'
+                    ? '…'
+                    : `₹${train?.fare?.fare?.totalFare?.general?.[fareClass] ?? 'N/A'}`}
                 </td>
                 <td className="px-6 py-4">
                   {calculateDuration(train.train_base.from_time, train.train_base.to_time)}
@@ -111,7 +123,9 @@ function TrainRecommendation() {
                   {`${formatRailwayTime(train.train_base.from_time)} - ${formatRailwayTime(train.train_base.to_time)}`}
                 </td>
                 <td className="px-6 py-4 text-cyan-400 font-medium">
-                  ₹{train?.fare?.fare?.totalFare?.general?.SL || 'N/A'}
+                  {train?.fare?.status === 'pending'
+                    ? '…'
+                    : `₹${train?.fare?.fare?.totalFare?.general?.[fareClass] ?? 'N/A'}`}
                 </td>
                 <td className="px-6 py-4">
                   {calculateDuration(train.train_base.from_time, train.train_base.to_time)}
